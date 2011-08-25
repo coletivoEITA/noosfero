@@ -7917,6 +7917,73 @@ msgstr "Feed RSS"
 msgid "No description informed."
 msgstr "Nenhuma descrição informada."
 
+#: plugins/former/models/former_plugin_form_field.rb:-
+msgid "former plugin form field"
+msgstr ""
+
+#: plugins/former/models/former_plugin_form_field.rb:-
+#, fuzzy
+msgid "Entity type"
+msgstr "Tipo de conteúdo"
+
+#: plugins/former/models/former_plugin_field.rb:-
+msgid "former plugin field"
+msgstr ""
+
+#: plugins/former/models/former_plugin_field.rb:-
+msgid "Form field"
+msgstr "Campo de formulário"
+
+#: plugins/former/models/former_plugin_option.rb:-
+msgid "former plugin option"
+msgstr ""
+
+#: plugins/former/models/former_plugin_value.rb:-
+msgid "former plugin value"
+msgstr ""
+
+#: plugins/former/models/former_plugin_value.rb:-
+msgid "Instance"
+msgstr "Instância"
+
+#: plugins/former/models/former_plugin_value.rb:-
+msgid "Value"
+msgstr "Valor"
+
+#: plugins/former/controllers/former_plugin_admin_controller.rb:12
+#: plugins/former/controllers/former_plugin_admin_controller.rb:65
+msgid "Fields were saved."
+msgstr "Os campos foram salvos."
+
+#: plugins/former/lib/former_plugin.rb:8
+msgid "Build form fields easily"
+msgstr "Crie campos de formulário facilmente"
+
+#: plugins/former/lib/former_plugin.rb:12
+#: plugins/former/views/former_plugin_admin/index.html.erb:1
+msgid "Manage form fields"
+msgstr "Manutenção de cadastro"
+
+#: plugins/former/lib/former_plugin.rb:87
+msgid "BSC form"
+msgstr "Cadastro de BSC"
+
+#: plugins/former/lib/former_plugin.rb:88
+msgid "Buyer form"
+msgstr "Cadastro de comprador"
+
+#: plugins/former/lib/former_plugin.rb:89
+msgid "Learning form"
+msgstr "Cadastro de saberes"
+
+#: plugins/former/lib/former_plugin.rb:90
+msgid "Contract form"
+msgstr "Cadastro de contrato"
+
+#: plugins/former/lib/former_plugin.rb:91
+msgid "Feedback form"
+msgstr "Cadastro de feedback"
+
 #: lib/zen3_terminology.rb:8
 msgid "My ePortfolio"
 msgstr "Meu ePortfolio"

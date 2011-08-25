@@ -40,6 +40,7 @@ function field_add(parent,form, id, name, options , required) {
 
 function new_field(id, options , name, clear_id , required)
 {
+    
     var form_field = jQuery('<form/>', {
         'id': id,
         'method' : 'post',
@@ -62,9 +63,12 @@ function new_field(id, options , name, clear_id , required)
                             data: jQuery(this).serialize(),
                             beforeSend: function(){
                                       jQuery( '#' + gsub_value(id) + 'options_status').addClass("small-loading");
+                                      jQuery( '#' + gsub_value(id) + 'options_status').text('')
 			    },
                             complete : function(response){
                                       jQuery( '#' + gsub_value(id) + 'options_status').removeClass("small-loading");
+                                      var save_response = jQuery.parseJSON(response.responseText);
+                                      jQuery( '#' + gsub_value(id) + 'options_status').text(save_response.status_msg);
                             }
 
                           });
@@ -148,6 +152,7 @@ function new_field(id, options , name, clear_id , required)
 //Add new option in a field div
 function field_new_option(field, name, value, clear_id) {
 
+
   var btn_div = jQuery('<div/>');
   var field_clean = gsub_value(field);
 
@@ -170,11 +175,13 @@ function field_new_option(field, name, value, clear_id) {
                 
                 jQuery(btn_add).attr("disabled", true);
                 jQuery(status_id).addClass("small-loading");
-
+                jQuery(status_id).text('');
+                
             },
             complete : function(response, object){
 
                 var new_field_option = jQuery.parseJSON(response.responseText);
+
                 var new_option = jQuery(field_option(field + '[' + new_field_option.option_id + ']', '', clear_id));
                 jQuery(object_field).before(new_option);
                 new_option.children('input').focus();
@@ -273,6 +280,10 @@ function field_option(name, value, clear_id) {
 function gsub_value(id)
 {
     return id.replace(/[^a-zA-Z 0-9]+/g,'_');
+}
+
+function escape_selector(selector) {
+  return selector.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
 }
 
 jQuery(document).ready(function(){
