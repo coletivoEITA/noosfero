@@ -88,6 +88,18 @@ class Noosfero::Plugin
     nil
   end
 
+  # Here the developer should specify the events to which the plugins can
+  # register to. Must be explicitly defined its returning
+  # variables.
+
+  # -> Adds buttons to the control panel
+  # returns = { :body => title, :url => url }
+  #   body  = name that will be displayed.
+  #   url   = url or route to which the button will redirect.
+  def admin_panel_links
+    nil
+  end
+
   # -> Adds tabs to the profile
   # returns   = { :title => title, :id => id, :content => content, :start => start }
   #   title   = name that will be displayed.
@@ -141,3 +153,5 @@ class Noosfero::Plugin
   end
 
 end
+
+

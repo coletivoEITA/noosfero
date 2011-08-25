@@ -7,6 +7,6 @@ class FormerValueTest < ActiveSupport::TestCase
 
   should 'fill a value of a field' do
     v = FormerValue.create!(:field => @fl, :instance_id => 5, :value => 'blah')
-    @fl.values[0].value == 'blah'
+    assert @fl.values[0].value == 'blah'
   end
 end
