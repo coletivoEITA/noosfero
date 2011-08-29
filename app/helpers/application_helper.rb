@@ -270,18 +270,21 @@ module ApplicationHelper
     end
 
     VIEW_EXTENSIONS.each do |ext|
-      return name if File.exists?(File.join(view_path, params[:controller], search_name+ext))
+       return name if File.exists?(File.join(view_path, params[:controller], search_name+ext))
     end
 
-    partial_for_class_in_view_path(klass.superclass, view_path)
+    return nil
   end
 
   def partial_for_class(klass)
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
-    name = klass.name.underscore
-    @controller.view_paths.each do |view_path|
-      partial = partial_for_class_in_view_path(klass, view_path)
-      return partial if partial
+
+    while(klass != nil)do
+      @controller.view_paths.each do |view_path|
+       partial = partial_for_class_in_view_path(klass, view_path)
+       return partial if partial
+      end
+      klass = klass.superclass
     end
 
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?'

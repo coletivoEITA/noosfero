@@ -140,4 +140,10 @@ class Noosfero::Plugin
     raw_content
   end
 
+   # -> Adds content to selection article types
+   def article_types
+     nil
+   end
+
+
 end

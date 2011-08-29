@@ -46,6 +46,7 @@ class CmsController < MyProfileController
     ]
     articles += special_article_types if params && params[:cms]
     parent_id = params ? params[:parent_id] : nil
+    
     if profile.enterprise?
       articles << EnterpriseHomepage
     end
@@ -59,7 +60,16 @@ class CmsController < MyProfileController
   end
 
   def special_article_types
-    [Folder, Blog, UploadedFile, Forum, Gallery, RssFeed]
+    article_types = [Folder, Blog, UploadedFile, Forum, Gallery, RssFeed]
+    plugin_articles = @plugins.map(:article_types)
+
+    for article in plugin_articles
+        article_types << article[:type]
+        append_view_path article[:view_path]
+    end
+
+    article_types
+
   end
 
   def view
@@ -93,6 +103,12 @@ class CmsController < MyProfileController
     @type = params[:type] || @article.class.to_s
     translations if @article.translatable?
     continue = params[:continue]
+
+    plugin_articles = @plugins.map(:article_types)
+
+    for article in plugin_articles
+        append_view_path article[:view_path]
+    end
 
     refuse_blocks
     record_coming

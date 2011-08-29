@@ -8573,6 +8573,15 @@ msgstr "Tem certeza que quer excluir este projeto?"
 msgid "Register a new project"
 msgstr "Registrar um novo projeto"
 
+#: plugins/cms_link/views/cms/_cms_link_plugin_link.rb:8
+msgid "New Favorite Link"
+msgstr "Novo Link Favorito"
+
+
+#: plugins/cms_link/views/cms/_cms_link_plugin_link.rb:8
+msgid "Copy and paste the link you want to share"
+msgstr "Copie e cole o link que deseja compartilhar"
+
 #: config/initializers/action_tracker.rb:8
 msgid "published 1 article: %{title}"
 msgid_plural "published %{num} articles: %{title}"
@@ -9325,3 +9334,4 @@ msgstr ""
 
 #~ msgid "Go back to the control panel."
 #~ msgstr "Voltar ao painel de controle"
+

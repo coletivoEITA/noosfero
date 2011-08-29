@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110728173905) do
+ActiveRecord::Schema.define(:version => 20110818060046) do
 
   create_table "action_tracker", :force => true do |t|
     t.integer  "user_id"
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.integer "profile_id"
   end
 
+  add_index "action_tracker_notifications", ["action_tracker_id", "profile_id"], :name => "index_action_tracker_notifications_on_profile_id_and_action_tra", :unique => true
   add_index "action_tracker_notifications", ["action_tracker_id"], :name => "index_action_tracker_notifications_on_action_tracker_id"
-  add_index "action_tracker_notifications", ["profile_id", "action_tracker_id"], :name => "index_action_tracker_notifications_on_profile_id_and_action_trac", :unique => true
   add_index "action_tracker_notifications", ["profile_id"], :name => "index_action_tracker_notifications_on_profile_id"
 
   create_table "article_versions", :force => true do |t|
@@ -165,6 +165,8 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.boolean "display_in_menu", :default => false
     t.integer "children_count",  :default => 0
     t.boolean "accept_products", :default => true
+    t.string  "acronym"
+    t.string  "abbreviation"
     t.integer "image_id"
   end
 
@@ -313,16 +315,21 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.datetime "updated_at"
   end
 
-  create_table "product_categorizations", :force => true do |t|
-    t.integer  "category_id"
-    t.integer  "product_id"
-    t.boolean  "virtual",     :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "national_region_types", :force => true do |t|
+    t.string "name"
   end
 
-  add_index "product_categorizations", ["category_id"], :name => "index_product_categorizations_on_category_id"
-  add_index "product_categorizations", ["product_id"], :name => "index_product_categorizations_on_product_id"
+  create_table "national_regions", :force => true do |t|
+    t.string   "name"
+    t.string   "national_region_code"
+    t.string   "parent_national_region_code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "national_region_type_id",     :null => false
+  end
+
+  add_index "national_regions", ["name"], :name => "name_index"
+  add_index "national_regions", ["national_region_code"], :name => "code_index"
 
   create_table "product_qualifiers", :force => true do |t|
     t.integer  "product_id"
@@ -356,7 +363,7 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.string   "type"
     t.string   "identifier"
     t.integer  "environment_id"
-    t.boolean  "active",                            :default => true
+    t.boolean  "active",                             :default => true
     t.string   "address"
     t.string   "contact_phone"
     t.integer  "home_page_id"
@@ -367,17 +374,22 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.float    "lat"
     t.float    "lng"
     t.integer  "geocode_precision"
-    t.boolean  "enabled",                           :default => true
-    t.string   "nickname",            :limit => 16
+    t.boolean  "enabled",                            :default => true
+    t.string   "nickname",             :limit => 16
     t.text     "custom_header"
     t.text     "custom_footer"
     t.string   "theme"
-    t.boolean  "public_profile",                    :default => true
+    t.boolean  "public_profile",                     :default => true
     t.date     "birth_date"
     t.integer  "preferred_domain_id"
     t.datetime "updated_at"
-    t.boolean  "visible",                           :default => true
+    t.boolean  "visible",                            :default => true
+    t.string   "national_region_code"
     t.integer  "image_id"
+    t.string   "cnpj"
+    t.boolean  "validated",                          :default => true
+    t.integer  "bsc_id"
+    t.string   "company_name"
   end
 
   add_index "profiles", ["environment_id"], :name => "index_profiles_on_environment_id"
@@ -457,6 +469,7 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.datetime "created_at"
     t.string   "target_type"
     t.integer  "image_id"
+    t.integer  "bsc_id"
   end
 
   create_table "thumbnails", :force => true do |t|

@@ -1,0 +1,10 @@
+<h1><%= _('New Favorite Link') %></h1>
+
+<%= required_fields_message %>
+
+<%= required f.text_field('name', :size => '64') %>
+
+<%= labelled_form_field(_('Description:'), text_area(:article, :body, :rows => 5, :cols => 68)) %>
+
+<%= required labelled_form_field(_('Link:') , text_field(:article, :external_link, :size => '64')) %>
+<small><%= _('Copy and paste the link you want to share') %></small>

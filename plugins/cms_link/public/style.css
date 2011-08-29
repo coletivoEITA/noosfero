@@ -1,0 +1,33 @@
+.content-shared-link {
+background: #E8F5FB;
+padding: 10px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+-o-border-radius: 5px;
+-khtml-border-radius: 5px;
+border-radius: 5px;
+margin: 5px 0;
+border: 1px solid #0194C8;
+
+}
+.content-shared-link .title {
+  margin: 0 0  5px 0;
+  font-weight: bold;
+}
+.content-shared-link .link {
+  margin: 0 0  5px 0;
+}
+.content-shared-link .link-description {
+  margin: 0 0  5px 0;
+}
+
+.icon-newlink {
+
+    background-image: url(images/emblem-symbolic-link.png );
+}
+
+.icon-link {
+
+    background-image: url(images/emblem-symbolic-link.png );
+}
+
