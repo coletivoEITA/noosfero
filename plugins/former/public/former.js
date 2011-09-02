@@ -129,7 +129,7 @@ function new_field(id, options , name, clear_id , required)
 
     form_field.append(btn_remove);
 
-    form_field.append('<span id="' + gsub_value(id) + 'remove' +'" style="margin: 0 0 0 10px; padding: 0 0 0 20px"/>');
+    form_field.append('<span id="' + gsub_value(id) + 'remove' +'" style="padding: 6px 0 0 0px; float: right; width: 24px; height: 14px;"/>');
 
     form_field.append('<span class="former-question-label former-line">'+ label_names[3] +'</span>');
 
