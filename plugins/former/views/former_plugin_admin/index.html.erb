@@ -4,7 +4,7 @@
   <ul id="list_fomers" class="ui-accordion">
     <% FormerPluginFormField.all.each do |ff| %>
     <li class="form-accordion-line">
-      <div class="title former-form-name"><%=ff.name%></div>
+      <div class="title former-form-name"><%=_(ff.name)%></div>
       <div id="form-content-<%=ff.identifier%>" class="content-form-accordion">
         <%= link_to_function _("Add field"), "field_add('#form-content-#{ff.identifier}','#{ff.identifier}', 'new', '', [] , false);"%>
         <span style="padding: 0 0 0 20px" id='<%=ff.identifier + '_status'%>'></span>
