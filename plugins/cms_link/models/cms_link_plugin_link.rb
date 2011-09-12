@@ -25,6 +25,10 @@ class CmsLinkPluginLink < Article
   def self.type_name
     _('Link')
   end
+  
+  def default_parent
+    profile.articles.find_by_name _('Links'), :conditions => {:type => 'Folder'}
+  end
 
   def to_html(options = {})
     lambda do
