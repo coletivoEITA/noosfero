@@ -1,0 +1,118 @@
+<h2> <%= _('Opportunities Sniffer') %> </h2>
+
+<div class="sniffer-plugin-sidebar">
+  <div class="sniffer-plugin-filter-needing">
+    <strong style="line-height: 250%"><%= _('Filter by Interested in') %></strong><br/>
+
+    <% array = [] %>
+    <% @needing_products.collect(&:product_category).uniq.each do |p| %>
+      <% array << {:id => p.id, :name => p.name} %>
+    <% end %>
+
+     <%= text_field_tag 'needing_products' %>
+     <% javascript_tag do %>
+       jQuery.TokenList(jQuery("#needing_products"), <%=array.to_json%>, {searchDelay: 0, permanentDropdown: true, theme: "facet", preventDuplicates: true,
+         onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
+     <% end %>
+  </div><br/>
+  <div class="sniffer-plugin-filder-using">
+    <strong style="line-height: 250%"><%= _('Filter by Offers you') %></strong><br/>
+
+    <% array = [] %>
+    <% @using_products.collect(&:product_category).uniq.each do |p| %>
+      <% array << {:id => p.id, :name => p.name} %>
+    <% end %>
+
+     <%= text_field_tag 'using_products' %>
+     <% javascript_tag do %>
+       jQuery.TokenList(jQuery("#using_products"), <%=array.to_json%>, {searchDelay: 0, permanentDropdown: true, theme: "facet", preventDuplicates: true,
+         onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
+     <% end %>
+  </div>
+  <br/>
+</div>
+<div class="sniffer-plugin-map-results">
+  <div id="map"></div>
+</div>
+<br style="clear:both"><br/>
+<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Your enterprise") %></span>
+<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/ltblue-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier") %></span>
+<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Consumer") %></span>
+<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier and Consumer") %></span>
+
+<%= content_tag('script', '', :src => GoogleMaps.api_url(environment.default_hostname), :type => 'text/javascript') %>
+<%= javascript_include_tag('google_maps') %>
+
+<script type='text/javascript'>
+  mapLoad(<%= GoogleMaps.initial_zoom.to_json %>);
+
+  var markerIndex = [];
+  var markerList = [];
+
+  var ltblueIcon = new GIcon(G_DEFAULT_ICON);
+  ltblueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/ltblue-dot.png";
+  var greenIcon = new GIcon(G_DEFAULT_ICON);
+  greenIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png";
+  var yellowIcon = new GIcon(G_DEFAULT_ICON);
+  yellowIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png";
+
+  <% @enterprises.each do |e| %>
+    <% if e.lat && e.lng %>
+      <% np = @needing_products.select{|p| p.enterprise_id == e.id} %>
+      <% up = @using_products.select{|p| p.enterprise_id == e.id} %>
+      <% np_ids = np.collect(&:id) %>
+      <% up_ids = up.collect(&:id) %>
+
+      icon = null;
+      if (<%= np.length %> > 0 && <%= up.length %> > 0)
+        icon = yellowIcon;
+      else if (<%= np.length %> > 0)
+        icon = greenIcon;
+      else 
+        icon = ltblueIcon;
+
+      marker = mapPutMarker(<%= e.lat.to_json %>, <%= e.lng.to_json %>, <%= e.name.to_json %>, icon,
+          "<%= url_for(:controller => :sniffer_plugin_myprofile, :action => :map_balloon, :eid => e.id, :np => np_ids, :up => up_ids, :escape => false) %>");
+
+      <% (np+up).each do |p| %>
+        if (markerIndex[<%= p.product_category.id %>] == undefined)
+          markerIndex[<%= p.product_category.id %>] = [];
+        markerIndex[<%= p.product_category.id %>].push(marker);
+      <% end %>
+
+      markerList.push(marker);
+      
+    <% end %>
+  <% end %>
+
+  var appliedFilters = [];
+
+  function applyFilter(id) {
+    if (appliedFilters.length == 0) {
+      jQuery.each(markerList, function(index, marker) {
+        marker.hide();
+      });
+    }
+
+    appliedFilters.push(id);
+    jQuery.each(markerIndex[id], function(index, marker) {
+      marker.show();
+    });
+  }
+
+  function unapplyFilter(id) {
+    appliedFilters.pop(id);
+    jQuery.each(markerIndex[id], function(index, marker) {
+      marker.hide();
+    });
+
+    if (appliedFilters.length == 0) {
+      jQuery.each(markerList, function(index, marker) {
+          marker.show();
+      });
+    }
+  }
+
+  marker = mapPutMarker(<%= profile.lat.to_json %>, <%= profile.lng.to_json %>, <%= profile.name.to_json %>, null, null);
+  mapCenter(marker.getLatLng());
+</script>

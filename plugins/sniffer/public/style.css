@@ -1,0 +1,21 @@
+.sniffer-plugin-sidebar {
+  float: left;
+  overflow: auto;
+  position: relative;
+  width: 25%;
+  height: 500px;
+}
+
+.sniffer-plugin-map-results {
+  float: left;
+  position: relative;
+  width: 75%;
+  height: 500px;
+}
+
+.controller-profile_editor a.control-panel-buyer-interests {
+  background-image: url(images/buyer-interests.png)
+}
+.controller-profile_editor .msie6 a.control-panel-buyer-interests {
+  background-image: url(images/buyer-interests.dif)
+}

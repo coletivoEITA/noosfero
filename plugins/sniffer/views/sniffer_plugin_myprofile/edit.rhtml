@@ -1,0 +1,24 @@
+<h1> <%= _('Buyer interests') %> </h1>
+  
+<% form_for(:sniffer, @sniffer_profile, :url => {:action => 'edit'}, :html => {:method => 'post'}) do |f| %>
+  <%= f.check_box(:enabled) %>
+  <%= f.label(:enabled, _('Enable network buyer profile'), {:onclick => 'jQuery("#"+jQuery(this).attr("for")).click(); return false;'}) %>
+  <div style="margin-left:25px"><%= _('By enabling the network buyer profile, enterprises and other network entities will be able to know your buying interests e get in contact for business') %></div>
+  <br style='clear: both'/>
+  <br style='clear: both'/>
+  
+  <div><%= _('Products and Services of Interest') %></div>
+  <%= f.text_field 'product_category_string_ids' %>
+  <% array = @sniffer_profile.product_categories.collect{|i| {:id => i.id, :name => i.name}} %>
+  <% javascript_tag do %>
+    jQuery.TokenList(jQuery("#sniffer_product_category_string_ids"), '<%= url_for(:action => 'product_categories') %>',
+      {searchDelay:150, prePopulate: <%= array.to_json %>, preventDuplicates: true, <%= jquery_token_input_messages_json %>});
+  <% end %>
+  <br style='clear: both'/>
+  <br style='clear: both'/>
+  
+  <div>
+    <%= submit_button(:save, _('Save')) %>
+    <%= button :back, _('Back to control panel'), :controller => 'profile_editor' %>
+  </div>
+<% end %>
