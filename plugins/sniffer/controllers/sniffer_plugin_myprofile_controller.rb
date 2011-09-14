@@ -1,8 +1,6 @@
 class SnifferPluginMyprofileController < MyProfileController
   append_view_path File.join(File.dirname(__FILE__) + '/../views')
 
-  no_design_blocks
-
   protect 'edit_profile', :profile
 
   before_filter :fetch_sniffer_profile, :only => [:edit, :search]
@@ -13,7 +11,10 @@ class SnifferPluginMyprofileController < MyProfileController
         @sniffer_profile.update_attributes(params[:sniffer])
         @sniffer_profile.enabled = params[:sniffer][:enabled]
         @sniffer_profile.save!
+        session[:notice] = @sniffer_profile.enabled ?
+          _('Buyer interests published') : _('Buyer interests disabled')
       rescue Exception => exception
+        flash[:error] = _('Could not save buyer interests options')
       end
       redirect_to :action => 'edit'
     end
@@ -28,6 +29,7 @@ class SnifferPluginMyprofileController < MyProfileController
   end
 
   def search
+    no_design_blocks
     if @sniffer_profile.profile.enterprise?
       @needing_products = @sniffer_profile.needing_products
       @using_products = @sniffer_profile.using_products

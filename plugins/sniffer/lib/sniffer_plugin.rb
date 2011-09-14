@@ -19,7 +19,7 @@ class SnifferPlugin < Noosfero::Plugin
   end
 
   def js_files
-    []
+    ['sniffer.js']
   end
 
 end

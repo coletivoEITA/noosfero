@@ -34,7 +34,7 @@ class SnifferPluginProfile < ActiveRecord::Base
     if !profile.enterprise?
       cat_using_products
     else
-      (profile.using_products + cat_needing_products).uniq
+      (profile.using_products + cat_using_products).uniq
     end
   end
 

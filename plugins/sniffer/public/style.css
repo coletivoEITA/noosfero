@@ -1,3 +1,11 @@
+.sniffer-edit-enable-label {
+  font-weight: bold;
+}
+.sniffer-edit-enable-help {
+  margin: 5px 0 20px 25px;
+  width: 300px;
+}
+
 .sniffer-plugin-sidebar {
   float: left;
   overflow: auto;
@@ -18,4 +26,26 @@
 }
 .controller-profile_editor .msie6 a.control-panel-buyer-interests {
   background-image: url(images/buyer-interests.dif)
+}
+
+#sniffer-plugin-disable-pane {
+  filter:alpha(opacity=06);
+  -moz-opacity:.06;
+  opacity:.06;
+  background-color: black;
+  position: absolute;
+  display: none;
+  top: 0px;
+  left: 0px;
+  z-index: 500; /* just preventing */ 
+}
+#sniffer-plugin-product-select {
+  width: 428px;
+  margin-left: 25px;
+}
+#sniffer-plugin-product-select.disabled {
+  color: #ccc;
+}
+#sniffer-plugin-product-select.disabled ul {
+  border-color: #ccc;
 }
