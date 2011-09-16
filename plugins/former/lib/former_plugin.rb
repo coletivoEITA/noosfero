@@ -66,14 +66,7 @@ module FormerPluginMethods
 
   module HasFormMethods
     def has_form(identifier, options = {})
-      f = FormerPluginFormField.find_by_identifier(identifier.to_s)
-      attr = {:identifier => identifier.to_s, :name => options[:name], :entity_type => name}
-      if f.nil?
-        f = FormerPluginFormField.create!(attr)
-      else
-        f.attributes = attr
-        f.save!
-      end
+      FormerPluginFormField.find_or_create identifier, name, options
   
       extend ClassMethods
       include InstanceMethods
@@ -89,5 +82,4 @@ if FormerPluginFormField.table_exists?
   Article.has_form :buyer_fields, :name => _('Buyer form')
   Article.has_form :learning_fields, :name => _('Learning form')
   Article.has_form :contract_fields, :name => _('Contract form')
-  Article.has_form :feedback_fields, :name => _('Feedback form')
 end

@@ -3,12 +3,13 @@ class FormerPluginAdminController < AdminController
  
   protect 'edit_environment_features', :environment
 
+  helper FormerPlugin::FieldEditHelper
+
   def index
     
   end
 
   def remove
-
     id = params[:id]
     type  = params[:type]
     
@@ -21,7 +22,6 @@ class FormerPluginAdminController < AdminController
         FormerPluginOptionField.find_by_id(id).destroy
       end
     rescue
-
       if type == 'field_option'
         status_msg = _('Option can not be deleted')
       else
@@ -30,11 +30,9 @@ class FormerPluginAdminController < AdminController
     end
     
     render :json => {:status_msg => status_msg}
-
   end
 
   def add_new_field
-
     form_identifier = params[:form_identifier]
     field_id = nil
     status_msg = _('Field was created')
@@ -50,11 +48,9 @@ class FormerPluginAdminController < AdminController
     end
 
     render :json => {:field_id => field_id, :status_msg => status_msg}
-
   end
 
   def add_new_option
-
     field_id = params[:field_id]
     status_msg = _('Option was created')
     option_id = nil
@@ -68,14 +64,14 @@ class FormerPluginAdminController < AdminController
     rescue 
       status_msg = _('Option can not be created')
     end
-    render :json => {:option_id => option_id, :status_msg => status_msg}
 
+    render :json => {:option_id => option_id, :status_msg => status_msg}
   end
 
-  def save_option
+  def save_field
 
     forms = params[:forms]
-    status_msg =  _('Fields were saved')
+    status_msg = _('Field saved')
     success = true
     begin
       
