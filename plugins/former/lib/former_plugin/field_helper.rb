@@ -12,11 +12,9 @@ module FormerPlugin::FieldHelper
   def field_widget(form, field, options = {}, html_options = {})
     ret = case field.class.name
     when 'FormerPluginOptionField'
-     	    f	= NoosferoFormBuilder::output_field( field.name,collection_select(form.object_name, field.form_method, field.options, 'id', 'name'));
-	    if(field.required)
-		    f = required(f)
-	    end
-	    f
+      f = NoosferoFormBuilder::output_field( field.name,collection_select(form.object_name, field.form_method, field.options, 'id', 'name'));
+      f = required(f) if field.required 
+      f
     when 'FormerPluginField'
       labelled_form_field(field.name, text_field(form.object_name, field.form_method)) 
     end
