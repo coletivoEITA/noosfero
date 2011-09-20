@@ -3,6 +3,7 @@ class FormerPluginField < ActiveRecord::Base
   has_many :values, :class_name => 'FormerPluginValue', :foreign_key => :field_id, :dependent => :destroy
 
   validates_presence_of :form
+  validates_uniqueness_of :identifier, :scope => ['form_field_id']
 
   def form_method
     "former_plugin_field_#{self.id.to_s}" 
