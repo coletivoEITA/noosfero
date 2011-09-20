@@ -4,17 +4,29 @@ class FormerPluginValue < ActiveRecord::Base
 
   validates_presence_of :field
 
-  before_save :option_to_value
-
+  alias_method :original_option, :option
   def option
-    (FormerPluginOption.find(option_id) || field.options.first) if option_id
+    original_option || option_from_content || option_default
   end
 
-  def option_from_value
-    option ||= self.field.options.find_by_name(self.content)
+  def option_with_content=(value)
+    self.option_without_content = value
+    option_to_content
+  end
+  alias_method_chain :option=, :content
+
+  def option_to_content
+    self.content = option ? option.name : nil
   end
 
-  def option_to_value
-    self.content = option.name if option
+  def option_from_content
+    o = self.field.options.find_by_name self.content
+    option = o if o
   end
+
+  def option_default
+    o = field.options.first
+    option = o if o
+  end
+
 end

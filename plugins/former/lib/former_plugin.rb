@@ -29,28 +29,31 @@ end
 module FormerPluginMethods
   module InstanceMethods
     def __former_plugin_value_set(field, args)
-      value = field.values.find_by_instance_id(self.id) || FormerPluginValue.new(:field => field) 
+      value = @former_plugin_values.select{ |v| v.field_id == field.id }.first
+      if value.nil?
+        value = field.values.find_by_instance_id(self.id) || FormerPluginValue.new(:field => field) 
+        @former_plugin_values << value
+      end
 
       case field.class.name
       when 'FormerPluginOptionField'
-        value.option = FormerPluginOption.find(args.to_i)
-        value.option_to_value
-        @former_plugin_values << value
+        value.option = FormerPluginOption.find_by_id args.to_i
         value.option.id
       else
         value.content = args
-        @former_plugin_values << value
-        value.content
       end
     end
 
     def __former_plugin_value_get(field)
       value = @former_plugin_values.select{ |v| v.field_id == field.id }.first
-      value ||= field.values.find_by_instance_id(self.id) || FormerPluginValue.new(:field => field) 
+      if value.nil?
+        value = field.values.find_by_instance_id(self.id) || FormerPluginValue.new(:field => field) 
+        @former_plugin_values << value
+      end
 
       case field.class.name
       when 'FormerPluginOptionField'
-        o = value.option_from_value
+        o = value.option
         o ? value.option.id : nil
       else
         value.content
