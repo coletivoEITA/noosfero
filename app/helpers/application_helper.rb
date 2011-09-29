@@ -1241,6 +1241,10 @@ module ApplicationHelper
     end
   end
 
+  def jquery_token_input_messages_json(hintText = _('Type in an keyword'), noResultsText = _('No results'), searchingText = _('Searching...'))
+    "hintText: '#{hintText}', noResultsText: '#{noResultsText}', searchingText: '#{searchingText}'"
+  end
+
   def render_dialog_error_messages(instance_name)
     render :partial => 'shared/dialog_error_messages', :locals => { :object_name => instance_name }
   end
