@@ -10,7 +10,7 @@ class SnifferPlugin < Noosfero::Plugin
 
   def control_panel_buttons
     buttons = [{ :title => _("Enable Buyer Interests"), :icon => 'buyer-interests', :url => {:controller => 'sniffer_plugin_myprofile', :action => 'edit'} }]
-    buttons.push( { :title => _("Opportunities Sniffer"), :icon => '', :url => {:controller => 'sniffer_plugin_myprofile', :action => 'search'} } ) if context.profile.enterprise?
+    buttons.push( { :title => _("Opportunities Sniffer"), :icon => 'sniff-opportunities', :url => {:controller => 'sniffer_plugin_myprofile', :action => 'search'} } ) if context.profile.enterprise?
     buttons
   end
 
