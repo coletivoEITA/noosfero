@@ -1,18 +1,26 @@
 <div id="balloon">
-  <div class='profile-info-picture'><%= profile_image(@enterprise, :minor) %></div>
-  <strong><%= link_to(@enterprise.name, url_for(@enterprise.url)) %></strong><br/>
-  <% if !@needing_products.empty? %>
-    <strong style="line-height: 250%"><%= _('Interested in') %></strong><br/>
-    <% @needing_products.each do |np| %>
-      <%= link_to_product np %>
-      <%# _('needs') %> <%# link_to_category sp.product_category %> <%# _('from your product') %><%# link_to_product sp %><br/>
+  <div class="sniffer-plugin-profile">
+    <%= profile_image @profile, :minor %>
+    <strong><%= link_to_profile @profile.name, @profile.identifier %></strong>
+  </div>
+  <div id="sniffer-plugin-suppliers-products" class="sniffer-plugin-products">
+    <% unless @suppliers_hashes.empty? %>
+      <strong><%= _('Offers you') %></strong>
+      <ul>
+        <% @suppliers_hashes.each do |h| %>
+          <li><%= render :partial => h[:partial], :locals => {:hash => h} %></li>
+        <% end %>
+      </ul>
     <% end %>
-  <% end %>
-  <% if !@using_products.empty? %>
-    <strong style="line-height: 250%"><%= _('Offers you') %></strong><br/>
-    <% @using_products.each do |p| %>
-        <%= link_to_product(p) %><br/>
+  </div>
+  <div id="sniffer-plugin-buyers-products" class="sniffer-plugin-products">
+    <% unless @buyers_hashes.empty? %>
+      <strong><%= _('Interested in') %></strong>
+      <ul>
+        <% @buyers_hashes.each do |h| %>
+          <li><%= render :partial => h[:partial], :locals => {:hash => h} %></li>
+        <% end %>
+      </ul>
     <% end %>
-  <% end %>
-  <br />
+  </div>
 </div>

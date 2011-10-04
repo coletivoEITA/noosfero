@@ -1,12 +1,11 @@
 class SnifferPluginProfile < ActiveRecord::Base
   belongs_to :profile
 
-  has_many :opportunities, :class_name => 'SnifferPluginOpportunity', :foreign_key => 'profile_id', :dependent => :destroy
-  has_many :product_categories, :through => :opportunities, :foreign_key => 'profile_id', :source => :product_category,
-    :conditions => ['opportunity_type = ?', 'ProductCategory']
+  SnifferPlugin.ext
 
-  has_many :cat_needing_products, :through => :product_categories, :source => :needing_products, :uniq => true
-  has_many :cat_using_products, :through => :product_categories, :source => :using_products, :uniq => true
+  has_many :opportunities, :class_name => 'SnifferPluginOpportunity', :foreign_key => 'profile_id', :dependent => :destroy
+  has_many :product_categories, :through => :opportunities, :source => :product_category, :foreign_key => 'profile_id', :class_name => 'ProductCategory',
+    :conditions => ['sniffer_plugin_opportunities.opportunity_type = ?', 'ProductCategory']
 
   validates_presence_of :profile
 
@@ -22,20 +21,28 @@ class SnifferPluginProfile < ActiveRecord::Base
     self.opportunities.find(:all, :conditions => {:opportunity_id => ids}).each{|o| o.opportunity_type = 'ProductCategory'; o.save! }
   end
 
-  def needing_products
-    if !profile.enterprise?
-      cat_needing_products
-    else
-      (profile.needing_products + cat_needing_products).uniq
-    end
+  def profile_input_categories
+    profile.input_categories
   end
 
-  def using_products
-    if !profile.enterprise?
-      cat_using_products
-    else
-      (profile.using_products + cat_using_products).uniq
-    end
+  def profile_product_categories
+    profile.product_categories
+  end
+
+  def all_categories
+    (profile_product_categories + profile_input_categories + product_categories).uniq
+  end
+
+  def suppliers_products
+    interests = Product.interests_suppliers_products(profile)
+    return interests if !profile.enterprise?
+    (Product.suppliers_products(profile) + interests).uniq
+  end
+
+  def buyers_products
+    interests = Product.interests_buyers_products(profile)
+    return interests if !profile.enterprise?
+    (Product.buyers_products(profile) + interests).uniq
   end
 
 end

@@ -55,3 +55,21 @@
 #sniffer-plugin-product-select.disabled ul {
   border-color: #ccc;
 }
+
+.sniffer-plugin-products strong {
+  line-height: 30px;
+}
+.sniffer-plugin-products ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 20px;
+}
+.sniffer-plugin-products li small {
+  font-size: 8px;
+}
+.sniffer-plugin-profile img {
+  vertical-align: middle;
+}
+.sniffer-plugin-profile strong {
+  margin-left: 12px;
+}
