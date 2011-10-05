@@ -12,7 +12,7 @@
      <%= text_field_tag 'suppliers_products' %>
      <% javascript_tag do %>
        jQuery.TokenList(jQuery("#suppliers_products"), <%=array.to_json%>, {searchDelay: 0, theme: "sniffer", preventDuplicates: true,
-         onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
+         onAdd: function (item) { applyCategoryFilter(item.id); }, onDelete: function (item) { unapplyCategoryFilter(item.id); } });
      <% end %>
   </div>
   <div class="sniffer-plugin-filter-buyers">
@@ -26,27 +26,26 @@
      <%= text_field_tag 'buyers_products' %>
      <% javascript_tag do %>
        jQuery.TokenList(jQuery("#buyers_products"), <%=array.to_json%>, {searchDelay: 0, theme: "sniffer", preventDuplicates: true,
-         onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
+         onAdd: function (item) { applyCategoryFilter(item.id); }, onDelete: function (item) { unapplyCategoryFilter(item.id); } });
      <% end %>
   </div>
   <div class="sniffer-plugin-filter-by-distance">
     <strong style="line-height: 30px"><%= _('Filter by Distance') %></strong>
     <span><%= _('max.') %></span>
     <div>
-      <%= text_field_tag 'distance' %>
+      <%= text_field_tag 'distance', '', :onkeypress => 'if ((event.keyCode || event.which) == 13) { maxDistance(jQuery(this).val()); }' %>
       <span><%= _('km') %></span>
-      <%= link_to_function _('Apply'), 'maxDistance(jQuery(this).val());' %>
+      <%= link_to_function _('Apply'), "maxDistance(jQuery('.sniffer-plugin-filter-by-distance #distance').val());" %>
     </div>
   </div>
   <div id="sniffer-plugin-search-visible-list" class="sniffer-plugin-search-list">
-    <strong style="line-height: 30px"><%= _('Visible Profiles') %></strong>
-
     <div class="sniffer-plugin-results">
       <% @profiles.each do |profile, data| %>
         <div id="sniffer-plugin-profile-<%=profile.id%>" class="sniffer-plugin-profile-result">
           <div class="sniffer-plugin-profile-title">
             <%= profile_image profile, :icon %>
             <strong><%= link_to_function profile.name, "showProfile(#{profile.id});" %></strong>
+            <span><%= _("~%{distance} km far") % {:distance => profile.distance.to_i} %></span>
           </div>
           <div class="sniffer-plugin-summary">
             <% sp = data[:suppliers_products].length %>
@@ -58,13 +57,18 @@
         </div>
       <% end %>
     </div>
-    <div class="no-results"><%= _('Any') %></div>
+    <% if @profiles.count %>
+      <div class="no-results"><%= _('Anything visible. Please change some of your filters.') %> </div>
+    <% else %>
+      <%= _('Any results found. Please fill inputs of your products and add some buying interests.') %>
+    <% end %>
   </div>
   <div id="sniffer-plugin-search-invisible-list" class="sniffer-plugin-search-list">
-    <strong style="line-height: 30px"><%= _('Invisible Profiles') %></strong>
-    <div class="sniffer-plugin-results">
-    </div>
-    <div class="no-results"><%= _('Any') %></div>
+    <% if @profiles.count %>
+      <strong style="line-height: 30px"><%= _('Unfiltered Profiles') %></strong>
+      <div class="sniffer-plugin-results"></div>
+      <div class="no-results"><%= _('Any.') %></div>
+    <% end %>
   </div>
 </div>
 <div class="sniffer-plugin-map-results">
@@ -116,8 +120,9 @@
 
     marker = mapPutMarker(<%= profile.lat.to_json %>, <%= profile.lng.to_json %>, <%= profile.name.to_json %>, icon, fillBalloon);
     marker.balloonUrl = "<%= url_for(:controller => :sniffer_plugin_myprofile, :action => :map_balloon, :id => profile.id, :escape => false) %>";
-    marker.balloonData = {data: <%=data.to_json%>};
+    marker.balloonData = <%=data.to_json%>;
     marker.profile = <%= profile.to_json %>;
+    marker.distance = <%= profile.distance.to_i %>;
     marker.inListElement = jQuery("#sniffer-plugin-profile-<%=profile.id%>");
 
     <% (sp+bp).each do |p| %>
@@ -131,24 +136,45 @@
 
   var filters = [];
 
-  function filter() {
-    jQuery.each(markerList, function(index, marker) {
-      marker.setVisible(false);
+  function matchCategoryFilters(marker) {
+    var match = true;
+    jQuery.each(filters, function (index, id) {
+      if (markerIndex[id].indexOf(marker) != -1)
+        match = false;
     });
+    return match;
   }
 
-  function applyFilter(id) {
+  function filter() {
+    jQuery.each(markerList, function(index, marker) {
+      var visible = (!filters.distance || filters.distance >= marker.distance) && (matchCategoryFilters(marker));
+      marker.setVisible(visible);
+      parent = visible ? '#sniffer-plugin-search-visible-list' : '#sniffer-plugin-search-invisible-list'
+      jQuery(parent + ' .sniffer-plugin-results').hide().append(marker.inListElement).fadeIn();
+    });
+
+    toggleVisible = !jQuery('#sniffer-plugin-search-visible-list .sniffer-plugin-results').children().length;
+    visibleNoResults = jQuery('#sniffer-plugin-search-visible-list .no-results');
+    if (toggleVisible)
+      visibleNoResults.hide().fadeIn();
+    else
+      visibleNoResults.hide();
+    jQuery('#sniffer-plugin-search-invisible-list .no-results').hide().toggle(!jQuery('#sniffer-plugin-search-invisible-list .sniffer-plugin-results').children().length);
+  }
+
+  function applyCategoryFilter(id) {
     filters.push(id);
     filter();
   }
 
-  function unapplyFilter(id) {
+  function unapplyCategoryFilter(id) {
     filters.pop(id);
     filter();
   }
 
   function maxDistance(distance) {
-    filters.distance = distance;
+    distance = parseInt(distance);
+    filters.distance = distance > 0 ? distance : undefined;
     filter();
   }
 

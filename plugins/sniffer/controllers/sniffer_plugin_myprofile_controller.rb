@@ -46,8 +46,8 @@ class SnifferPluginMyprofileController < MyProfileController
 
   def map_balloon
     @profile = Profile.find params[:id]
-    @suppliers_hashes = build_products(params[:data][:suppliers_products])
-    @buyers_hashes = build_products(params[:data][:buyers_products])
+    @suppliers_hashes = build_products(params[:suppliers_products])
+    @buyers_hashes = build_products(params[:buyers_products])
     render :layout => false
   end
 
@@ -72,7 +72,12 @@ class SnifferPluginMyprofileController < MyProfileController
 
   def enterprise_from_product(p)
     e = Enterprise.new :identifier => p.profile_identifier, :name => p.profile_name, :lat => p.profile_lat, :lng => p.profile_lng
-    #e.define_instance_method(:profile_distance) { p.profile_distance }
+    e.instance_eval do
+      @distance = p.profile_distance;
+      def distance 
+        @distance
+      end
+    end
     e.id = p.profile_id
     e
   end

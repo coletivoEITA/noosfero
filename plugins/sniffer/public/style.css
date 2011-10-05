@@ -10,14 +10,15 @@
   float: left;
   overflow: auto;
   position: relative;
-  width: 25%;
+  width: 30%;
   height: 500px;
+  padding-right: 10px;
 }
 
 .sniffer-plugin-map-results {
   float: left;
   position: relative;
-  width: 75%;
+  width: 68%;
   height: 500px;
 }
 
@@ -67,11 +68,23 @@
 .sniffer-plugin-products li small {
   font-size: 8px;
 }
-.sniffer-plugin-profile-title img {
-  vertical-align: middle;
+.sniffer-plugin-search-list .sniffer-plugin-profile-title strong {
+  margin-left: 5px;
 }
 .sniffer-plugin-profile-title strong {
   margin-left: 12px;
+}
+.sniffer-plugin-profile-title img {
+  vertical-align: middle;
+}
+.sniffer-plugin-profile-title span {
+  font-size: 10px;
+}
+.sniffer-plugin-filter-by-distance span {
+  color: #777;
+}
+.sniffer-plugin-profile-result {
+  margin: 15px 10px 15px 0;
 }
 .sniffer-plugin-legend {
   clear: both;
@@ -91,6 +104,9 @@
   padding: 3px 5px;
   width: 30px;
 }
-.sniffer-plugin-filter-by-distance span {
-  color: #777;
+.sniffer-plugin-search-list .no-results {
+  margin: 8px 0;
+}
+#sniffer-plugin-search-invisible-list {
+  display: none;
 }
