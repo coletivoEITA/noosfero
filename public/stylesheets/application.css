@@ -6136,3 +6136,13 @@ h1#agenda-title {
 #user a#pending-tasks-count {
   color: #FFFFFF;
 }
+
+/* AutoComplete*/
+.formfield input.ui-autocomplete-loading { background: url('/images/loading-small.gif') right center no-repeat, url("../images/input-bg.gif") no-repeat left top;  }
+ 
+.ui-autocomplete-category {
+     font-weight: bold;
+     padding: .2em .4em;
+     margin: .8em 0 .2em;
+     line-height: 1.5;
+}

@@ -1,1 +1,1 @@
-/home/daniela/projetos/noosfero/plugins/send_email/doc/send_email.textile
+/home/isaac/rede_social_infc_noosfero/plugins/send_email/doc/send_email.textile
