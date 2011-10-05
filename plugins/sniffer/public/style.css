@@ -67,9 +67,30 @@
 .sniffer-plugin-products li small {
   font-size: 8px;
 }
-.sniffer-plugin-profile img {
+.sniffer-plugin-profile-title img {
   vertical-align: middle;
 }
-.sniffer-plugin-profile strong {
+.sniffer-plugin-profile-title strong {
   margin-left: 12px;
+}
+.sniffer-plugin-legend {
+  clear: both;
+  float: right;
+  margin: 10px;
+}
+.sniffer-plugin-legend img {
+  vertical-align: middle;
+}
+
+.sniffer-plugin-summary {
+  font-size: 12px;
+  color: #777;
+}
+.sniffer-plugin-filter-by-distance #distance {
+  border: 1px solid #999;
+  padding: 3px 5px;
+  width: 30px;
+}
+.sniffer-plugin-filter-by-distance span {
+  color: #777;
 }

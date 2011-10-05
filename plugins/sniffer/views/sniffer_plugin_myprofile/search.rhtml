@@ -2,7 +2,7 @@
 
 <div class="sniffer-plugin-sidebar">
   <div class="sniffer-plugin-filter-suppliers">
-    <strong style="line-height: 250%"><%= _('Filter by Interested in') %></strong><br/>
+    <strong style="line-height: 30px"><%= _('Filter by Offers you') %></strong>
 
     <% array = [] %>
     <% @suppliers_products.collect(&:product_category).uniq.each do |p| %>
@@ -11,12 +11,12 @@
 
      <%= text_field_tag 'suppliers_products' %>
      <% javascript_tag do %>
-       jQuery.TokenList(jQuery("#suppliers_products"), <%=array.to_json%>, {searchDelay: 0, permanentDropdown: true, theme: "facet", preventDuplicates: true,
+       jQuery.TokenList(jQuery("#suppliers_products"), <%=array.to_json%>, {searchDelay: 0, theme: "sniffer", preventDuplicates: true,
          onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
      <% end %>
-  </div><br/>
-  <div class="sniffer-plugin-filder-buyers">
-    <strong style="line-height: 250%"><%= _('Filter by Offers you') %></strong><br/>
+  </div>
+  <div class="sniffer-plugin-filter-buyers">
+    <strong style="line-height: 30px"><%= _('Filter by Interested in') %></strong>
 
     <% array = [] %>
     <% @buyers_products.collect(&:product_category).uniq.each do |p| %>
@@ -25,20 +25,58 @@
 
      <%= text_field_tag 'buyers_products' %>
      <% javascript_tag do %>
-       jQuery.TokenList(jQuery("#buyers_products"), <%=array.to_json%>, {searchDelay: 0, permanentDropdown: true, theme: "facet", preventDuplicates: true,
+       jQuery.TokenList(jQuery("#buyers_products"), <%=array.to_json%>, {searchDelay: 0, theme: "sniffer", preventDuplicates: true,
          onAdd: function (item) { applyFilter(item.id); }, onDelete: function (item) { unapplyFilter(item.id); } });
      <% end %>
   </div>
-  <br/>
+  <div class="sniffer-plugin-filter-by-distance">
+    <strong style="line-height: 30px"><%= _('Filter by Distance') %></strong>
+    <span><%= _('max.') %></span>
+    <div>
+      <%= text_field_tag 'distance' %>
+      <span><%= _('km') %></span>
+      <%= link_to_function _('Apply'), 'maxDistance(jQuery(this).val());' %>
+    </div>
+  </div>
+  <div id="sniffer-plugin-search-visible-list" class="sniffer-plugin-search-list">
+    <strong style="line-height: 30px"><%= _('Visible Profiles') %></strong>
+
+    <div class="sniffer-plugin-results">
+      <% @profiles.each do |profile, data| %>
+        <div id="sniffer-plugin-profile-<%=profile.id%>" class="sniffer-plugin-profile-result">
+          <div class="sniffer-plugin-profile-title">
+            <%= profile_image profile, :icon %>
+            <strong><%= link_to_function profile.name, "showProfile(#{profile.id});" %></strong>
+          </div>
+          <div class="sniffer-plugin-summary">
+            <% sp = data[:suppliers_products].length %>
+            <% bp = data[:buyers_products].length %>
+            <div><%= (sp > 0 and bp > 0) ? _('Supplier and Consumer') : (sp > 0 ? _('Supplier') : _('Consumer')) %></div>
+            <div><%= _('Offers %{n} %{products} to you') % {:n => sp, :products => sp > 1 ? _('products') : _('product')} if sp > 0 %></div>
+            <div><%= _('Interested in %{n} %{products} from you') % {:n => bp, :products => bp > 1 ? _('products') : _('product')} if bp > 0 %></div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="no-results"><%= _('Any') %></div>
+  </div>
+  <div id="sniffer-plugin-search-invisible-list" class="sniffer-plugin-search-list">
+    <strong style="line-height: 30px"><%= _('Invisible Profiles') %></strong>
+    <div class="sniffer-plugin-results">
+    </div>
+    <div class="no-results"><%= _('Any') %></div>
+  </div>
 </div>
 <div class="sniffer-plugin-map-results">
   <div id="map"></div>
 </div>
-<br style="clear:both"><br/>
-<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Your enterprise") %></span>
-<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/ltblue-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier") %></span>
-<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Consumer") %></span>
-<img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier and Consumer") %></span>
+<div style="clear:both"></div>
+<div class="sniffer-plugin-legend">
+  <img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Your enterprise") %></span>
+  <img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/ltblue-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier") %></span>
+  <img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Consumer") %></span>
+  <img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"> <span style="display: inline-block; line-height: 32px"><%= _("Supplier and Consumer") %></span>
+</div>
 
 <%= content_tag('script', '', :src => "http://maps.googleapis.com/maps/api/js?sensor=false", :type => 'text/javascript') %>
 <%= javascript_include_tag('google_maps') %>
@@ -54,62 +92,76 @@
   var yellowIcon = "http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png";
 
   function fillBalloon(marker) {
-    jQuery.post(marker.balloonUrl, marker.balloonData, function (data) { mapOpenBalloon(marker, jQuery(data).html()); });
+    if (marker.cachedData)
+      mapOpenBalloon(marker, marker.cachedData);
+    else
+      jQuery.post(marker.balloonUrl, marker.balloonData, function (data) {
+        marker.cachedData = jQuery(data).html();
+        mapOpenBalloon(marker, marker.cachedData);
+      });
   }
 
-  <% @enterprises.each do |e, data| %>
-    <% next unless e.lat && e.lng %>
+  <% @profiles.each do |profile, data| %>
+    <% next unless profile.lat && profile.lng %>
+    <% sp = data[:suppliers_products] %>
+    <% bp = data[:buyers_products] %>
 
     icon = null;
-    //if (<%# np.length %> > 0 && <%# up.length %> > 0)
-      //icon = yellowIcon;
-    //else if (<%# np.length %> > 0)
-      //icon = greenIcon;
-    //else 
-      //icon = ltblueIcon;
+    if (<%= sp.length %> > 0 && <%= bp.length %> > 0)
+      icon = yellowIcon;
+    else if (<%= sp.length %> > 0)
+      icon = greenIcon;
+    else 
+      icon = ltblueIcon;
 
-    marker = mapPutMarker(<%= e.lat.to_json %>, <%= e.lng.to_json %>, <%= e.name.to_json %>, icon, fillBalloon);
-    marker.balloonUrl = "<%= url_for(:controller => :sniffer_plugin_myprofile, :action => :map_balloon, :id => e.id, :escape => false) %>";
+    marker = mapPutMarker(<%= profile.lat.to_json %>, <%= profile.lng.to_json %>, <%= profile.name.to_json %>, icon, fillBalloon);
+    marker.balloonUrl = "<%= url_for(:controller => :sniffer_plugin_myprofile, :action => :map_balloon, :id => profile.id, :escape => false) %>";
     marker.balloonData = {data: <%=data.to_json%>};
+    marker.profile = <%= profile.to_json %>;
+    marker.inListElement = jQuery("#sniffer-plugin-profile-<%=profile.id%>");
 
-    //<%# (np+up).each do |p| %>
-    //  if (markerIndex[<%# p.product_category.id %>] == undefined)
-    //    markerIndex[<%# p.product_category.id %>] = [];
-    //  markerIndex[<%# p.product_category.id %>].push(marker);
-    //<%# end %>
+    <% (sp+bp).each do |p| %>
+      if (markerIndex[<%= p.product_category_id %>] == undefined)
+        markerIndex[<%= p.product_category_id %>] = [];
+      markerIndex[<%= p.product_category_id %>].push(marker);
+    <% end %>
 
     markerList.push(marker);
   <% end %>
 
-  var appliedFilters = [];
+  var filters = [];
 
-  function applyFilter(id) {
-    if (appliedFilters.length == 0) {
-      jQuery.each(markerList, function(index, marker) {
-        marker.hide();
-      });
-    }
-
-    appliedFilters.push(id);
-    jQuery.each(markerIndex[id], function(index, marker) {
-      marker.show();
+  function filter() {
+    jQuery.each(markerList, function(index, marker) {
+      marker.setVisible(false);
     });
   }
 
-  function unapplyFilter(id) {
-    appliedFilters.pop(id);
-    jQuery.each(markerIndex[id], function(index, marker) {
-      marker.hide();
-    });
+  function applyFilter(id) {
+    filters.push(id);
+    filter();
+  }
 
-    if (appliedFilters.length == 0) {
-      jQuery.each(markerList, function(index, marker) {
-          marker.show();
-      });
-    }
+  function unapplyFilter(id) {
+    filters.pop(id);
+    filter();
+  }
+
+  function maxDistance(distance) {
+    filters.distance = distance;
+    filter();
+  }
+
+  function showProfile(id) {
+    jQuery.each(markerList, function(index, marker) {
+      if (marker.profile.id == id)
+        fillBalloon(marker);
+    });
   }
 
   marker = mapPutMarker(<%= profile.lat.to_json %>, <%= profile.lng.to_json %>, <%= profile.name.to_json %>, null,
     "<%= url_for(:controller => :sniffer_plugin_myprofile, :action => :my_map_balloon, :escape => false) %>");
   mapCenter(marker.getPosition());
+
+  filter();
 </script>

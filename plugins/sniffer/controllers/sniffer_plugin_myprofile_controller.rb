@@ -38,7 +38,8 @@ class SnifferPluginMyprofileController < MyProfileController
     suppliers = @suppliers_products.group_by{ |p| objs[p.profile_id] ||= enterprise_from_product(p) }.to_hash
     buyers = @buyers_products.group_by{ |p| objs[p.profile_id] ||= enterprise_from_product(p) }
     buyers.each{ |k, v| suppliers[k] ||= [] }
-    @enterprises = suppliers.merge(buyers) do |enterprise, suppliers_products, buyers_products|
+    suppliers.each{ |k, v| buyers[k] ||= [] }
+    @profiles = suppliers.merge(buyers) do |profile, suppliers_products, buyers_products|
       {:suppliers_products => suppliers_products, :buyers_products => buyers_products}
     end
   end
@@ -71,6 +72,7 @@ class SnifferPluginMyprofileController < MyProfileController
 
   def enterprise_from_product(p)
     e = Enterprise.new :identifier => p.profile_identifier, :name => p.profile_name, :lat => p.profile_lat, :lng => p.profile_lng
+    #e.define_instance_method(:profile_distance) { p.profile_distance }
     e.id = p.profile_id
     e
   end
