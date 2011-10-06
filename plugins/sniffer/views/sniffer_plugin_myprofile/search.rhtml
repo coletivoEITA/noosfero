@@ -33,7 +33,12 @@
   <div id="sniffer-plugin-search-visible-list" class="sniffer-plugin-search-list">
     <div class="sniffer-plugin-results">
       <% if @no_results %>
-        <%= _('No results found. Please fill inputs of your products and add some buying interests.') %>
+        <div class="any-result">
+          <%= _('No results found. Please fill inputs of your %{products}, add some %{interests} and check your %{location}.') % {
+            :products => link_to(_('products'), {:controller => :manage_products, :action => :index }),
+            :interests => link_to(_('buying interests'), {:action => :edit }),
+            :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } %>
+        </div>
       <% else %>
         <% @profiles.each do |profile, data| %>
           <div id="sniffer-plugin-profile-<%=profile.id%>" class="sniffer-plugin-profile-result">

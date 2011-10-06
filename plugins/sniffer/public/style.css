@@ -113,3 +113,6 @@
 .sniffer-plugin-hide-show-link {
   font-size: 10px;
 }
+.sniffer-plugin-results .any-result {
+  margin-top: 25px;
+}
