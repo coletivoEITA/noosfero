@@ -66,7 +66,7 @@
   padding: 0 20px;
 }
 .sniffer-plugin-products li small {
-  font-size: 8px;
+  font-size: 9px;
 }
 .sniffer-plugin-search-list .sniffer-plugin-profile-title strong {
   margin-left: 5px;
@@ -109,4 +109,7 @@
 }
 #sniffer-plugin-search-invisible-list {
   display: none;
+}
+.sniffer-plugin-hide-show-link {
+  font-size: 10px;
 }

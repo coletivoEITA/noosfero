@@ -10,3 +10,9 @@ function sniffer_plugin_interest_enable(enabled) {
     height: el.innerHeight() + margin*2,
   }).toggle(!enabled);
 }
+
+function sniffer_plugin_show_hide_toggle(context, hideText, showText, element) {
+  isShow = (jQuery(context).text() == showText);
+  element.fadeToggle();
+  jQuery(context).text(isShow ? hideText : showText);
+}

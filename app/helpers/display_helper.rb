@@ -12,10 +12,10 @@ module DisplayHelper
     product.enterprise.enabled? ? product.enterprise.public_profile_url.merge(:controller => 'manage_products', :action => 'show', :id => product) : product.enterprise.url
   end
 
-  def link_to_category(category, full = true)
+  def link_to_category(category, full = true, options = {})
     return _('Uncategorized product') unless category
     name = full ? category.full_name(' &rarr; ') : category.name
-    link_to name, Noosfero.url_options.merge({:controller => 'search', :action => 'category_index', :category_path => category.path.split('/'),:host => category.environment.default_hostname })
+    link_to name, Noosfero.url_options.merge({:controller => 'search', :action => 'category_index', :category_path => category.path.split('/'),:host => category.environment.default_hostname }), options
   end
 
   def link_to_product_category(category)

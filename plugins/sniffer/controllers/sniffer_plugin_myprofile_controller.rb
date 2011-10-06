@@ -33,10 +33,11 @@ class SnifferPluginMyprofileController < MyProfileController
 
     @suppliers_products = @sniffer_profile.suppliers_products
     @buyers_products = @sniffer_profile.buyers_products
+    @suppliers_hashes = build_products(@suppliers_products.collect(&:attributes))
+    @buyers_hashes = build_products(@buyers_products.collect(&:attributes))
 
-    objs = {}
-    suppliers = @suppliers_products.group_by{ |p| objs[p.profile_id] ||= enterprise_from_product(p) }.to_hash
-    buyers = @buyers_products.group_by{ |p| objs[p.profile_id] ||= enterprise_from_product(p) }
+    suppliers = @suppliers_products.group_by{ |p| @id_profiles[p['profile_id'].to_i] }.to_hash
+    buyers = @buyers_products.group_by{ |p| @id_profiles[p['profile_id'].to_i] }
     buyers.each{ |k, v| suppliers[k] ||= [] }
     suppliers.each{ |k, v| buyers[k] ||= [] }
     @profiles = suppliers.merge(buyers) do |profile, suppliers_products, buyers_products|
@@ -46,8 +47,10 @@ class SnifferPluginMyprofileController < MyProfileController
 
   def map_balloon
     @profile = Profile.find params[:id]
-    @suppliers_hashes = build_products(params[:suppliers_products])
-    @buyers_hashes = build_products(params[:buyers_products])
+    supplier_products = params[:suppliers_products] ? params[:suppliers_products].values : []
+    buyer_products = params[:buyers_products] ? params[:buyers_products].values : []
+    @suppliers_hashes = build_products(supplier_products).values.first
+    @buyers_hashes = build_products(buyer_products).values.first
     render :layout => false
   end
 
@@ -70,26 +73,37 @@ class SnifferPluginMyprofileController < MyProfileController
     end
   end
 
-  def enterprise_from_product(p)
-    e = Enterprise.new :identifier => p.profile_identifier, :name => p.profile_name, :lat => p.profile_lat, :lng => p.profile_lng
-    e.instance_eval do
-      @distance = p.profile_distance;
-      def distance 
-        @distance
-      end
-    end
-    e.id = p.profile_id
-    e
-  end
-
   def build_products(data)
-    return [] if data.blank?
-    data.map do |index, attributes|
-      product = Product.find attributes['id']
-      category = ProductCategory.find attributes['product_category_id']
-      my_product = Product.find attributes['my_product_id'] if attributes['my_product_id']
-      {:product => product, :category => category, :my_product => my_product, :partial => attributes['view']}
+    @id_profiles ||= {}
+    @id_products ||= {}
+    @id_categories ||= {}
+    @id_my_products ||= {}
+
+    return {} if data.blank?
+
+    Profile.all(:conditions => {:id => data.map{ |h| h['profile_id'].to_i }.uniq}).each{ |p| @id_profiles[p.id] ||= p }
+    Product.all(:conditions => {:id => data.map{ |h| h['id'].to_i }.uniq}, :include => :enterprise).each{ |p| @id_products[p.id] ||= p }
+    ProductCategory.all(:conditions => {:id => data.map{ |h| h['product_category_id'].to_i }.uniq}).each{ |c| @id_categories[c.id] ||= c }
+    Product.all(:conditions => {:id => data.map{ |h| h['my_product_id'].to_i }.uniq}, :include => :enterprise).each{ |p| @id_my_products[p.id] ||= p }
+
+    results = {}
+    data.each do |attributes|
+      profile = @id_profiles[attributes['profile_id'].to_i]
+      profile.instance_eval do
+        @distance = attributes['profile_distance']
+        def distance 
+          @distance
+        end
+      end
+
+      results[profile] ||= []
+      results[profile] << {
+        :profile => profile, :partial => attributes['view'], :product => @id_products[attributes['id'].to_i],
+        :category => @id_categories[attributes['product_category_id'].to_i],
+        :my_product => @id_my_products[attributes['my_product_id'].to_i], :partial => attributes['view']
+      }
     end
+    results
   end
 
 end

@@ -55,5 +55,7 @@ function mapLoad(initial_zoom) {
 }
 
 function mapCenter(latlng) {
+  if (!latlng)
+    map.fitBounds(mapBounds);
   map.setCenter(latlng ? latlng : mapBounds.getCenter());
 }
