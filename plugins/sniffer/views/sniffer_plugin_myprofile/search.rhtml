@@ -32,7 +32,7 @@
   </div>
   <div id="sniffer-plugin-search-visible-list" class="sniffer-plugin-search-list">
     <div class="sniffer-plugin-results">
-      <% if @profiles.count == 0 %>
+      <% if @no_results %>
         <%= _('No results found. Please fill inputs of your products and add some buying interests.') %>
       <% else %>
         <% @profiles.each do |profile, data| %>
@@ -82,10 +82,10 @@
       <% end %>
     </div>
 
-    <div class="no-results"><%= _('No results. Please change some of your filters.') if @profiles.count %></div>
+    <div class="no-results"><%= _('No results. Please change some of your filters.') unless @no_results %></div>
   </div>
   <div id="sniffer-plugin-search-invisible-list" class="sniffer-plugin-search-list">
-    <% if @profiles.count %>
+    <% unless @no_results %>
       <strong style="line-height: 30px"><%= _('Unfiltered Profiles') %></strong>
       <div class="sniffer-plugin-results">
       </div>

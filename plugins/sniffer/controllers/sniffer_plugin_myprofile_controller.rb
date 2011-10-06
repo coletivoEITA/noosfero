@@ -33,6 +33,7 @@ class SnifferPluginMyprofileController < MyProfileController
 
     @suppliers_products = @sniffer_profile.suppliers_products
     @buyers_products = @sniffer_profile.buyers_products
+    @no_results = @suppliers_products.count == 0 && @buyers_products.count == 0
     @suppliers_hashes = build_products(@suppliers_products.collect(&:attributes))
     @buyers_hashes = build_products(@buyers_products.collect(&:attributes))
 
