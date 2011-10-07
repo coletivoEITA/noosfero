@@ -103,7 +103,10 @@
     <%= _('Edit your %{products}, add some %{interests} and check your %{location}.') % {
       :products => link_to(_('products'), {:controller => :manage_products, :action => :index }),
       :interests => link_to(_('buying interests'), {:action => :edit }),
-      :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } %>
+      :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } unless @no_results %>
+      <% button_bar do %>
+        <%= button :back, _('Back to control panel'), :controller => 'profile_editor' %>
+      <% end %>
   </div>
 </div>
 
