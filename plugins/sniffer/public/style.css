@@ -116,3 +116,7 @@
 .sniffer-plugin-results .any-result {
   margin-top: 25px;
 }
+#sniffer-plugin-tips {
+  margin-top: 40px;
+  font-size: 10px;
+}

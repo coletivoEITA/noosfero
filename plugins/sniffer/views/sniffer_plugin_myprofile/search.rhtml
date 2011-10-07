@@ -89,6 +89,7 @@
 
     <div class="no-results"><%= _('No results. Please change some of your filters.') unless @no_results %></div>
   </div>
+
   <div id="sniffer-plugin-search-invisible-list" class="sniffer-plugin-search-list">
     <% unless @no_results %>
       <strong style="line-height: 30px"><%= _('Unfiltered Profiles') %></strong>
@@ -97,7 +98,15 @@
       <div class="no-results"><%= _('Any.') %></div>
     <% end %>
   </div>
+
+  <div id="sniffer-plugin-tips">
+    <%= _('Edit your %{products}, add some %{interests} and check your %{location}.') % {
+      :products => link_to(_('products'), {:controller => :manage_products, :action => :index }),
+      :interests => link_to(_('buying interests'), {:action => :edit }),
+      :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } %>
+  </div>
 </div>
+
 <div class="sniffer-plugin-map-results">
   <div id="map"></div>
 </div>
