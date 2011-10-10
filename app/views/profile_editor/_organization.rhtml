@@ -1,8 +1,11 @@
+<% extend FormerPlugin::FieldHelper %>
 <h2><%= _('General information') %></h2>
 
   <%= required_fields_message %>
 
   <%= required f.text_field(:name) %>
+
+  <%= widgets_for_form(f, :bsc_fields) %>
 
 <% if @environment.enabled?('enable_organization_url_change') %>
   <script type="text/javascript">
