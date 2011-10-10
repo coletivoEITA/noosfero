@@ -13,4 +13,8 @@ class TextArticle < Article
     end
   end
 
+  def use_media_panel?
+    true
+  end
+
 end

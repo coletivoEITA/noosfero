@@ -1,0 +1,11 @@
+<%= required_fields_message %>
+
+<%= render :file => 'shared/tiny_mce' %>
+
+<%= required f.text_field('name', :size => '64') %>
+
+<%= labelled_form_field(_('Summary:'), text_area(:article, :summary, :rows => 3)) %>
+
+<%= render :partial => 'shared/lead_and_body', :locals => {:tiny_mce => true} %>
+
+<%= labelled_form_field(_('Good practices:'), text_area(:article, :good_practices, :rows => 3)) %>

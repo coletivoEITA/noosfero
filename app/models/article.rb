@@ -253,6 +253,10 @@ class Article < ActiveRecord::Base
     true
   end
 
+  def use_media_panel?
+    false
+  end
+
   def folder?
     false
   end

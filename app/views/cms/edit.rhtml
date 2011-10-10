@@ -49,7 +49,7 @@
 <% end %>
 </div>
 
-<% if environment.enabled?('media_panel') && [TinyMceArticle, TextileArticle, Event, EnterpriseHomepage].any?{|klass| @article.kind_of?(klass)} %>
+<% if environment.enabled?('media_panel') and @article.use_media_panel? %>
   <%= render :partial => 'text_editor_sidebar' %>
 <% end %>
 

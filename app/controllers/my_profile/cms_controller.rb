@@ -356,7 +356,7 @@ class CmsController < MyProfileController
   end
 
   def refuse_blocks
-    if ['TinyMceArticle', 'TextileArticle', 'Event', 'EnterpriseHomepage'].include?(@type)
+    if !type.blank? and @type.constantize.new.use_media_panel?
       @no_design_blocks = true
     end
   end

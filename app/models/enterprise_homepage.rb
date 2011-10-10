@@ -30,4 +30,8 @@ class EnterpriseHomepage < Article
     false
   end
 
+  def use_media_panel?
+    true
+  end
+
 end

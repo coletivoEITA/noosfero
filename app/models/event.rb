@@ -112,6 +112,10 @@ class Event < Article
     result
   end
 
+  def use_media_panel?
+    true
+  end
+
   def event?
     true
   end
