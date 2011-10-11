@@ -128,7 +128,4 @@ ActiveRecord::Base.extend FormerPluginMethods::HasFormMethods
 
 if FormerPluginFormField.table_exists?
   Enterprise.has_form :bsc_fields, :name => _('BSC form')
-  Article.has_form :buyer_fields, :name => _('Buyer form')
-  Article.has_form :learning_fields, :name => _('Learning form')
-  Article.has_form :contract_fields, :name => _('Contract form')
 end
