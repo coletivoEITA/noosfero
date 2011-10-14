@@ -1,0 +1,37 @@
+#cms-learning-edit-products {
+  float:left;
+}
+
+#cms-learning-edit-kinds {
+  float: right;
+}
+
+#cms-learning-edit-products,
+#cms-learning-edit-kinds {
+  margin: 0px 0 10px 0px;
+}
+
+.cms-learning-field {
+}
+
+.cms-learning-association {
+}
+.cms-learning-association li {
+  white-space: pre-wrap;
+}
+
+#cms-learning-view-content {
+}
+#cms-learning-right-bar {
+  float: right;
+  width: 40%;
+  margin: 0 0 15px 15px;
+}
+
+#cms-learning-view-content b {
+  line-height: 25px;
+}
+#cms-learning-right-bar b {
+  font-style: italic;
+  font-weight: normal;
+}

@@ -12,6 +12,30 @@ class CmsLearningPlugin < Noosfero::Plugin
     (RAILS_ROOT + '/plugins/cms_learning/views')
   end
 
+  def self.form
+    @form ||= FormerPluginFormField.find_or_create :feedback_fields, CmsLearningPluginLearning.to_s, {:name => _('CMS Learning form')}
+  end
+
+  def self.learning_field
+    f = form.fields.first
+    if f.nil? 
+      f = FormerPluginOptionField.create! :form => form, :name => _('Kind'), :identifier => 'kind'
+      f.options = [_('Learning 1'), _('Learning 2'), _('Learning 3')].map do |name|
+        FormerPluginOption.create! :field_id => f.id, :name => name
+      end
+    end
+    fields = [f] #only this field!
+    f
+  end
+
+  def stylesheet?
+    true
+  end
+
+  def js_files
+    []
+  end
+
   def article_types
      {
       :name => CmsLearningPluginLearning.name,

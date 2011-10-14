@@ -3,24 +3,39 @@ class CmsLearningPluginLearning < Article
   settings_items :summary, :type => :string, :default => ""
   settings_items :good_practices, :type => :string, :default => ""
 
-  has_many :product_categories, :foreign_key => 'resource_id', :class_name => 'ProductCategory',
-    :conditions => ['articles.resource_type = ?', 'ProductCategory'], :order => 'id asc'
-  has_many :kinds, :foreign_key => 'resource_id', :class_name => 'ProductCategory',
-    :conditions => ['articles.resource_type = ?', 'FormerPluginValue'], :order => 'id asc'
+  has_many :resources, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource'
+  has_many :resources_product_categories, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource',
+    :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
+
+  has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :dependent => :destroy,
+    :class_name => 'ProductCategory', :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
+  #has_many :kinds, :through => :resources, :source => :kind, :foreign_key => 'article_id', :dependent => :destroy,
+  #  :class_name => 'FormerPluginValue', :conditions => ['article_resources.resource_type = ?', 'FormerPluginValue']
+
+  validates_presence_of :body
+  validates_presence_of :summary
+  validates_presence_of :good_practices
+
+  attr_accessible :name
+  attr_accessible :body
+  attr_accessible :summary
+  attr_accessible :good_practices
+  attr_accessible :product_category_string_ids
+  attr_accessible :kind_option_contents
 
   def self.short_description
     _('Learning')
   end
 
   def self.description
-      _('Share learnings to the network.')
+    _('Share learnings to the network.')
   end
 
   def self.icon_name(article = nil)
     'learning'
   end
 
-  def name
+  def self.type_name
     _('Learning')
   end
 
@@ -43,26 +58,42 @@ class CmsLearningPluginLearning < Article
     true
   end
 
-  attr_accessible :product_category_string_ids
+  def kinds
+    CmsLearningPlugin.learning_field.values.all(:conditions => {:instance_id => self.id})
+  end
+
   def product_category_string_ids
     ''
   end
   def product_category_string_ids=(ids)
     ids = ids.split(',')
     r = ProductCategory.find(ids)
-    self.product_categories = ids.collect {|id| r.detect {|x| x.id == id.to_i}}
-    self.product_categories.update_all ['resource_type = ?', 'ProductCategory']
+    self.resources_product_categories.destroy_all
+    @product_categories = ids.collect{ |id| r.detect{ |x| x.id == id.to_i } }.map do |pc|
+      ArticleResource.new :resource_id => pc.id, :resource_type => ProductCategory.name
+    end
   end
 
-  attr_accessible :kind_option_ids
-  def kind_option_ids
+  def kind_option_contents
     ''
   end
-  def kind_option_ids=(ids)
-    ids = ids.split(',')
-    r = FormerPluginOptions.find(ids)
-    self.kinds = ids.collect {|id| r.detect {|x| x.id == id.to_i}}
-    self.kinds.update_all ['resource_type = ?', 'FormerPluginValue']
+  def kind_option_contents=(contents)
+    contents = contents.split(',')
+    field = CmsLearningPlugin.learning_field
+    r = field.options.all :conditions => {:name => contents}
+    kinds.each{ |k| k.destroy }
+    options = contents.collect{ |c| r.detect{ |x| x.name == c } }
+    @values = options.map do |o|
+      FormerPluginValue.new :field => field, :option => o
+    end
+  end
+
+  protected
+
+  after_save :save_associated
+  def save_associated
+    @values.each{ |v| v.instance_id = self.id; v.save! }
+    @product_categories.each{ |c| c.article_id = self.id; c.save! }
   end
 
 end
