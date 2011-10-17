@@ -16,12 +16,7 @@ class CmsLearningPluginLearning < Article
   validates_presence_of :summary
   validates_presence_of :good_practices
 
-  attr_accessible :name
-  attr_accessible :body
-  attr_accessible :summary
-  attr_accessible :good_practices
-  attr_accessible :product_category_string_ids
-  attr_accessible :kind_option_contents
+  attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids, :kind_option_contents
 
   def self.short_description
     _('Learning')
@@ -32,7 +27,7 @@ class CmsLearningPluginLearning < Article
   end
 
   def self.icon_name(article = nil)
-    'learning'
+    'cms-learning'
   end
 
   def self.type_name
@@ -92,8 +87,8 @@ class CmsLearningPluginLearning < Article
 
   after_save :save_associated
   def save_associated
-    @values.each{ |v| v.instance_id = self.id; v.save! }
-    @product_categories.each{ |c| c.article_id = self.id; c.save! }
+    @values.each{ |v| v.instance_id = self.id; v.save! } unless @values.blank?
+    @product_categories.each{ |c| c.article_id = self.id; c.save! } unless @product_categories.blank?
   end
 
 end

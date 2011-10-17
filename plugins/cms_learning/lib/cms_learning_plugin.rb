@@ -46,4 +46,13 @@ class CmsLearningPlugin < Noosfero::Plugin
      }
   end
 
+  def search_controller_filter
+    [{
+      :type => 'before_filter',
+      :method_name => 'append_view_path',
+      :options => {},
+      :block => lambda { @controller.append_view_path CmsLearningPlugin.view_path }
+    }]
+  end
+
 end
