@@ -6,22 +6,22 @@
     </div>
   </div>
   <div class="search-content-second-column">
-    <div>
+    <div style="clear: both">
       <span class="search-field-label"><%= _("Summary") %></span>
       <% content = strip_tags(cms_learning_plugin_learning.summary.to_s) %>
       <span><%= excerpt(content, content.first(3), 70) %></span>
     </div>
-    <div>
+    <div style="clear: both">
       <span class="search-field-label"><%= _("Good practices") %></span>
       <% content = strip_tags(cms_learning_plugin_learning.good_practices.to_s) %>
       <span><%= excerpt(content, content.first(3), 70) %></span>
     </div>
-    <div>
+    <div style="clear: both">
       <span class="search-field-label"><%= _("Details") %></span>
       <% content = strip_tags(cms_learning_plugin_learning.body.to_s) %>
       <span><%= excerpt(content, content.first(3), 70) %></span>
     </div>
-    <%= render :partial => 'article_common', :object => cms_learning_plugin_learning %>
+    <%= render :partial => 'article_common', :object => cms_learning_plugin_learning, :locals => {:show_description => false} %>
   </div>
   <br class="clear"/>
 </li>
