@@ -3,14 +3,15 @@ class CmsLearningPluginLearning < Article
   settings_items :summary, :type => :string, :default => ""
   settings_items :good_practices, :type => :string, :default => ""
 
-  has_many :resources, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource'
+  has_many :resources, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource', :dependent => :destroy
   has_many :resources_product_categories, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource',
     :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
 
-  has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :dependent => :destroy,
+  has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :readonly => true,
     :class_name => 'ProductCategory', :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
-  #has_many :kinds, :through => :resources, :source => :kind, :foreign_key => 'article_id', :dependent => :destroy,
-  #  :class_name => 'FormerPluginValue', :conditions => ['article_resources.resource_type = ?', 'FormerPluginValue']
+  def kinds
+    CmsLearningPlugin.learning_field.values.all(:conditions => {:instance_id => self.id}, :order => 'id asc')
+  end
 
   validates_presence_of :body
   validates_presence_of :summary
@@ -53,10 +54,6 @@ class CmsLearningPluginLearning < Article
     true
   end
 
-  def kinds
-    CmsLearningPlugin.learning_field.values.all(:conditions => {:instance_id => self.id})
-  end
-
   def product_category_string_ids
     ''
   end
@@ -64,7 +61,7 @@ class CmsLearningPluginLearning < Article
     ids = ids.split(',')
     r = ProductCategory.find(ids)
     self.resources_product_categories.destroy_all
-    @product_categories = ids.collect{ |id| r.detect{ |x| x.id == id.to_i } }.map do |pc|
+    @res_product_categories = ids.collect{ |id| r.detect{ |x| x.id == id.to_i } }.map do |pc|
       ArticleResource.new :resource_id => pc.id, :resource_type => ProductCategory.name
     end
   end
@@ -78,7 +75,7 @@ class CmsLearningPluginLearning < Article
     r = field.options.all :conditions => {:name => contents}
     kinds.each{ |k| k.destroy }
     options = contents.collect{ |c| r.detect{ |x| x.name == c } }
-    @values = options.map do |o|
+    @res_kinds = options.map do |o|
       FormerPluginValue.new :field => field, :option => o
     end
   end
@@ -87,8 +84,8 @@ class CmsLearningPluginLearning < Article
 
   after_save :save_associated
   def save_associated
-    @values.each{ |v| v.instance_id = self.id; v.save! } unless @values.blank?
-    @product_categories.each{ |c| c.article_id = self.id; c.save! } unless @product_categories.blank?
+    @res_product_categories.each{ |c| c.article_id = self.id; c.save! } unless @res_product_categories.blank?
+    @res_kinds.each{ |v| v.instance_id = self.id; v.save! } unless @res_kinds.blank?
   end
 
 end
