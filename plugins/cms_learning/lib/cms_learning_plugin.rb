@@ -13,7 +13,7 @@ class CmsLearningPlugin < Noosfero::Plugin
   end
 
   def self.form
-    @form ||= FormerPluginFormField.find_or_create :feedback_fields, CmsLearningPluginLearning.to_s, {:name => _('CMS Learning form')}
+    @form ||= FormerPluginFormField.find_or_create :learning_fields, CmsLearningPluginLearning.to_s, {:name => _('CMS Learning form')}
   end
 
   def self.learning_field
