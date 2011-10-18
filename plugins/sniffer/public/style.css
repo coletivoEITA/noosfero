@@ -94,6 +94,10 @@
 .sniffer-plugin-legend img {
   vertical-align: middle;
 }
+.sniffer-plugin-legend span {
+  display: inline-block;
+  line-height: 32px;
+}
 
 .sniffer-plugin-summary {
   font-size: 12px;
