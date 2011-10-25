@@ -19,6 +19,10 @@ class CmsLearningPluginLearning < Article
 
   attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids, :kind_option_contents
 
+  def self.type_name
+    _('Learning')
+  end
+
   def self.short_description
     _('Learning')
   end
