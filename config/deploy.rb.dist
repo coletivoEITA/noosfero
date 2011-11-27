@@ -1,0 +1,397 @@
+# Inspired by http://railscasts.com/episodes/133-capistrano-tasks
+# See also
+#   http://noosfero.org/Development/InstallSteps
+#   http://articles.slicehost.com/2008/1/18/capistrano-series-configuring-capistrano-1
+
+require 'capistrano_colors'
+
+# Noosfero's environment settings
+set :name, "My environment"
+set :domain, "localhost"
+set :default_locale, "pt"
+set :enabled_plugins, []
+role :app, domain
+role :web, domain
+role :db, domain, :primary => true
+
+# Deploy destination
+set :deploy_to, "/home/youruser/rails_app/#{domain}"
+set :deploy_via, :remote_cache
+set :use_sudo, false
+set :rails_env, "production"
+
+# Server access
+set :application, "localhost"
+set :user, "youruser"
+set :port, 24
+
+# Repository
+set :scm, "git"
+set :repository, "git://gitorious.org/noosfero/noosfero.git"
+set :branch, "master"
+
+# Configuration variables
+set :mongrel_port, 3000
+set :mongrel_servers, 4
+set :smtp_tls_support, false
+set :exception_notification, true
+set :apache_conf_path, '/etc/apache2'
+
+# RVM (comment if not using)
+# See http://beginrescueend.com/integration/capistrano
+set :default_shell, "/bin/bash -i" #needed for rvm_install
+#$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
+#require "rvm/capistrano"
+#set :rvm_ruby_string, '1.8.7@noosfero'
+#set :rvm_type, :user
+
+namespace :deploy do
+
+  # TODO: make it possible with development environment
+  task :start do
+    run "cd #{current_path}; script/production stop"
+  end
+  task :stop do
+    run "cd #{current_path}; script/production start"
+  end
+  desc "Restart the mongrel server."
+  task :restart do
+    deploy.migrate
+    run "cd #{current_path}; script/production stop; script/production start"
+  end
+
+  desc "Initial setup (configs, release, db, noosfero env.)."
+  task :setup do
+    deploy.dirs.create
+    deploy.configs.copy
+    deploy.update
+    deploy.symlink
+    deploy.db.drop
+    deploy.db.create
+    deploy.db.schema_load
+    deploy.translations.compile
+    deploy.db.data.create_env_and_domain
+    deploy.plugins.enable
+    deploy.migrate
+  end
+
+  desc "Install optional extras dependencies."
+  task :install_extras do
+    deploy.exception_notification.install if fetch(:exception_notification, true)
+    deploy.smtp.install_tls_support if fetch(:smtp_tls_support, false)
+  end
+
+  # Put your own sync code here
+  desc "Sync some data."
+  task :sync_data do
+    system "rsync -vr some data #{user}@#{application}:#{shared_path}/"
+  end
+
+end
+after "deploy:symlink", "uploads:symlink"
+
+
+namespace :plugins do
+  
+  desc "Enable configured plugin list (and disable others)."
+  task :enable do
+    run "cd #{current_path}; script/noosfero-plugins disableall"
+    fetch(:enabled_plugins).each do |plugin|
+      run "cd #{current_path}; script/noosfero-plugins enable #{plugin}"
+    end
+  end
+
+  desc "Disable configured plugin list."
+  task :disable do
+    fetch(:enabled_plugins).each do |plugin|
+      run "cd #{current_path}; script/noosfero-plugins disable #{plugin}"
+    end
+  end
+
+end
+after "deploy:symlink", "plugins:enable"
+
+
+# Inpired by http://www.simonecarletti.com/blog/2009/06/capistrano-and-database-yml/
+namespace :configs do
+
+  # You may config inline here or create them at config/deploy
+  configs = {
+    'database.yml' => (<<-EOF
+      base: &base
+        adapter: postgresql
+        encoding: unicode
+        username: #{fetch :user}
+        password:
+      development:
+        database: capistrano_development
+        <<: *base
+      test:
+        database: capistrano_test
+        <<: *base
+      production:
+        database: capistrano_production
+        <<: *base
+    EOF
+    ), 'local.rb' => (<<-EOF
+      Noosfero.default_locale = '#{fetch :default_locale}'
+
+      # Replace with own server, see http://noosfero.org/Development/SMTPMailSending
+      ActionMailer::Base.delivery_method = :test
+    EOF
+    ), 'mongrel_cluster.yml' => (<<-EOF
+      --- 
+      log_file: log/mongrel.log
+      port: #{fetch :mongrel_port}
+      pid_file: tmp/pids/mongrel.pid
+      servers: #{fetch :mongrel_servers}
+    EOF
+    ), 'ferret_server.yml' => (<<-EOF
+      production:
+        host: localhost
+        port: 9011
+        pid_file: tmp/pids/ferret.production.pid
+      development:
+        host: localhost
+        port: 9010
+        pid_file: tmp/pids/ferret.development.pid
+    EOF
+    ), 'noosfero.yml' => (<<-EOF
+      development:
+        mail_enabled: true
+        webmail_url: "http://localhost.localdomain/"
+        addthis_enabled: true
+        addthis_pub: your-user-name
+        addthis_logo: http://localhost:#{fetch :mongrel_port}/images/logo-200x50.png
+        addthis_options: favorites, email, digg, delicious, technorati, slashdot, twitter, more
+        gravatar: wavatar
+        googlemaps_initial_zoom: 4
+        exception_recipients: [admin@example.com]
+      
+      test:
+      
+      production:
+    EOF
+    ),
+  }
+
+  desc "Copy the configurations files for each release."
+  task :copy do
+    run "mkdir -p #{shared_path}/config"
+    configs.each do |file, template|
+      location = "config/deploy/#{file}"
+      config = File.file?(location) ? File.read(location) : template
+      put config, "#{shared_path}/config/#{file}"
+    end
+  end
+
+  desc "Update the symlink of configs files."
+  task :symlink do
+    configs.keys.each do |file|
+      run "ln -nfs #{shared_path}/config/#{file} #{current_path}/config/#{file}"
+    end
+  end
+
+  desc "Update the symlink of configs files (in release)."
+  task :release_symlink do
+    configs.keys.each do |file|
+      run "ln -nfs #{shared_path}/config/#{file} #{release_path}/config/#{file}"
+    end
+  end
+
+end
+after "deploy:symlink", "configs:symlink"
+after "deploy:update_code", "configs:release_symlink"
+
+
+namespace :translations do
+  desc "Compile translations on the server."
+  task :compile do
+    run "cd #{current_path}; #{rake} noosfero:translations:compile RAILS_ENV=#{fetch :rails_env}"
+  end
+end
+after "deploy:symlink", "translations:compile"
+
+
+namespace :db do
+
+  # FIXME: add support for other DBMS (rake db:create and db:drop tasks aren't working due to acts_as_ferret)
+
+  desc "Create the database."
+  task :create do
+    run "cd #{current_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+  end
+
+  desc "Drop the database."
+  task :drop do
+    run "cd #{current_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+  end
+
+  # We cannot have schema:load - capistrano blocks load task
+  desc "Load the schema into database (reset all data)."
+  task :schema_load do
+    run "cd #{current_path}; script/noosfero-plugins disableall" #workaround bug of plugins load in this task
+    run "cd #{current_path}; #{rake} db:schema:load RAILS_ENV=#{fetch :rails_env}"
+  end
+
+  namespace :data do
+
+    desc "Create the default environment and domain, if it don't exist yet."
+    task :create_env_and_domain do
+      run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.create!(:name => \"#{fetch :name}\", :is_default => true) if Environment.default.blank?'"
+      run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.default.domains << Domain.new(:name => \"#{fetch :domain}\") if Environment.default.domains.blank?'"
+    end
+
+    desc "Populate the server with sample data."
+    task :sample_populate do
+      run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/sample-data"
+    end
+
+  end
+
+end
+
+
+# Inspired by
+# http://trevorturk.com/2007/03/25/working-with-attachment_fu/
+# http://www.simonecarletti.com/blog/2009/02/capistrano-uploads-folder/
+namespace :uploads do
+
+  desc "Symlink shared configs and folders on each release."
+  task :symlink do
+    %w{image_uploads}.each do |share|
+      run "rm -rf #{current_path}/public/#{share}"
+      run "mkdir -p #{shared_path}/system/#{share}"
+      run "ln -nfs #{shared_path}/system/#{share} #{current_path}/public/#{share}"
+    end
+  end
+
+end
+after "deploy:symlink", "uploads:symlink"
+
+
+# See http://noosfero.org/Development/SMTPMailSending for configuration details
+namespace :smtp do
+  desc "Install TLS support for SMTP."
+  task :install_tls_support do
+    run "cd #{current_path}; script/plugin install git://github.com/collectiveidea/action_mailer_optional_tls.git"
+  end
+end
+
+
+namespace :exception_notification do
+  desc "Install exception notification (see noosfero.yml file)."
+  task :install do
+    run "gem install exception_notification -v 1.0.20090728"
+  end
+end
+
+
+namespace :apache do
+
+  site_config = <<-EOF
+    <VirtualHost *:80>
+      ServerName #{fetch :domain}
+
+      DocumentRoot "#{current_path}/public"
+      <Directory "#{current_path}/public">
+        Options FollowSymLinks
+        AllowOverride None
+        Order Allow,Deny
+        Allow from all
+      </Directory>
+
+      RewriteEngine On
+
+      # Rewrite index to check for static index.html
+      RewriteRule ^/$ /index.html [QSA]
+
+      # Rewrite to check for Rails cached page
+      RewriteRule ^([^.]+)$ $1.html [QSA]
+
+      RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+      RewriteRule ^.*$ balancer://#{fetch :domain}%{REQUEST_URI} [P,QSA,L]
+
+      ErrorDocument 503 /503.html
+
+      ErrorLog #{shared_path}/log/apache.log
+      LogLevel warn
+      CustomLog #{shared_path}/log/apache.access.log combined
+
+      Include #{current_path}/etc/noosfero/apache/cache.conf
+
+    </VirtualHost>
+
+    <Proxy balancer://#{fetch :domain}>
+      #{fetch(:mongrel_servers).times.map { |i| "BalancerMember http://127.0.0.1:#{fetch(:mongrel_port)+i}" } * "\n"}
+      Order Allow,Deny
+      Allow from All
+    </Proxy>
+  EOF
+
+  desc "Configure apache."
+  task :configure do
+    sudo "a2enmod deflate expires proxy proxy_balancer proxy_http rewrite"
+    put site_config, "/tmp/#{fetch :domain}"
+    sudo "mv /tmp/#{fetch :domain} #{fetch :apache_conf_path}/sites-available"
+    deploy.apache.enable_site
+  end
+
+  desc "Add (if needed) and enable the apache server."
+  task :enable_site do
+    sudo "a2ensite #{fetch :domain}"
+    sudo "invoke-rc.d apache2 restart"
+  end
+end
+
+
+# Inpired by http://dirk.net/2010/07/12/clearing-memcached-at-capistrano-deployment/
+namespace :cache do
+
+  desc "Clear memcache after deployment."
+  task :clear, :roles => :app do
+    run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'ActionController::Base.cache_store.clear; Rails.cache.clear;'"
+  end
+
+end
+after "deploy:restart", "cache:clear"
+
+
+namespace :dependencies do
+
+  desc "Install deps using Debian's Lenny packages."
+  task :lenny_install do
+    sudo "apt-get install ruby rake po4a libgettext-ruby-util libgettext-ruby-data libgettext-ruby1.8 libsqlite3-ruby rcov librmagick-ruby libredcloth-ruby libwill-paginate-ruby iso-codes libfeedparser-ruby libferret-ruby libdaemons-ruby mongrel mongrel-cluster tango-icon-theme libhpricot-ruby libzip-ruby1.8"
+  end
+
+  # See http://noosfero.org/Development/RVMGemBasedInstallation
+  desc "Install deps using RVM and bundler."
+  task :rvm_install do
+    sudo "apt-get -y install po4a iso-codes tango-icon-theme"
+    sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev"
+
+    run "bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )"
+    run "echo '[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\"' >> $HOME/.bashrc"
+    run "rvm install 1.8.7"
+    run "rvm use 1.8.7 && rvm gemset create noosfero"
+
+    run "rvm 1.8.7@noosfero && gem update --system 1.4.1"
+    run "rvm 1.8.7@noosfero && gem install bundler"
+    run "cd #{current_path}; rvm 1.8.7@noosfero && bundle install"
+  end
+
+end
+
+namespace :dirs do
+
+  desc "Create log and tmp dirs."
+  task :create do
+    run "mkdir -p #{fetch :releases_path}"
+    run "mkdir -p #{shared_path}/log"
+    run "mkdir -p #{shared_path}/tmp"
+    run "mkdir -p #{shared_path}/pids"
+  end
+
+end
+before "deploy:restart", "cache:clear"
+
