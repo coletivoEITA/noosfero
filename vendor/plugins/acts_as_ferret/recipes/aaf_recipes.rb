@@ -65,7 +65,8 @@ namespace :ferret do
   namespace :index do
 
     desc "Rebuild the Ferret index. See aaf_recipes.rb for instructions."
-    task :rebuild => :environment, :roles => :app do
+    task :rebuild, :roles => :app do
+      require 'config/environment'
       rake = fetch(:rake, 'rake')
       rails_env = fetch(:rails_env, 'production')
       indexes = fetch(:ferret_indexes, nil)
@@ -88,10 +89,10 @@ namespace :ferret do
 
 end
 
-after  "deploy:stop",    "ferret:stop"
-before "deploy:start",   "ferret:start"
+#after  "deploy:stop",    "ferret:stop"
+#before "deploy:start",   "ferret:start"
 
-before "deploy:restart", "ferret:stop"
-after  "deploy:restart", "ferret:start"
-after "deploy:symlink", "ferret:index:symlink"
+#before "deploy:restart", "ferret:stop"
+#after  "deploy:restart", "ferret:start"
+#after "deploy:symlink", "ferret:index:symlink"
 
