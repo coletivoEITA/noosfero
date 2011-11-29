@@ -10,20 +10,16 @@ set :name, "My environment"
 set :domain, "localhost"
 set :default_locale, "pt"
 set :enabled_plugins, []
-role :app, domain
-role :web, domain
-role :db, domain, :primary => true
-
-# Deploy destination
-set :deploy_to, "/home/youruser/rails_app/#{domain}"
-set :deploy_via, :remote_cache
-set :use_sudo, false
-set :rails_env, "production"
 
 # Server access
 set :application, "localhost"
-set :user, "youruser"
-set :port, 24
+set :user, "noosfero"
+set :port, 22
+
+# Deploy destination
+set :deploy_to, "/home/user/rails_app/#{fetch :application}"
+set :deploy_via, :remote_cache
+set :use_sudo, false
 
 # Repository
 set :scm, "git"
@@ -31,28 +27,33 @@ set :repository, "git://gitorious.org/noosfero/noosfero.git"
 set :branch, "master"
 
 # Configuration variables
+set :database_name_prefix, 'noosfero'
 set :mongrel_port, 3000
 set :mongrel_servers, 4
 set :smtp_tls_support, false
 set :exception_notification, true
 set :apache_conf_path, '/etc/apache2'
+set :rails_env, "production"
 
-# RVM (comment if not using)
-# See http://beginrescueend.com/integration/capistrano
-set :default_shell, "/bin/bash -i" #needed for rvm_install
-#$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
-#require "rvm/capistrano"
-#set :rvm_ruby_string, '1.8.7@noosfero'
-#set :rvm_type, :user
+# RVM (comment if not using), see http://beginrescueend.com/integration/capistrano
+$:.unshift File.expand_path('./lib', ENV['rvm_path'])
+require "rvm/capistrano"
+set :rvm_ruby_string, '1.8.7@noosfero'
+set :rvm_type, :user
+
+# Server(s) configuration, see http://stackoverflow.com/questions/1661868/using-capistrano-to-deploy-a-rails-application-to-multiple-web-servers
+role :app, application
+role :web, application
+role :db, application, :primary => true
 
 namespace :deploy do
 
   # TODO: make it possible with development environment
   task :start do
-    run "cd #{current_path}; script/production stop"
+    run "cd #{current_path}; script/production start"
   end
   task :stop do
-    run "cd #{current_path}; script/production start"
+    run "cd #{current_path}; script/production stop"
   end
   desc "Restart the mongrel server."
   task :restart do
@@ -60,14 +61,14 @@ namespace :deploy do
     run "cd #{current_path}; script/production stop; script/production start"
   end
 
-  desc "Initial setup (configs, release, db, noosfero env.)."
+  desc "Initial setup (drop db, setup configs, db, noosfero env.)."
   task :setup do
     deploy.dirs.create
     deploy.configs.copy
-    deploy.update
-    deploy.symlink
+    deploy.update_code
     deploy.db.drop
     deploy.db.create
+    deploy.symlink
     deploy.db.schema_load
     deploy.translations.compile
     deploy.db.data.create_env_and_domain
@@ -81,15 +82,14 @@ namespace :deploy do
     deploy.smtp.install_tls_support if fetch(:smtp_tls_support, false)
   end
 
-  # Put your own sync code here
-  desc "Sync some data."
-  task :sync_data do
-    system "rsync -vr some data #{user}@#{application}:#{shared_path}/"
-  end
-
 end
-after "deploy:symlink", "uploads:symlink"
 
+after "deploy:symlink", "configs:symlink"
+after "deploy:symlink", "plugins:enable"
+after "deploy:symlink", "translations:compile"
+after "deploy:symlink", "uploads:symlink"
+after "deploy:update_code", "configs:release_symlink"
+after "deploy:restart", "cache:clear"
 
 namespace :plugins do
   
@@ -109,7 +109,6 @@ namespace :plugins do
   end
 
 end
-after "deploy:symlink", "plugins:enable"
 
 
 # Inpired by http://www.simonecarletti.com/blog/2009/06/capistrano-and-database-yml/
@@ -124,13 +123,13 @@ namespace :configs do
         username: #{fetch :user}
         password:
       development:
-        database: capistrano_development
+        database: #{fetch :database_name_prefix, 'noosfero'}_development
         <<: *base
       test:
-        database: capistrano_test
+        database: #{fetch :database_name_prefix, 'noosfero'}_test
         <<: *base
       production:
-        database: capistrano_production
+        database: #{fetch :database_name_prefix, 'noosfero'}_production
         <<: *base
     EOF
     ), 'local.rb' => (<<-EOF
@@ -142,9 +141,9 @@ namespace :configs do
     ), 'mongrel_cluster.yml' => (<<-EOF
       --- 
       log_file: log/mongrel.log
-      port: #{fetch :mongrel_port}
+      port: #{fetch :mongrel_port, 300}
       pid_file: tmp/pids/mongrel.pid
-      servers: #{fetch :mongrel_servers}
+      servers: #{fetch :mongrel_servers, 4}
     EOF
     ), 'ferret_server.yml' => (<<-EOF
       production:
@@ -162,7 +161,7 @@ namespace :configs do
         webmail_url: "http://localhost.localdomain/"
         addthis_enabled: true
         addthis_pub: your-user-name
-        addthis_logo: http://localhost:#{fetch :mongrel_port}/images/logo-200x50.png
+        addthis_logo: http://localhost:#{fetch :mongrel_port, 3000}/images/logo-200x50.png
         addthis_options: favorites, email, digg, delicious, technorati, slashdot, twitter, more
         gravatar: wavatar
         googlemaps_initial_zoom: 4
@@ -200,8 +199,6 @@ namespace :configs do
   end
 
 end
-after "deploy:symlink", "configs:symlink"
-after "deploy:update_code", "configs:release_symlink"
 
 
 namespace :translations do
@@ -210,7 +207,6 @@ namespace :translations do
     run "cd #{current_path}; #{rake} noosfero:translations:compile RAILS_ENV=#{fetch :rails_env}"
   end
 end
-after "deploy:symlink", "translations:compile"
 
 
 namespace :db do
@@ -219,12 +215,12 @@ namespace :db do
 
   desc "Create the database."
   task :create do
-    run "cd #{current_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+    run "cd #{release_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
   desc "Drop the database."
-  task :drop do
-    run "cd #{current_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+  task :drop, :on_error => :continue do
+    run "cd #{release_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
   # We cannot have schema:load - capistrano blocks load task
@@ -236,6 +232,7 @@ namespace :db do
 
   namespace :data do
 
+    # Translations must be done before, so we get template data localized
     desc "Create the default environment and domain, if it don't exist yet."
     task :create_env_and_domain do
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.create!(:name => \"#{fetch :name}\", :is_default => true) if Environment.default.blank?'"
@@ -267,7 +264,6 @@ namespace :uploads do
   end
 
 end
-after "deploy:symlink", "uploads:symlink"
 
 
 # See http://noosfero.org/Development/SMTPMailSending for configuration details
@@ -323,7 +319,7 @@ namespace :apache do
     </VirtualHost>
 
     <Proxy balancer://#{fetch :domain}>
-      #{fetch(:mongrel_servers).times.map { |i| "BalancerMember http://127.0.0.1:#{fetch(:mongrel_port)+i}" } * "\n"}
+      #{fetch(:mongrel_servers, 4).times.map { |i| "BalancerMember http://127.0.0.1:#{fetch(:mongrel_port, 3000)+i}" } * "\n"}
       Order Allow,Deny
       Allow from All
     </Proxy>
@@ -354,19 +350,20 @@ namespace :cache do
   end
 
 end
-after "deploy:restart", "cache:clear"
 
 
 namespace :dependencies do
 
   desc "Install deps using Debian's Lenny packages."
   task :lenny_install do
-    sudo "apt-get install ruby rake po4a libgettext-ruby-util libgettext-ruby-data libgettext-ruby1.8 libsqlite3-ruby rcov librmagick-ruby libredcloth-ruby libwill-paginate-ruby iso-codes libfeedparser-ruby libferret-ruby libdaemons-ruby mongrel mongrel-cluster tango-icon-theme libhpricot-ruby libzip-ruby1.8"
+    sudo "apt-get install ruby rake po4a libgettext-ruby-util libgettext-ruby-data libgettext-ruby1.8 libsqlite3-ruby rcov librmagick-ruby libredcloth-ruby libwill-paginate-ruby iso-codes libfeedparser-ruby libferret-ruby libdaemons-ruby mongrel mongrel-cluster tango-icon-theme libhpricot-ruby libzip-ruby1.8 postgresql libpgsql-ruby"
   end
 
   # See http://noosfero.org/Development/RVMGemBasedInstallation
   desc "Install deps using RVM and bundler."
   task :rvm_install do
+    deploy.dirs.create # needed for a first time
+
     sudo "apt-get -y install po4a iso-codes tango-icon-theme"
     sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev"
 
@@ -374,13 +371,15 @@ namespace :dependencies do
     run "echo '[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\"' >> $HOME/.bashrc"
     run "rvm install 1.8.7"
     run "rvm use 1.8.7 && rvm gemset create noosfero"
-
     run "rvm 1.8.7@noosfero && gem update --system 1.4.1"
     run "rvm 1.8.7@noosfero && gem install bundler"
-    run "cd #{current_path}; rvm 1.8.7@noosfero && bundle install"
+
+    deploy.update_code
+    run "cd #{release_path}; rvm 1.8.7@noosfero && bundle install"
   end
 
 end
+
 
 namespace :dirs do
 
@@ -393,5 +392,19 @@ namespace :dirs do
   end
 
 end
-before "deploy:restart", "cache:clear"
+
+
+namespace :data do
+
+  desc "Example task to sync data."
+  task :sync do
+    system "rsync -vr some data #{user}@#{application}:#{shared_path}/"
+  end
+
+end
+
+
+# Workarounds
+default_run_options[:pty] = true # for sudo and ssh on lxc
+set :default_shell, "/bin/bash -li" #needed for rvm_install
 
