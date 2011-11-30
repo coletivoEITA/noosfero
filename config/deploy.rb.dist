@@ -49,19 +49,21 @@ role :db, application, :primary => true
 namespace :deploy do
 
   # TODO: make it possible with development environment
+  desc "Start all servers."
   task :start do
     run "cd #{current_path}; script/production start"
   end
+  desc "Stop all servers."
   task :stop do
     run "cd #{current_path}; script/production stop"
   end
-  desc "Restart the mongrel server."
+  desc "Restart all servers."
   task :restart do
     deploy.migrate
     run "cd #{current_path}; script/production stop; script/production start"
   end
 
-  desc "Initial setup (drop db, setup configs, db, noosfero env.)."
+  desc "Initial setup (create/load db, setup configs, noosfero env.)."
   task :setup do
     deploy.dirs.create
     deploy.configs.copy
@@ -73,12 +75,6 @@ namespace :deploy do
     deploy.db.data.create_env_and_domain
     deploy.plugins.enable
     deploy.migrate
-  end
-
-  desc "Install optional extras dependencies."
-  task :install_extras do
-    deploy.exception_notification.install if fetch(:exception_notification, true)
-    deploy.smtp.install_tls_support if fetch(:smtp_tls_support, false)
   end
 
 end
@@ -173,7 +169,7 @@ namespace :configs do
     ),
   }
 
-  desc "Copy the configurations files for each release."
+  desc "Copy configuration files for each release."
   task :copy do
     run "mkdir -p #{shared_path}/config"
     configs.each do |file, template|
@@ -183,14 +179,14 @@ namespace :configs do
     end
   end
 
-  desc "Update the symlink of configs files."
+  desc "Symlink shared config files."
   task :symlink do
     configs.keys.each do |file|
       run "ln -nfs #{shared_path}/config/#{file} #{current_path}/config/#{file}"
     end
   end
 
-  desc "Update the symlink of configs files (in release)."
+  desc "Symlink shared config files (for a release)."
   task :release_symlink do
     configs.keys.each do |file|
       run "ln -nfs #{shared_path}/config/#{file} #{release_path}/config/#{file}"
@@ -201,72 +197,90 @@ end
 
 
 namespace :translations do
-  desc "Compile translations on the server."
+
+  desc "Compile translations for current release."
   task :compile do
     run "cd #{current_path}; #{rake} noosfero:translations:compile RAILS_ENV=#{fetch :rails_env}"
   end
+
 end
 
 
 namespace :db do
 
-  # FIXME: add support for other DBMS (rake db:create and db:drop tasks aren't working due to acts_as_ferret)
-
-  desc "Create the database."
+  desc "Create database."
   task :create do
     run "cd #{shared_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
-  desc "Drop the database."
+  desc "Drop database (lose all data)."
   task :drop, :on_error => :continue do
     run "cd #{shared_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
-  desc "Backup the database."
-  task :backup do
-    run "mkdir -p #{shared_path}/backups"
-    file = "#{Time.now.utc.strftime('%Y%m%d%H%M%S')}.sql"
-    run "cd #{shared_path}; pg_dump `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` -f backups/#{file}"
-    run "cd #{shared_path}/backups; ln -nfs #{file} newest.sql"
-  end
-
-  desc "Restore database backup (newest version or -s version=DATE)."
-  task :restore do
-    deploy.db.drop
-    deploy.db.create
-    version = 'newest' if version.nil?
-    run "cd #{shared_path}; psql `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` < #{shared_path}/backups/#{version}.sql"
-  end
-
-  desc "Download newest backup the database."
-  task :download_newest_backup do
-    file = ""
-    run("readlink #{shared_path}/backups/newest.sql") { |channel, stream, data| file = data.strip if stream == :out }
-    get "#{shared_path}/backups/#{file}", "#{application}-#{file}"
-  end
-
-  desc "List Backup the database."
-  task :backup_list do
-    run "ls -l #{shared_path}/backups"
-  end
-
   # We cannot have schema:load - capistrano blocks lock this task
-  desc "Load the schema into database (reset all data)."
+  desc "Load schema into database (reset all data)."
   task :schema_load do
     run "cd #{current_path}; script/noosfero-plugins disableall" #workaround bug of plugins load in this task
     run "cd #{current_path}; #{rake} db:schema:load RAILS_ENV=#{fetch :rails_env}"
   end
 
+  namespace :user do
+
+    desc "Create database user."
+    task :create do
+      sudo "createuser #{fetch :user} -S -d -R", :as => "postgres"
+    end
+
+    desc "Drop database user."
+    task :drop do
+      sudo "dropuser #{fetch :user}", :as => "postgres"
+    end
+
+  end
+
+  namespace :backup do
+
+    desc "Backup database."
+    task :do do
+      run "mkdir -p #{shared_path}/backups"
+      file = "#{Time.now.utc.strftime('%Y%m%d%H%M%S')}.sql"
+      run "cd #{shared_path}; pg_dump `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` -f backups/#{file}"
+      run "cd #{shared_path}/backups; ln -nfs #{file} newest.sql"
+    end
+
+    desc "Restore database backup (newest version or -s version=DATE)."
+    task :restore do
+      deploy.db.drop
+      deploy.db.create
+      version = 'newest' if version.nil?
+      run "cd #{shared_path}; psql `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` < #{shared_path}/backups/#{version}.sql"
+    end
+
+    desc "Download newest database backup."
+    task :download_newest do
+      file = ""
+      run("readlink #{shared_path}/backups/newest.sql") { |channel, stream, data| file = data.strip if stream == :out }
+      get "#{shared_path}/backups/#{file}", "#{application}-#{file}"
+    end
+
+    desc "List database backups."
+    task :list do
+      run "ls -l #{shared_path}/backups"
+    end
+    
+  end
+
   namespace :data do
 
     # Translations must be done before, so we get template data localized
-    desc "Create the default environment and domain, if it don't exist yet."
+    desc "Create default environment and domain, if them don't exist yet."
     task :create_env_and_domain do
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.create!(:name => \"#{fetch :name}\", :is_default => true) if Environment.default.blank?'"
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.default.domains << Domain.new(:name => \"#{fetch :domain}\") if Environment.default.domains.blank?'"
     end
 
-    desc "Populate the server with sample data."
+    desc "Populate database with sample data."
     task :sample_populate do
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/sample-data"
     end
@@ -281,7 +295,7 @@ end
 # http://www.simonecarletti.com/blog/2009/02/capistrano-uploads-folder/
 namespace :uploads do
 
-  desc "Symlink shared configs and folders on each release."
+  desc "Symlink uploaded files on current release."
   task :symlink do
     %w{image_uploads}.each do |share|
       run "rm -rf #{current_path}/public/#{share}"
@@ -352,7 +366,7 @@ namespace :apache do
     </Proxy>
   EOF
 
-  desc "Configure apache."
+  desc "Copy/Enable Apache's VirtualHost config."
   task :configure do
     sudo "a2enmod deflate expires proxy proxy_balancer proxy_http rewrite"
     put site_config, "/tmp/#{fetch :domain}"
@@ -360,7 +374,7 @@ namespace :apache do
     deploy.apache.enable_site
   end
 
-  desc "Add (if needed) and enable the apache server."
+  desc "Enable Apache site (see configure)."
   task :enable_site do
     sudo "a2ensite #{fetch :domain}"
     sudo "invoke-rc.d apache2 restart"
@@ -371,7 +385,7 @@ end
 # Inpired by http://dirk.net/2010/07/12/clearing-memcached-at-capistrano-deployment/
 namespace :cache do
 
-  desc "Clear memcache after deployment."
+  desc "Clear memcached cache."
   task :clear, :roles => :app do
     run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'ActionController::Base.cache_store.clear; Rails.cache.clear;'"
   end
@@ -423,9 +437,20 @@ end
 
 namespace :data do
 
-  desc "Example task to sync data."
+  desc "Modify this task to sync data."
   task :sync do
     system "rsync -vr some data #{user}@#{application}:#{shared_path}/"
+  end
+
+end
+
+
+namespace :extras do
+
+  desc "Install optional extras dependencies."
+  task :install do
+    deploy.exception_notification.install if fetch(:exception_notification, true)
+    deploy.smtp.install_tls_support if fetch(:smtp_tls_support, false)
   end
 
 end
