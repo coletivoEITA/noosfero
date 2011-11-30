@@ -66,7 +66,6 @@ namespace :deploy do
     deploy.dirs.create
     deploy.configs.copy
     deploy.update_code
-    deploy.db.drop
     deploy.db.create
     deploy.symlink
     deploy.db.schema_load
@@ -215,15 +214,43 @@ namespace :db do
 
   desc "Create the database."
   task :create do
-    run "cd #{release_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+    run "cd #{shared_path}; createdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
   desc "Drop the database."
   task :drop, :on_error => :continue do
-    run "cd #{release_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
+    run "cd #{shared_path}; dropdb `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"`"
   end
 
-  # We cannot have schema:load - capistrano blocks load task
+  desc "Backup the database."
+  task :backup do
+    run "mkdir -p #{shared_path}/backups"
+    file = "#{Time.now.utc.strftime('%Y%m%d%H%M%S')}.sql"
+    run "cd #{shared_path}; pg_dump `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` -f backups/#{file}"
+    run "cd #{shared_path}/backups; ln -nfs #{file} newest.sql"
+  end
+
+  desc "Restore database backup (newest version or -s version=DATE)."
+  task :restore do
+    deploy.db.drop
+    deploy.db.create
+    version = 'newest' if version.nil?
+    run "cd #{shared_path}; psql `ruby -ryaml -e \"puts YAML.load_file('config/database.yml')['#{fetch :rails_env}']['database']\"` < #{shared_path}/backups/#{version}.sql"
+  end
+
+  desc "Download newest backup the database."
+  task :download_newest_backup do
+    file = ""
+    run("readlink #{shared_path}/backups/newest.sql") { |channel, stream, data| file = data.strip if stream == :out }
+    get "#{shared_path}/backups/#{file}", "#{application}-#{file}"
+  end
+
+  desc "List Backup the database."
+  task :backup_list do
+    run "ls -l #{shared_path}/backups"
+  end
+
+  # We cannot have schema:load - capistrano blocks lock this task
   desc "Load the schema into database (reset all data)."
   task :schema_load do
     run "cd #{current_path}; script/noosfero-plugins disableall" #workaround bug of plugins load in this task
