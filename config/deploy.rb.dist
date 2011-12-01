@@ -17,7 +17,7 @@ set :user, "noosfero"
 set :port, 22
 
 # Deploy destination
-set :deploy_to, "/home/user/rails_app/#{fetch :application}"
+set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :application}"
 set :deploy_via, :remote_cache
 set :use_sudo, false
 
@@ -27,7 +27,7 @@ set :repository, "git://gitorious.org/noosfero/noosfero.git"
 set :branch, "master"
 
 # Configuration variables
-set :database_name_prefix, 'noosfero'
+set :database_name_prefix, "#{fetch :user}_#{fetch :domain}"
 set :mongrel_port, 3000
 set :mongrel_servers, 4
 set :smtp_tls_support, false
@@ -38,7 +38,8 @@ set :rails_env, "production"
 # RVM (comment if not using), see http://beginrescueend.com/integration/capistrano
 $:.unshift File.expand_path('./lib', ENV['rvm_path'])
 require "rvm/capistrano"
-set :rvm_ruby_string, '1.8.7@noosfero'
+set :rvm_gemset, 'noosfero'
+set :rvm_ruby_string, "1.8.7@#{fetch :rvm_gemset}"
 set :rvm_type, :user
 
 # Server(s) configuration, see http://stackoverflow.com/questions/1661868/using-capistrano-to-deploy-a-rails-application-to-multiple-web-servers
@@ -411,12 +412,12 @@ namespace :dependencies do
     run "bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )"
     run "echo '[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\"' >> $HOME/.bashrc"
     run "rvm install 1.8.7"
-    run "rvm use 1.8.7 && rvm gemset create noosfero"
-    run "rvm 1.8.7@noosfero && gem update --system 1.4.1"
-    run "rvm 1.8.7@noosfero && gem install bundler"
+    run "rvm use 1.8.7 && rvm gemset create #{fetch :rvm_gemset}"
+    run "rvm 1.8.7@#{fetch :rvm_gemset} && gem update --system 1.4.1"
+    run "rvm 1.8.7@#{fetch :rvm_gemset} && gem install bundler"
 
     deploy.update_code
-    run "cd #{release_path}; rvm 1.8.7@noosfero && bundle install"
+    run "cd #{release_path}; rvm 1.8.7@#{fetch :rvm_gemset} && bundle install"
   end
 
 end
