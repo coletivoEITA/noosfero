@@ -18,7 +18,7 @@ set :user, "noosfero"
 set :port, 22
 
 # Deploy destination
-set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :application}"
+set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :domain}"
 set :deploy_via, :remote_cache
 set :use_sudo, false
 set :keep_releases, 10
