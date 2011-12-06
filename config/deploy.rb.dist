@@ -422,8 +422,8 @@ namespace :dependencies do
     self[:default_shell] = "/bin/bash -li" # we don't yet have RVM
     deploy.dirs.create # needed for a first time
 
-    sudo "apt-get -y install po4a iso-codes tango-icon-theme"
-    sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev"
+    sudo "apt-get -y install po4a iso-codes tango-icon-theme curl"
+    sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev libxslt1-dev"
 
     run "bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )"
     run "echo '[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\"' >> $HOME/.bashrc"
