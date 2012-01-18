@@ -15,7 +15,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
 
     @profile = create_user('testinguser').person
     @environment = @profile.environment
-    Comment.skip_captcha!
   end
   attr_reader :profile, :environment
 
@@ -188,17 +187,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     end
   end
 
-  should 'not be able to post comment while inverse captcha field filled' do
-    profile = create_user('popstar').person
-    page = profile.articles.build(:name => 'myarticle', :body => 'the body of the text')
-    page.save!
-    profile.home_page = page; profile.save!
-
-    assert_no_difference Comment, :count do
-      post :view_page, :profile => profile.identifier, :page => [ 'myarticle' ], @controller.icaptcha_field => 'filled', :comment => { :title => 'crap!', :body => 'I think that this article is crap', :name => 'Anonymous coward', :email => 'coward@anonymous.com' }
-    end
-  end
-
   should 'be able to remove comments if is moderator' do
     commenter = create_user('commenter_user').person
     community = Community.create!(:name => 'Community test', :identifier => 'community-test')
@@ -210,15 +198,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
       post :view_page, :profile => community.identifier, :page => [ 'test' ], :remove_comment => comment.id
       assert_response :redirect
     end
-  end
-
-  should 'render inverse captcha field' do
-    profile = create_user('popstar').person
-    page = profile.articles.build(:name => 'myarticle', :body => 'the body of the text')
-    page.save!
-    profile.home_page = page; profile.save!
-    get :view_page, :profile => profile.identifier, :page => [ 'myarticle' ]
-    assert_tag :tag => 'input', :attributes => { :type => 'text', :name => @controller.icaptcha_field }
   end
 
   should 'filter html content from body' do
@@ -1134,26 +1113,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     assert_tag :a, :attributes => { :class => /article-translations-menu/, :onclick => /toggleSubmenu/ }
   end
 
-  should 'be redirected to translation if article is a root' do
-    @request.env['HTTP_REFERER'] = 'http://some.path'
-    FastGettext.stubs(:locale).returns('es')
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => es_article.explode_path
-    assert_equal es_article, assigns(:page)
-  end
-
-  should 'be redirected to translation' do
-    @request.env['HTTP_REFERER'] = 'http://some.path'
-    FastGettext.stubs(:locale).returns('en')
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    get :view_page, :profile => @profile.identifier, :page => es_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => en_article.explode_path
-    assert_equal en_article, assigns(:page)
-  end
-
   should 'not be redirected if already in translation' do
     en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
     es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
@@ -1180,16 +1139,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
     assert_response :success
     assert_equal en_article, assigns(:page)
-  end
-
-  should 'be redirected if http_referer is nil' do
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    @request.env['HTTP_REFERER'] = nil
-    FastGettext.stubs(:locale).returns('es')
-    get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => es_article.explode_path
-    assert_equal es_article, assigns(:page)
   end
 
   should 'not be redirected to transition if came from edit' do
@@ -1279,7 +1228,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     comment.save!
     login_as 'testuser'
     get :view_page, :profile => 'testuser', :page => [ 'test' ]
-    assert_tag :tag => 'a', :attributes => { :class => /comment-reply-link/ }
+    assert_tag :tag => 'a', :attributes => { :class => /comment-footer-link/ }, :content => 'Reply'
   end
 
   should 'display reply to comment button if not authenticated' do
@@ -1289,7 +1238,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     comment = article.comments.build(:author => profile, :title => 'a comment', :body => 'lalala')
     comment.save!
     get :view_page, :profile => 'testuser', :page => [ 'test' ]
-    assert_tag :tag => 'a', :attributes => { :class => /comment-reply-link/ }
+    assert_tag :tag => 'a', :attributes => { :class => /comment-footer-link/ }, :content => 'Reply'
   end
 
   should 'display replies if comment has replies' do

@@ -3,11 +3,10 @@ require File.dirname(__FILE__) + '/../test_helper'
 class CommentTest < Test::Unit::TestCase
 
   def setup
-    Comment.skip_captcha!
   end
 
-  should 'have a name and require it' do
-    assert_mandatory(Comment.new, :title)
+  should 'have a name but not require it' do
+    assert_optional(Comment.new, :title)
   end
 
   should 'have a body and require it' do
@@ -198,7 +197,6 @@ class CommentTest < Test::Unit::TestCase
     comment.valid?
 
     assert comment.errors.invalid?(:name)
-    assert comment.errors.invalid?(:title)
     assert comment.errors.invalid?(:body)
   end
 
@@ -329,14 +327,6 @@ class CommentTest < Test::Unit::TestCase
 
   should 'not provide author url for unauthenticated user' do
     assert_nil Comment.new(:email => 'my@email.com').author_url
-  end
-
-  should 'have the captcha_solution be solved' do
-    Comment.dont_skip_captcha!
-    c = Comment.new
-    assert !c.valid? && c.errors.invalid?(:captcha_solution)
-    c.skip_captcha!
-    assert !c.valid? && !c.errors.invalid?(:captcha_solution)
   end
 
 end

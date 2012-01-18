@@ -666,6 +666,7 @@ div#notice {
 
 .tag_cloud a {
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .tag_cloud a small {
@@ -1242,9 +1243,6 @@ table.profile th {
 
 .browse-results-innerbox {
   margin-top: 10px;
-  border-bottom: none;
-  border: 1px solid #CCC;
-  background: url(imgs/comment-bg-S.png) 0% 100% repeat-x;
   padding-bottom: 10px;
 
 }
@@ -1298,4 +1296,10 @@ table.profile th {
 }
 #chat-window .history .other-name {
    color: #7F1F1F;
+}
+
+/* recaptcha*/
+
+table#recaptcha_table tr:hover td {
+  background-color: #fff;
 }

@@ -18,18 +18,6 @@ class ApplicationHelperTest < Test::Unit::TestCase
 
     File.expects(:exists?).with(p1+"test/_integer.rhtml").returns(true)
 
-    assert_equal 'integer', partial_for_class(Integer)
-  end
-
-
-  should 'calculate correctly partial for models recursively' do
-    p1 = 'path1/'
-    p2 = 'path2/'
-    @controller = mock()
-    @controller.stubs(:view_paths).returns([p1,p2])
-
-    self.stubs(:params).returns({:controller => 'test'})
-
     File.expects(:exists?).with(p1+"test/_float.rhtml").returns(false)
     File.expects(:exists?).with(p1+"test/_float.html.erb").returns(false)
     File.expects(:exists?).with(p2+"test/_float.rhtml").returns(false)
@@ -40,22 +28,13 @@ class ApplicationHelperTest < Test::Unit::TestCase
     File.expects(:exists?).with(p1+"test/_numeric.html.erb").returns(false)
     File.expects(:exists?).with(p2+"test/_numeric.rhtml").returns(true)
 
-    assert_equal 'numeric', partial_for_class(Float)
-  end
-
-  should 'raise error when partial is missing' do
-    p1 = 'path1/'
-    p2 = 'path2/'
-    @controller = mock()
-    @controller.stubs(:view_paths).returns([p1,p2])
-
-    self.stubs(:params).returns({:controller => 'test'})
-
     File.expects(:exists?).with(p1+"test/_object.rhtml").returns(false)
     File.expects(:exists?).with(p1+"test/_object.html.erb").returns(false)
     File.expects(:exists?).with(p2+"test/_object.rhtml").returns(false)
     File.expects(:exists?).with(p2+"test/_object.html.erb").returns(false)
 
+    assert_equal 'integer', partial_for_class(Integer)
+    assert_equal 'numeric', partial_for_class(Float)
     assert_raises ArgumentError do
       partial_for_class(Object)
     end
@@ -72,6 +51,15 @@ class ApplicationHelperTest < Test::Unit::TestCase
     File.expects(:exists?).with(p+"test/application_helper_test/school/_project.rhtml").returns(true)
 
     assert_equal 'test/application_helper_test/school/project', partial_for_class(School::Project)
+  end
+
+  should 'look for superclasses on view_for_profile actions' do
+    File.expects(:exists?).with("#{RAILS_ROOT}/app/views/blocks/profile_info_actions/float.rhtml").returns(false)
+    File.expects(:exists?).with("#{RAILS_ROOT}/app/views/blocks/profile_info_actions/float.html.erb").returns(false)
+    File.expects(:exists?).with("#{RAILS_ROOT}/app/views/blocks/profile_info_actions/numeric.rhtml").returns(false)
+    File.expects(:exists?).with("#{RAILS_ROOT}/app/views/blocks/profile_info_actions/numeric.html.erb").returns(true)
+
+    assert_equal 'blocks/profile_info_actions/numeric.html.erb', view_for_profile_actions(Float)
   end
 
   should 'give error when there is no partial for class' do
@@ -240,9 +228,10 @@ class ApplicationHelperTest < Test::Unit::TestCase
     assert_equal 'sampleuser', theme_owner
   end
 
-  should 'use default template when there is no profile' do
+  should 'use environment´s template when there is no profile' do
     stubs(:profile).returns(nil)
-    assert_equal "/designs/templates/default/stylesheets/style.css", template_stylesheet_path
+    environment.expects(:layout_template).returns('sometemplate')
+    assert_equal "/designs/templates/sometemplate/stylesheets/style.css", template_stylesheet_path
   end
 
   should 'use template from profile' do
@@ -479,11 +468,20 @@ class ApplicationHelperTest < Test::Unit::TestCase
   end
 
   should 'generate a gravatar url' do
+    stubs(:theme_option).returns({})
     with_constants :NOOSFERO_CONF => {'gravatar' => 'crazyvatar'} do
       url = str_gravatar_url_for( 'rms@gnu.org', :size => 50 )
       assert_match(/^http:\/\/www\.gravatar\.com\/avatar\.php\?/, url)
       assert_match(/(\?|&)gravatar_id=ed5214d4b49154ba0dc397a28ee90eb7(&|$)/, url)
       assert_match(/(\?|&)d=crazyvatar(&|$)/, url)
+      assert_match(/(\?|&)size=50(&|$)/, url)
+    end
+    stubs(:theme_option).returns('gravatar' => 'nicevatar')
+    with_constants :NOOSFERO_CONF => {'gravatar' => 'crazyvatar'} do
+      url = str_gravatar_url_for( 'rms@gnu.org', :size => 50 )
+      assert_match(/^http:\/\/www\.gravatar\.com\/avatar\.php\?/, url)
+      assert_match(/(\?|&)gravatar_id=ed5214d4b49154ba0dc397a28ee90eb7(&|$)/, url)
+      assert_match(/(\?|&)d=nicevatar(&|$)/, url)
       assert_match(/(\?|&)size=50(&|$)/, url)
     end
   end
@@ -548,7 +546,7 @@ class ApplicationHelperTest < Test::Unit::TestCase
     community.stubs(:url).returns('url for community')
     community.stubs(:public_profile_url).returns('url for community')
     links = links_for_balloon(community)
-    assert_equal ['Wall', 'Members', 'Agenda', 'Join', 'Leave', 'Send an e-mail'], links.map{|i| i.keys.first}
+    assert_equal ['Wall', 'Members', 'Agenda', 'Join', 'Leave community', 'Send an e-mail'], links.map{|i| i.keys.first}
   end
 
   should 'return ordered list of links to balloon to Enterprise' do
@@ -651,13 +649,18 @@ class ApplicationHelperTest < Test::Unit::TestCase
     env = Environment.default
     env.stubs(:enabled?).with(:show_zoom_button_on_article_images).returns(false)
     stubs(:environment).returns(env)
-    assert_nil add_zoom_to_images
+    assert_nil add_zoom_to_article_images
   end
 
   should 'return code when :show_zoom_button_on_article_images is enabled in environment' do
     env = Environment.default
     env.stubs(:enabled?).with(:show_zoom_button_on_article_images).returns(true)
     stubs(:environment).returns(env)
+    assert_not_nil add_zoom_to_article_images
+  end
+
+  should 'return code when add_zoom_to_images' do
+    env = Environment.default
     assert_not_nil add_zoom_to_images
   end
 

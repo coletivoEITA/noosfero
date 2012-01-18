@@ -2,8 +2,6 @@ class AccountController < ApplicationController
 
   no_design_blocks
 
-  inverse_captcha :field => 'e_mail'
-
   require_ssl :except => [ :login_popup, :logout_popup, :profile_details ]
 
   before_filter :login_required, :only => [:activation_question, :accept_terms, :activate_enterprise]
@@ -13,6 +11,17 @@ class AccountController < ApplicationController
   def index
     unless logged_in?
       render :action => 'index_anonymous'
+    end
+  end
+
+  def activate
+    @user = User.find_by_activation_code(params[:activation_code]) if params[:activation_code]
+    if @user and @user.activate
+      @message = _("Your account has been activated, now you can log in!")
+      render :action => 'login', :userlogin => @user.login
+    else
+      session[:notice] = _("It looks like you're trying to activate an account. Perhaps have already activated this account?")
+      redirect_to :controller => :home
     end
   end
 
@@ -58,9 +67,8 @@ class AccountController < ApplicationController
       @user.person_data = params[:profile_data]
       @person = Person.new(params[:profile_data])
       @person.environment = @user.environment
-      if request.post? && params[self.icaptcha_field].blank?
+      if request.post?
         @user.signup!
-        self.current_user = @user
         owner_role = Role.find_by_name('owner')
         @user.person.affiliate(@user.person, [owner_role]) if owner_role
         invitation = Task.find_by_code(@invitation_code)
@@ -68,8 +76,7 @@ class AccountController < ApplicationController
           invitation.update_attributes!({:friend => @user.person})
           invitation.finish
         end
-        session[:notice] = _("Thanks for signing up!")
-        go_to_initial_page if redirect?
+        @register_pending = true
       end
     rescue ActiveRecord::RecordInvalid
       @person.valid?

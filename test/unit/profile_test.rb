@@ -1259,7 +1259,7 @@ class ProfileTest < Test::Unit::TestCase
     task = Task.create!(:requestor => person, :target => env)
 
     Person.any_instance.stubs(:is_admin?).returns(true)
-    assert_equal [task], person.all_pending_tasks
+    assert_equal [task], Task.to(person).pending
   end
 
   should 'find task from environment if is admin' do
@@ -1283,7 +1283,7 @@ class ProfileTest < Test::Unit::TestCase
 
     Person.any_instance.stubs(:is_admin?).returns(true)
 
-    assert_equal [task1, task2], person.all_pending_tasks
+    assert_equal [task1, task2], Task.to(person).pending
   end
 
   should 'find task by id on all environments' do
@@ -1724,6 +1724,20 @@ class ProfileTest < Test::Unit::TestCase
     with_image = fast_create(Person, :name => 'with_image', :environment_id => env.id, :image_id => img.id)
     assert_equal 2, env.profiles.without_image.count
     assert_not_includes env.profiles.without_image, with_image
+  end
+
+  should 'return enterprises subclasses too on namedscope enterprises' do
+    class EnterpriseSubclass < Enterprise; end
+    child = EnterpriseSubclass.create!(:identifier => 'child', :name => 'Child')
+
+    assert_includes Profile.enterprises, child
+  end
+
+  should 'return communities subclasses too on namedscope communities' do
+    class CommunitySubclass < Community; end
+    child = CommunitySubclass.create!(:identifier => 'child', :name => 'Child')
+
+    assert_includes Profile.communities, child
   end
 
   private

@@ -433,21 +433,6 @@ class CmsControllerTest < Test::Unit::TestCase
     assert_equal [c1, c3], saved.categories
   end
 
-  should 'filter html from textile article name' do
-    post :new, :type => 'TextileArticle', :profile => profile.identifier, :article => { :name => 'a <strong>test</strong> article', :body => 'the text of the article ...' }
-    assert_sanitized assigns(:article).name
-  end
-
-  should 'filter html from textile article abstract' do
-    post :new, :type => 'TextileArticle', :profile => profile.identifier, :article => { :name => 'article', :abstract => '<strong>abstract</strong>', :body => 'the text of the article ...' }
-    assert_sanitized assigns(:article).abstract
-  end
-
-  should 'filter html from textile article body' do
-    post :new, :type => 'TextileArticle', :profile => profile.identifier, :article => { :name => 'article', :abstract => 'abstract', :body => 'the <b>text</b> of <a href=#>the</a> article ...' }
-    assert_sanitized assigns(:article).body
-  end
-
   should 'filter html with white_list from tiny mce article name' do
     post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => "<strong>test</strong>", :body => 'the text of the article ...' }
     assert_equal "<strong>test</strong>", assigns(:article).name
@@ -1320,7 +1305,6 @@ class CmsControllerTest < Test::Unit::TestCase
   should 'create a task suggest task to a profile' do
     c = Community.create!(:name => 'test comm', :identifier => 'test_comm', :moderated_articles => true)
 
-    SuggestArticle.any_instance.stubs(:skip_captcha?).returns(true)
     assert_difference SuggestArticle, :count do
       post :suggest_an_article, :profile => c.identifier, :back_to => 'action_view', :task => {:article_name => 'some name', :article_body => 'some body', :email => 'some@localhost.com', :name => 'some name'}
     end

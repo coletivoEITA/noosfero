@@ -9,7 +9,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110728173905) do
+ActiveRecord::Schema.define(:version => 20111018201239) do
+
+  create_table "abuse_reports", :force => true do |t|
+    t.integer  "reporter_id"
+    t.integer  "abuse_complaint_id"
+    t.text     "content"
+    t.text     "reason"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "action_tracker", :force => true do |t|
     t.integer  "user_id"
@@ -31,8 +40,8 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.integer "profile_id"
   end
 
+  add_index "action_tracker_notifications", ["action_tracker_id", "profile_id"], :name => "index_action_tracker_notifications_on_profile_id_and_action_tra", :unique => true
   add_index "action_tracker_notifications", ["action_tracker_id"], :name => "index_action_tracker_notifications_on_action_tracker_id"
-  add_index "action_tracker_notifications", ["profile_id", "action_tracker_id"], :name => "index_action_tracker_notifications_on_profile_id_and_action_trac", :unique => true
   add_index "action_tracker_notifications", ["profile_id"], :name => "index_action_tracker_notifications_on_profile_id"
 
   create_table "article_versions", :force => true do |t|
@@ -240,6 +249,8 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.text     "terms_of_use_acceptance_text"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "reports_lower_bound",          :default => 0,         :null => false
+    t.text     "send_email_plugin_allow_to"
   end
 
   create_table "external_feeds", :force => true do |t|
@@ -313,6 +324,30 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.datetime "updated_at"
   end
 
+  create_table "national_region_types", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "national_regions", :force => true do |t|
+    t.string   "name"
+    t.string   "national_region_code"
+    t.string   "parent_national_region_code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "national_region_type_id",     :null => false
+  end
+
+  add_index "national_regions", ["name"], :name => "name_index"
+  add_index "national_regions", ["national_region_code"], :name => "code_index"
+
+  create_table "price_details", :force => true do |t|
+    t.decimal  "price",              :default => 0.0
+    t.integer  "product_id"
+    t.integer  "production_cost_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "product_categorizations", :force => true do |t|
     t.integer  "category_id"
     t.integer  "product_id"
@@ -328,6 +363,14 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.integer  "product_id"
     t.integer  "qualifier_id"
     t.integer  "certifier_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "production_costs", :force => true do |t|
+    t.string   "name"
+    t.integer  "owner_id"
+    t.string   "owner_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -356,7 +399,7 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.string   "type"
     t.string   "identifier"
     t.integer  "environment_id"
-    t.boolean  "active",                            :default => true
+    t.boolean  "active",                                     :default => true
     t.string   "address"
     t.string   "contact_phone"
     t.integer  "home_page_id"
@@ -367,17 +410,25 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.float    "lat"
     t.float    "lng"
     t.integer  "geocode_precision"
-    t.boolean  "enabled",                           :default => true
-    t.string   "nickname",            :limit => 16
+    t.boolean  "enabled",                                    :default => true
+    t.string   "nickname",                     :limit => 16
     t.text     "custom_header"
     t.text     "custom_footer"
     t.string   "theme"
-    t.boolean  "public_profile",                    :default => true
+    t.boolean  "public_profile",                             :default => true
     t.date     "birth_date"
     t.integer  "preferred_domain_id"
     t.datetime "updated_at"
-    t.boolean  "visible",                           :default => true
+    t.boolean  "visible",                                    :default => true
     t.integer  "image_id"
+    t.boolean  "validated",                                  :default => true
+    t.string   "cnpj"
+    t.boolean  "shopping_cart",                              :default => true
+    t.boolean  "shopping_cart_delivery",                     :default => false
+    t.decimal  "shopping_cart_delivery_price",               :default => 0.0
+    t.integer  "bsc_id"
+    t.string   "company_name"
+    t.string   "national_region_code"
   end
 
   add_index "profiles", ["environment_id"], :name => "index_profiles_on_environment_id"
@@ -402,6 +453,15 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
   create_table "region_validators", :id => false, :force => true do |t|
     t.integer "region_id"
     t.integer "organization_id"
+  end
+
+  create_table "reported_images", :force => true do |t|
+    t.integer "size"
+    t.string  "content_type"
+    t.string  "filename"
+    t.integer "height"
+    t.integer "width"
+    t.integer "abuse_report_id"
   end
 
   create_table "role_assignments", :force => true do |t|
@@ -457,6 +517,7 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.datetime "created_at"
     t.string   "target_type"
     t.integer  "image_id"
+    t.integer  "bsc_id"
   end
 
   create_table "thumbnails", :force => true do |t|
@@ -493,6 +554,8 @@ ActiveRecord::Schema.define(:version => 20110728173905) do
     t.string   "last_chat_status",                        :default => ""
     t.string   "chat_status",                             :default => ""
     t.datetime "chat_status_at"
+    t.string   "activation_code",           :limit => 40
+    t.datetime "activated_at"
   end
 
   create_table "validation_infos", :force => true do |t|

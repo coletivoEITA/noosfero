@@ -447,6 +447,7 @@ class ManageProductsControllerTest < Test::Unit::TestCase
     plugins = mock()
     plugins.stubs(:enabled_plugins).returns([])
     plugins.stubs(:map).with(:body_beginning).returns([])
+    plugins.stubs(:map).with(:head_ending).returns([])
     plugins.stubs(:map).with(:product_info_extras, product).returns(contents)
     Noosfero::Plugin::Manager.stubs(:new).returns(plugins)
 
@@ -455,4 +456,59 @@ class ManageProductsControllerTest < Test::Unit::TestCase
     assert_tag :tag => 'span', :content => 'This is ' + plugin1_local_variable + ' speaking!', :attributes => {:id => 'plugin1'}
     assert_tag :tag => 'span', :content => 'This is ' + plugin2_local_variable + ' speaking!', :attributes => {:id => 'plugin2'}
   end
+
+  should 'not allow product creation for profiles that can\'t do it' do
+    class SpecialEnterprise < Enterprise
+      def create_product?
+        false
+      end
+    end
+    enterprise = SpecialEnterprise.create!(:identifier => 'special-enterprise', :name => 'Special Enterprise')
+    get 'new', :profile => enterprise.identifier
+    assert_response 403
+  end
+
+  should 'remove price detail of a product' do
+    product = fast_create(Product, :enterprise_id => @enterprise.id, :product_category_id => @product_category.id)
+    cost = fast_create(ProductionCost, :owner_id => Environment.default.id, :owner_type => 'Environment')
+    detail = product.price_details.create(:production_cost_id => cost.id, :price => 10)
+
+    assert_equal [detail], product.price_details
+
+    post :remove_price_detail, :id => detail.id, :product => product, :profile => @enterprise.identifier
+    product.reload
+    assert_equal [], product.price_details
+  end
+
+  should 'create a production cost for enterprise' do
+    get :create_production_cost, :profile => @enterprise.identifier, :id => 'Taxes'
+
+    assert_equal ['Taxes'], Enterprise.find(@enterprise.id).production_costs.map(&:name)
+    resp = ActiveSupport::JSON.decode(@response.body)
+    assert_equal 'Taxes', resp['name']
+    assert resp['id'].kind_of?(Integer)
+    assert resp['ok']
+    assert_nil resp['error_msg']
+  end
+
+  should 'display error if production cost has no name' do
+    get :create_production_cost, :profile => @enterprise.identifier
+
+    resp = ActiveSupport::JSON.decode(@response.body)
+    assert_nil resp['name']
+    assert_nil resp['id']
+    assert !resp['ok']
+    assert_match /blank/, resp['error_msg']
+  end
+
+  should 'display error if name of production cost is too long' do
+    get :create_production_cost, :profile => @enterprise.identifier, :id => 'a'*60
+
+    resp = ActiveSupport::JSON.decode(@response.body)
+    assert_nil resp['name']
+    assert_nil resp['id']
+    assert !resp['ok']
+    assert_match /too long/, resp['error_msg']
+  end
+
 end

@@ -89,6 +89,7 @@ class ShoppingCartPluginProfileController < ProfileController
   end
 
   def send_request
+      register_order(params[:customer], session[:cart][:items])
     begin
       ShoppingCartPlugin::Mailer.deliver_customer_notification(params[:customer], profile, session[:cart][:items])
       ShoppingCartPlugin::Mailer.deliver_supplier_notification(params[:customer], profile, session[:cart][:items])
@@ -117,7 +118,7 @@ class ShoppingCartPluginProfileController < ProfileController
       session[:cart][:visibility] = true
       render :text => {
         :ok => true,
-        :message => _('Cart displayed.'),
+        :message => _('Basket displayed.'),
         :error => {:code => 0}
       }.to_json
     rescue Exception => exception
@@ -136,7 +137,7 @@ class ShoppingCartPluginProfileController < ProfileController
       session[:cart][:visibility] = false
       render :text => {
         :ok => true,
-        :message => _('Cart Hidden.'),
+        :message => _('Basket hidden.'),
         :error => {:code => 0}
       }.to_json
     rescue Exception => exception
@@ -172,7 +173,7 @@ class ShoppingCartPluginProfileController < ProfileController
         :ok => false,
         :error => {
         :code => 2,
-        :message => _("There is no cart.")
+        :message => _("There is no basket.")
       }
       }.to_json
       return false
@@ -202,7 +203,7 @@ class ShoppingCartPluginProfileController < ProfileController
         :ok => false,
         :error => {
         :code => 4,
-        :message => _("The cart doesn't have this product.")
+        :message => _("The basket doesn't have this product.")
       }
       }.to_json
       return false
@@ -222,5 +223,24 @@ class ShoppingCartPluginProfileController < ProfileController
       return false
     end
     true
+  end
+
+  def register_order(custumer, items)
+    new_items = {}
+    items.each do |id, quantity|
+      new_items[id] = {:quantity => quantity, :price => Product.find(id).price}
+    end
+    ShoppingCartPlugin::PurchaseOrder.create!(
+      :seller => profile,
+      :customer => user,
+      :status => ShoppingCartPlugin::PurchaseOrder::Status::OPENED,
+      :products_list => new_items,
+      :customer_name => params[:customer][:name],
+      :customer_email => params[:customer][:email],
+      :customer_contact_phone => params[:customer][:contact_phone],
+      :customer_address => params[:customer][:address],
+      :customer_city => params[:customer][:city],
+      :customer_zip_code => params[:customer][:zip_code]
+    )
   end
 end
