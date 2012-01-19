@@ -1,0 +1,137 @@
+<!--
+<h2><%= _("%{target} offers:") % {:target => @target_enterprise_name} %></h2>
+
+<table>
+  <tr>
+    <th><%= _("Product") %></th>
+    <th><%= _("Quantity") %></th>
+  </tr>
+  <% if @target_products %>
+    <% @target_products.each do |p| %>
+      <tr>
+        <td><%= p.name %></td>
+        <td><%= @target_quantities["#{p.id}"] %></td>
+      </tr>
+    <% end %>
+  <% end %>
+  <% if @target_knowledges %>
+  <% @target_knowledges.each do |k| %>
+    <tr>
+      <td><%= k.name %></td>
+      <td><%= @target_knowledge_quantities["#{k.id}"] %></td>
+    </tr>
+  <% end %>
+  <% end %>
+
+
+</table>
+-->
+
+<% form_for :exchange, :url => {:controller => 'exchange_plugin_profile', :action => 'conclude_exchange_proposal'} do |f| %>
+  <%= hidden_field_tag "origin_enterprise_id", @origin_enterprise.id %>
+  <% if @target_products %>
+    <% @target_products.each do |p| %>
+      <%= hidden_field_tag "target_product_id[]", p.id %>
+      <%= hidden_field_tag "target_quantity[#{p.id}]", @target_quantities["#{p.id}"] %>
+    <% end %>
+  <% end %>
+  <% if @target_knowledges %>
+    <% @target_knowledges.each do |k| %>
+      <%= hidden_field_tag "target_knowledge_id[]", k.id %>
+      <%= hidden_field_tag "target_knowledge_quantity[#{k.id}]", @target_knowledge_quantities["#{k.id}"] %>
+    <% end %>
+  <% end %>
+
+  <% if @matching_products.count > 0 %>
+    <h2><%= _("%{origin} offers that matches %{target} interests:") % {:target => @target_enterprise_name, :origin => @origin_enterprise.name} %></h2>
+    <table style="background:#FF0000">
+      <tr>
+        <th> </th>
+        <th><%= _("Product") %></th>
+        <th><%= _("Quantity") %></th>
+        <th><%=  %></th>
+      </tr>
+      <% @matching_products.each do |p| %>
+        <% input_name = (Input.find p.input_id).name %>
+        <tr>
+          <td><%= check_box_tag "origin_product_id[]", p.products_supplier_id %></td>
+          <td><%= p.products_supplier_name %></td>
+          <td><%= text_field_tag "origin_quantity[#{p.products_supplier_id}]", nil, :class => "numbers-only" %></td>
+          <td><%= _("%{e_name} offers %{products_supplier_name} and %{profile_name} needs %{input_name} to make %{p_name} <br />") % 
+          {:products_supplier_name => p.products_supplier_name, :profile_name => profile.name, :input_name => input_name, :e_name => @origin_enterprise.name, :p_name => p.name} %>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <p><%= _("There are no offers by %{origin} that matches %{target} interests.") % {:target => @target_enterprise_name, :origin => @origin_enterprise.name} %></p>
+  <% end %>
+
+  <% if @origin_products_filtered.count > 0 %>
+  <h2><%= _("%{origin} offers:") % {:origin => @origin_enterprise.name} %></h2>
+  <table style="background:#00FF00">
+    <tr>
+      <th></th>
+      <th><%= _("Product") %></th>
+      <th><%= _("Quantity") %></th>
+    </tr>
+    <% @origin_products_filtered.each do |p| %>
+      <tr>
+        <td><%= check_box_tag "origin_product_id[]", p.id %></td>
+        <td><%= p.name %></td>
+        <td><%= text_field_tag "origin_quantity[#{p.id}]", nil, :class => "numbers-only" %></td>
+      </tr>
+    <% end %>
+    <% if @origin_knowledges_filtered.count > 0%>
+      <% @origin_knowledges_filtered.each do |k| %>
+        <tr>
+          <td><%= check_box_tag "origin_knowledge_id[]", k.id %></td>
+          <td><%= k.name %></td>
+          <td><%= text_field_tag "origin_knowledge_quantity[#{k.id}]", nil, :class => "numbers-only" %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+  <% end %>
+
+  <% if @target_inputs_filtered.count > 0 %>
+    <h2><%= _("%{target} inputs:") % {:target => profile.name} %></h2>
+    <table style="background:#00FFFF">
+      <tr>
+        <th></th>
+        <th><%= _("Product") %></th>
+        <th><%= _("Quantity") %></th>
+      </tr>
+      <% @target_inputs_filtered.each do |p| %>
+        <tr>
+          <td><%= check_box_tag "target_input_id[]", p.id,false,:onClick => "alert('" + _('You dont have this product within your offers. Please add it and try again.') + "'); this.checked = 0;" %></td>
+          <td><%= p.name %></td>
+          <td><%= text_field_tag "target_input_quantity[#{p.id}]", nil, :class => "numbers-only" %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+
+  <% if @target_interests_filtered.count > 0 %>
+    <h2><%= _("%{target} interests:") % {:target => profile.name} %></h2>
+    <table style="background:#00DDFF">
+      <tr>
+        <th></th>
+        <th><%= _("Product") %></th>
+        <th><%= _("Quantity") %></th>
+      </tr>
+      <% @target_interests_filtered.each_with_index do |p,k| %>
+        <tr>
+          <td><%= check_box_tag "target_interest_id[]", p.id,false,:onClick => 
+              "alert('" + _('You dont have this product within your offers. Please add it and try again.') + "'); this.checked = 0;" %></td>
+          <td><%= @target_interests_names_filtered[k] %></td>
+          <td><%= text_field_tag "target_interest_quantity[#{p.id}]", nil, :class => "numbers-only" %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+
+  <% button_bar do %>
+    <%= f.submit "Continue >>"%>
+    <%= button_to_function :back, _('Back to %{target} offers') % {:target => @target_enterprise_name}, "history.back()"%>
+  <% end %>
+<% end %> 

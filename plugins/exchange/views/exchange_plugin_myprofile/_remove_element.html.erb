@@ -1,0 +1,4 @@
+<li id="<%= enterprise %>_product_<%= element.element_id %>"> <%= (eval(element.element_type).find element.element_id).name %> | 
+  <%= link_to_remote "[+]", :url => {:action => "add_element", :product_id => element.element_id, :exchange_id => @exchange.id, 
+        :enterprise => enterprise} %></li>
+

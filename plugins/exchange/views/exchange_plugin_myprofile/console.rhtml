@@ -1,0 +1,80 @@
+<style>
+  #message{
+    width: 300px;
+    background: blue;
+    margin:auto;
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+
+  #message-new{
+    background: green;
+  }
+
+</style>
+
+<h1><%= _("Exchange between %{origin} and %{target}") % {:origin => @exchange.enterprise_origin.name, :target => @exchange.enterprise_target.name} %></h1>
+
+<div id="exchange_summary" style="background:#AAA">
+
+  <h2><%= _('Exchange Summary')%></h2>
+
+  <ul>
+    <li><%= _('Proposer: %s') % @exchange.enterprise_origin.name %></li>
+    <li><%= _('Exchange Elements:') %> <%if @edit_allowed %>[<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>] <% end %></li>
+    <ul>
+      <% @exchange.exchange_elements.select{|e| e.enterprise_id == @exchange.enterprise_origin.id}.each do |x| %>
+        <li><%= "#{x.element.name} (#{x.quantity})"%></li>
+      <% end %>
+    </ul>
+    </li>
+    <li><%= _('Target: %s') % @exchange.enterprise_target.name %></li>
+    <li><%= _('Exchange Elements:') %> [<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>]</li>
+    <ul>
+      <% @exchange.exchange_elements.select{|e| e.enterprise_id == @exchange.enterprise_target.id}.each do |x| %>
+        <li><%= "#{x.element.name} (#{x.quantity})" %></li>
+      <% end %>
+    </ul>
+
+
+    <li><%= _('Exchange State:') %> <%= ExchangePlugin::Exchange.state[@exchange.state] %></li>
+  </ul>
+
+  <div>
+    <% if @button %>
+      <% button_bar do %>
+        <%= button_to @button[0][0], {:action => @button[0][1], :id => @exchange.id} %>
+        <%= button_to @button[1][0], {:action => @button[1][1], :id => @exchange.id} %>
+      <% end %>
+    <% else%>
+      <%= _('Waiting for a response by the other part of the exchange') %>
+    <% end %>
+    <%= button_to _('Back to my exchanges'), :action => "index" %>
+  </div>
+
+  </div>
+
+  <div id="messages" style="background:#CCC">
+    <h2><%= _('Messages') %></h2>
+    <div>
+      <% form_for :message, :url => {:controller => 'exchange_plugin_myprofile', :action => 'new_message', :exchange_id => @exchange.id} do |f| %>
+    <%= text_area_tag 'body', _('Write your message here...'), :rows => 3, :cols => 30 %>
+    <br />
+    <%= f.submit _('Submit Message')%>
+  <% end %>
+  </div>
+    <% @messages.each do |m| %> 
+      <div id="message">
+        <ul>
+          <% if m.enterprise_sender %><li> <%=_('From: %{enterprise} - %{person}') % {:enterprise => m.enterprise_sender.name, :person =>  m.person_sender.name} %></li><% end %>
+          <% if m.enterprise_recipient %><li> <%=_('To: %s') % m.enterprise_recipient.name %></li><% end %>
+          <li><%=_('Sent: %s') % m.created_at %></li>
+          <li><%= m.body %></li>
+        </ul>
+      </div>
+    <% end %>
+
+  </div>
+
+
+

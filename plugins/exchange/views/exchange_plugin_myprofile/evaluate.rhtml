@@ -1,0 +1,30 @@
+<h2><%= _('Evaluate Exchange') %></h2>
+
+<ul>
+  <li><%= _('%s offered:') % @exchange.enterprise_origin.name %></li>
+  <ul id="origin_elements">
+    <% @origin_elements.each do |p| %>
+      <li id="origin_element_<%= p.id %>"><%= (eval(p.element_type).find p.element_id).name %> | <%= p.quantity %></li>
+    <% end %>
+  </ul>
+  <li><%= _('%s offered:') % @exchange.enterprise_target.name %></li>
+  <ul id="target_elements">
+    <% @target_elements.each do |p| %>
+      <li id="target_element_<%= p.id %>"><%= (eval(p.element_type).find p.element_id).name %> | <%= p.quantity %></li>
+    <% end %>
+  </ul>
+</ul>
+
+<div id="evaluation">
+  <% form_for :evaluation, :url => {:controller => 'exchange_plugin_myprofile', :action => 'evaluate', :exchange_id => @exchange.id} do |f| %>
+    <%= _('Give a score to the behaviour of %s during the exchange process:') % @enterprise_other.name %>
+    <table style="width:auto">
+    <% 5.times do |i|%>
+      <tr><td><%= i+1 %></td><td><%= radio_button_tag "score", i+1 %></td></tr>
+    <% end %>
+    </table>
+    <%= text_area_tag 'text', _('Write your evaluation message here...'), :rows => 3, :cols => 30 %>
+    <br />
+    <%= f.submit _('Submit Message')%>
+  <% end %>
+</div>
