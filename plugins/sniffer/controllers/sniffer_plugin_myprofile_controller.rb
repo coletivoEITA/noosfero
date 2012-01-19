@@ -90,12 +90,7 @@ class SnifferPluginMyprofileController < MyProfileController
     results = {}
     data.each do |attributes|
       profile = @id_profiles[attributes['profile_id'].to_i]
-      profile.instance_eval do
-        @distance = attributes['profile_distance']
-        def distance 
-          @distance
-        end
-      end
+      profile.distance = attributes['profile_distance']
 
       results[profile] ||= []
       results[profile] << {

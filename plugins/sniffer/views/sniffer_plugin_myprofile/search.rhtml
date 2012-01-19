@@ -34,7 +34,7 @@
     <div class="sniffer-plugin-results">
       <% if @no_results %>
         <div class="any-result">
-          <%= _('No results found. Please fill inputs of your %{products}, add some %{interests} and check your %{location}.') % {
+          <%= _('No results found. Please fill inputs of your %{products}, add some %{interests} and mark your %{location}.') % {
             :products => link_to(_('products'), {:controller => :manage_products, :action => :index }),
             :interests => link_to(_('buying interests'), {:action => :edit }),
             :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } %>
@@ -100,7 +100,7 @@
   </div>
 
   <div id="sniffer-plugin-tips">
-    <%= _('Edit your %{products}, add some %{interests} and check your %{location}.') % {
+    <%= _('Edit your %{products}, add some %{interests} and mark your %{location}.') % {
       :products => link_to(_('products'), {:controller => :manage_products, :action => :index }),
       :interests => link_to(_('buying interests'), {:action => :edit }),
       :location => link_to(_('location'), {:controller => :maps, :action => :edit_location}) } unless @no_results %>
@@ -178,7 +178,7 @@
   function matchCategoryFilters(marker) {
     var match = true;
     jQuery.each(filters, function (index, id) {
-      if (markerIndex[id].indexOf(marker) != -1)
+      if (markerIndex[id].indexOf(marker) == -1)
         match = false;
     });
     return match;
