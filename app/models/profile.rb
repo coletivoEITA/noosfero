@@ -616,6 +616,13 @@ private :generate_url, :url_options
     end
   end
 
+  def edit_home_boxes
+    
+    lambda do
+      render :file => 'cms/feedback_plugin_page'
+    end
+  end
+
   def custom_header
     self[:custom_header] || environment && environment.custom_header
   end
