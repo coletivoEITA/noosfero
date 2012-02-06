@@ -53,7 +53,12 @@ class Block < ActiveRecord::Base
   #   homepage of its owner.
   # * <tt>'except_home_page'</tt> the block is displayed only when viewing
   #   the homepage of its owner.
-  settings_items :display, :type => :string, :default => 'always'
+  validates_inclusion_of :display, :in => ['always', 'never', 'home_page_only', 'except_home_page']
+  named_scope :visibility, lambda { |visibility| { :conditions => { :display => visibility } } }
+  named_scope :visible, :conditions => { :display => 'always' }
+  named_scope :invisible, :conditions => { :display => 'never' }
+  named_scope :visible_to_home_page, :conditions => { :display => ['always', 'home_page_only'] }
+  named_scope :not_visible_to_home_page, :conditions => { :display => ['never', 'except_home_page'] }
 
   # The block can be configured to be displayed in all languages or in just one language. It can assume any locale of the environment:
   #

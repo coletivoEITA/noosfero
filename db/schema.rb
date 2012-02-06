@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111004184104) do
+ActiveRecord::Schema.define(:version => 20120203130722) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -146,9 +146,11 @@ ActiveRecord::Schema.define(:version => 20111004184104) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "fetched_at"
+    t.string   "display",          :default => "always"
   end
 
   add_index "blocks", ["box_id"], :name => "index_blocks_on_box_id"
+  add_index "blocks", ["display"], :name => "index_blocks_on_display"
   add_index "blocks", ["enabled"], :name => "index_blocks_on_enabled"
   add_index "blocks", ["fetched_at"], :name => "index_blocks_on_fetched_at"
   add_index "blocks", ["type"], :name => "index_blocks_on_type"
