@@ -282,25 +282,6 @@ body, th, td, input {
 
 /************************** main content *****************************/
 
-#main-content-wrapper-1, #main-content-wrapper-2,
-#main-content-wrapper-3, #main-content-wrapper-4,
-#main-content-wrapper-5, #main-content-wrapper-6,
-#main-content-wrapper-7, #main-content-wrapper-8 {
-  position: relative;
-}
-
-#main-content-wrapper-1 { background: url(imgs/content-bg-N.png)  0%     0% repeat-x  }
-#main-content-wrapper-2 { background: url(imgs/content-bg-S.png)  0%   100% repeat-x  }
-#main-content-wrapper-3 { background: url(imgs/content-bg-L.png)  100%   0% repeat-y  }
-#main-content-wrapper-4 { background: url(imgs/content-bg-O.png)  0%     0% repeat-y  }
-#main-content-wrapper-5 { background: url(imgs/content-bg-NL.png) 100%   0% no-repeat }
-#main-content-wrapper-6 { background: url(imgs/content-bg-NO.png) 0%     0% no-repeat }
-#main-content-wrapper-7 { background: url(imgs/content-bg-SL.png) 100% 100% no-repeat }
-#main-content-wrapper-8 { background: url(imgs/content-bg-SO.png) 0%   100% no-repeat }
-#main-content-wrapper-8 {
-  padding: 10px 20px;
-}
-
 #content .main-block h1, #not-found h1, #access-denied h1 {
   font-variant: small-caps;
   color: #555753;
