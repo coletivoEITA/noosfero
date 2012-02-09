@@ -4,7 +4,7 @@ class DeserializeDisplayInBlock < ActiveRecord::Migration
     add_index :blocks, :display
 
     Block.all.each do |block|
-      block.display = block.settings.delete :display
+      block.display = block.settings.delete(:display) || 'always'
       block.save!
     end
   end

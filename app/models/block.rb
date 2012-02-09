@@ -67,6 +67,10 @@ class Block < ActiveRecord::Base
   named_scope :visible_to_home_page, :conditions => { :display => ['always', 'home_page_only'] }
   named_scope :not_visible_to_home_page, :conditions => { :display => ['never', 'except_home_page'] }
 
+  def display
+    self['display'] || 'always'
+  end
+
   # The block can be configured to be displayed in all languages or in just one language. It can assume any locale of the environment:
   #
   # * <tt>'all'</tt>: the block is always displayed
