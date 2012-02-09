@@ -804,6 +804,8 @@ private :generate_url, :url_options
   def is_on_homepage?(url, page=nil)
     if page
       page == self.home_page
+    elsif home_page.nil?
+      url == "/profile/#{self.identifier}"
     else
       url == '/' + self.identifier
     end
