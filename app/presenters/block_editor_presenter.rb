@@ -69,7 +69,15 @@ class BlockEditorPresenter < BlockPresenter
       buttons << thickbox_inline_popup_icon(:help, _('Help on this block'), {}, "help-on-box-#{block.id}") << content_tag('div', content_tag('h2', _('Help')) + content_tag('div', block.help, :style => 'margin-bottom: 1em;') + thickbox_close_button(_('Close')), :style => 'display: none;', :id => "help-on-box-#{block.id}")
     end
 
-    content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'button-bar')
+    if block.box.main? and block.editable?
+      buttons << select_tag('block[percentage_width]', options_for_select(Block::PERCENTAGE_WIDTHS.map{ |p| [_("%d%") % p, p] }, block.percentage_width),
+                            :onchange => "b = jQuery(this).parents('.block'); b[0].className = b[0].className.replace(/block-\\d*percent/g, '');" +
+                              "b.addClass('block-'+this.value+'percent');" +
+                              "jQuery.post('#{url_for(:controller => @controller.boxes_controller, :action => :update, :id => block.id)}', this.serialize());",
+                            :onkeyup => "this.onchange()" )
+    end
+
+    content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'block-edit-buttons button-bar')
   end
 
   def select_blocks(arr, context)

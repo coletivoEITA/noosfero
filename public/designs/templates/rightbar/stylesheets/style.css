@@ -2,9 +2,28 @@
   margin: 0 200px 0 0;
 }
 
-.box-1 .blocks {
-  width: 100%;
-  float: right;
+.box-1 .block {
+  float: left;
+}
+
+.box-1 .block-25percent {
+  width: 135px;
+  margin-right: 20px;
+}
+.box-1 .block-33percent {
+  width: 186px;
+  margin-right: 20px;
+}
+.box-1 .block-50percent {
+  width: 290px;
+  margin-right: 20px;
+}
+.box-1 .block-75percent {
+  width: 445px;
+  margin-right: 20px;
+}
+.box-1 .block-100percent {
+  width: 620px;
 }
 
 .box-2 {

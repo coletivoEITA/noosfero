@@ -45,6 +45,13 @@ class Block < ActiveRecord::Base
     true
   end
 
+  PERCENTAGE_WIDTHS = ['25', '33', '50', '75', '100']
+
+  validates_inclusion_of :percentage_width, :in => PERCENTAGE_WIDTHS
+  def percentage_width
+    self['percentage_width'] || '100'
+  end
+
   # The condition for displaying a block. It can assume the following values:
   #
   # * <tt>'always'</tt>: the block is always displayed

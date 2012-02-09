@@ -146,6 +146,7 @@ ActiveRecord::Schema.define(:version => 20120203130722) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "fetched_at"
+    t.string   "percentage_width", :default => "100"
     t.string   "display",          :default => "always"
   end
 
