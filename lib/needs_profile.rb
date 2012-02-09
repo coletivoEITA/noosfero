@@ -23,10 +23,14 @@ module NeedsProfile
   def load_profile
     @profile ||= environment.profiles.find_by_identifier(params[:profile])
     if @profile
-      profile_hostname = @profile.hostname
-      if profile_hostname && request.host == @environment.default_hostname
-        params.delete(:profile)
-        redirect_to(Noosfero.url_options.merge(params).merge(:host => profile_hostname))
+      if !@profile.visible? and @profile.display_info_to?(user)
+        render_access_denied(_("This profile is inaccessible. You don't have the permission to view the content here."), _("Oops ... you cannot go ahead here"))
+      else
+        profile_hostname = @profile.hostname
+        if profile_hostname && request.host == @environment.default_hostname
+          params.delete(:profile)
+          redirect_to(Noosfero.url_options.merge(params).merge(:host => profile_hostname))
+        end
       end
     else
       render_not_found
