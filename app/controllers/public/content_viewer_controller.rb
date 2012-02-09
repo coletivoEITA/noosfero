@@ -102,13 +102,9 @@ class ContentViewerController < ApplicationController
       @posts = posts.paginate({ :page => params[:npage], :per_page => @page.posts_per_page }.merge(Article.display_filter(user, profile)))
     end
 
-    if @page.folder? && @page.gallery?
-      @images = @page.images
-      @images = @images.paginate(:per_page => per_page, :page => params[:npage]) unless params[:slideshow]
-    end
-
     @comments = @page.comments(true).as_thread
     @comments_count = @page.comments.count
+
     if params[:slideshow]
       render :action => 'slideshow', :layout => 'slideshow'
     end

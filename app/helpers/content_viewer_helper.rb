@@ -12,6 +12,14 @@ module ContentViewerHelper
     end
   end
 
+  def view_page(article)
+    @page = article
+    @comments = @page.comments(true).as_thread
+    @comments_count = @page.comments.count
+
+    render :file => 'content_viewer/view_page'
+  end
+
   def article_title(article, args = {})
     title = article.display_title if article.kind_of?(UploadedFile) && article.image?
     title = article.title if title.blank?

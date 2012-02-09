@@ -11,8 +11,16 @@ class ArticleBlock < Block
   def content
     block = self
     lambda do
-      block_title(block.title) +
-      (block.article ? article_to_html(block.article, :gallery_view => false) : _('Article not selected yet.'))
+      if block.box.main?
+        if block.article 
+          view_page block.article
+        else
+          _('Article not selected yet.')
+        end
+      else
+        block_title(block.title) +
+          (block.article ? article_to_html(block.article, :gallery_view => false) : _('Article not selected yet.'))
+      end
     end
   end
 

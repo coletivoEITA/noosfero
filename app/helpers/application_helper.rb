@@ -26,6 +26,8 @@ module ApplicationHelper
 
   include AccountHelper
 
+  include ContentViewerHelper
+
   include ProfileHelper
 
   def locale
