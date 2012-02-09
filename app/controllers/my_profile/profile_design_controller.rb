@@ -3,6 +3,8 @@ class ProfileDesignController < BoxOrganizerController
   needs_profile
 
   protect 'edit_profile_design', :profile
+
+  protected
   
   def available_blocks
     blocks = [ ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock ]
