@@ -1,0 +1,39 @@
+<div id="boxes-edit-bar">
+  <% for_profile = self.respond_to?(:profile) && self.profile %>
+  <% editing = false unless defined? editing %>
+
+  <% if for_profile %>
+    <% is_on_homepage = context[:article] ? (context[:article] == owner.home_page) : false %>
+    <% edit_main_box = is_on_homepage %>
+  <% else %>
+    <% edit_main_box = false %>
+  <% end %>
+
+  <% javascript_tag do %>
+    jQuery(document).ready(function() {
+      block_dragndrop_init('<%= url_for :controller => @controller.boxes_controller, :action => :move_block%>', <%= edit_main_box %>);
+      <% if editing %>
+        jQuery('#box-edit-button')[0].onclick();
+      <% end %>
+    });
+  <% end %>
+
+  <%= button_to_function :edit, editing ? _('Done editing') : _('Edit boxes'),
+    "t = jQuery('#boxes').toggleClass('box-organizer').hasClass('box-organizer');" +
+    "jQuery(this).text(t ? '#{_('Done editing')}' : '#{_('Edit boxes')}'); jQuery('#boxes-edit-buttons').toggle(t);" +
+    "block_dragndrop_toggleAll(t);",
+    :id => 'box-edit-button' %>
+
+  <span id="boxes-edit-buttons" style="<%= "display: none" unless editing %>">
+    <%= lightbox_button 'add', _('Add a block'), :controller => @controller.boxes_controller, :action => :add_block %> 
+
+    <% if for_profile %>
+      <% selected = profile.is_on_homepage?(request.path, @page) ? 'homepage' : 'pages' %>
+      <%= select_tag 'page', options_for_select([[_('Homepage'), 'homepage'], [_("Profile's pages"), 'pages']], selected),
+        :onchange => "window.location.href = jQuery(this).val() == 'pages' ? " +
+        "'#{url_for :controller => @controller.boxes_controller, :action => :index}' : '#{url_for profile.url}' " %>
+    <% end %>
+  </span>
+
+  <div style="clear: both"></div>
+</div>
