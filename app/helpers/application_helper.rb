@@ -26,6 +26,8 @@ module ApplicationHelper
 
   include AccountHelper
 
+  include ProfileHelper
+
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
   end

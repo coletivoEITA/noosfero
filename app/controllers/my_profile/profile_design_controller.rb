@@ -7,7 +7,7 @@ class ProfileDesignController < BoxOrganizerController
   protected
   
   def available_blocks
-    blocks = [ ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock ]
+    blocks = [ ProfileBlock, ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock ]
 
     # blocks exclusive for organizations
     if profile.has_members?

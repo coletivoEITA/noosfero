@@ -5,20 +5,11 @@ class ProfileController < PublicController
   before_filter :store_location, :only => [:join, :join_not_logged, :report_abuse]
   before_filter :login_required, :only => [:add, :join, :join_not_logged, :leave, :unblock, :leave_scrap, :remove_scrap, :remove_activity, :view_more_scraps, :view_more_activities, :view_more_network_activities, :report_abuse, :register_report]
 
+  include ProfileHelper
   helper TagsHelper
 
   def index
-    @activities = @profile.tracked_actions.paginate(:per_page => 30, :page => params[:page])
-    @wall_items = []
-    @network_activities = !@profile.is_a?(Person) ? @profile.tracked_notifications.paginate(:per_page => 30, :page => params[:page]) : []
-    if logged_in? && current_person.follows?(@profile)
-      @network_activities = @profile.tracked_notifications.paginate(:per_page => 30, :page => params[:page]) if @network_activities.empty?
-      @wall_items = @profile.scraps_received.not_replies.paginate(:per_page => 30, :page => params[:page])
-    end
-    @tags = profile.article_tags
-    unless profile.display_info_to?(user)
-      profile.visible? ? private_profile : invisible_profile
-    end
+    self.load_profile_badge
   end
 
   def tags
