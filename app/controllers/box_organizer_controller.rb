@@ -46,18 +46,6 @@ class BoxOrganizerController < ApplicationController
     end
   end
 
-  def move_block_down
-    @block = boxes_holder.blocks.find(params[:id])
-    @block.move_lower
-    redirect_to :action => 'index'
-  end
-
-  def move_block_up
-    @block = boxes_holder.blocks.find(params[:id])
-    @block.move_higher
-    redirect_to :action => 'index'
-  end
-
   def add_block
     type = params[:type]
     if ! type.blank?
