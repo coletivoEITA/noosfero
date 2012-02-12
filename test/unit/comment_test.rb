@@ -1,12 +1,12 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class CommentTest < Test::Unit::TestCase
+class CommentTest < ActiveSupport::TestCase
 
   def setup
   end
 
-  should 'have a name and require it' do
-    assert_mandatory(Comment.new, :title)
+  should 'have a name but not require it' do
+    assert_optional(Comment.new, :title)
   end
 
   should 'have a body and require it' do
@@ -60,6 +60,7 @@ class CommentTest < Test::Unit::TestCase
     c1.name = 'my name'
     c1.valid?
     assert c1.errors.invalid?(:name)
+    assert_no_match /\{fn\}/, c1.errors.on(:name)
   end
 
   should 'update counter cache in article' do
@@ -197,7 +198,6 @@ class CommentTest < Test::Unit::TestCase
     comment.valid?
 
     assert comment.errors.invalid?(:name)
-    assert comment.errors.invalid?(:title)
     assert comment.errors.invalid?(:body)
   end
 

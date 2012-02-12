@@ -7,19 +7,22 @@ class Noosfero::Plugin
 
   class << self
 
+    def klass(dir)
+      (dir.to_s.camelize + 'Plugin').constantize # load the plugin
+    end
+
     def init_system
       Dir.glob(File.join(Rails.root, 'config', 'plugins', '*')).select do |entry|
         File.directory?(entry)
       end.each do |dir|
         Rails.configuration.controller_paths << File.join(dir, 'controllers')
-        Dependencies.load_paths << File.join(dir, 'controllers')
-        [ Dependencies.load_paths, $:].each do |path|
+        ActiveSupport::Dependencies.load_paths << File.join(dir, 'controllers')
+        [ ActiveSupport::Dependencies.load_paths, $:].each do |path|
           path << File.join(dir, 'models')
           path << File.join(dir, 'lib')
         end
 
-        plugin_name = File.basename(dir).camelize + 'Plugin'
-        plugin_name.constantize # load the plugin
+        klass(File.basename(dir))
       end
     end
 
@@ -108,6 +111,12 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Adds content to profile editor info and settings
+  # returns = lambda block that creates html code or raw rhtml/html.erb
+  def profile_editor_extras
+    nil
+  end
+
   # -> Adds content to calalog list item
   # returns = lambda block that creates a html code
   def catalog_list_item_extras(item)
@@ -137,6 +146,12 @@ class Noosfero::Plugin
   # -> Adds content to the beginning of the page
   # returns = lambda block that creates html code or raw rhtml/html.erb
   def body_beginning
+    nil
+  end
+
+  # -> Adds content to the ending of the page head
+  # returns = lambda block that creates html code or raw rhtml/html.erb
+  def head_ending
     nil
   end
 

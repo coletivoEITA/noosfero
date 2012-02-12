@@ -4,14 +4,13 @@ require 'cms_controller'
 # Re-raise errors caught by the controller.
 class CmsController; def rescue_action(e) raise e end; end
 
-class CmsControllerTest < Test::Unit::TestCase
+class CmsControllerTest < ActionController::TestCase
 
   fixtures :environments
 
   def setup
     @controller = CmsController.new
     @request    = ActionController::TestRequest.new
-    @request.stubs(:ssl?).returns(true)
     @response   = ActionController::TestResponse.new
 
     @profile = create_user_with_permission('testinguser', 'post_content')
@@ -203,7 +202,7 @@ class CmsControllerTest < Test::Unit::TestCase
 
     assert_difference Article, :count, -1 do
       post :destroy, :profile => profile.identifier, :id => a.id
-      assert_redirected_to :action => 'index'
+      assert_redirected_to :controller => 'cms', :profile => profile.identifier, :action => 'index'
     end
   end
 
@@ -757,33 +756,6 @@ class CmsControllerTest < Test::Unit::TestCase
     end
   end
 
-  should 'require ssl in general' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :index, :profile => 'testinguser'
-    assert_redirected_to :protocol => 'https://'
-  end
-
-  should 'accept ajax connections to new action without ssl' do
-    @request.expects(:ssl?).returns(false).at_least_once
-    xml_http_request :get, :new, :profile => 'testinguser'
-    assert_response :success
-  end
-
-  should 'not loose type argument in new action when redirecting to ssl' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :new, :profile => 'testinguser', :type => 'Folder'
-    assert_redirected_to :protocol => 'https://', :action => 'new', :type => 'Folder'
-  end
-
-  should 'not accept non-ajax connections to new action without ssl' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :new, :profile => 'testinguser'
-    assert_redirected_to :protocol => 'https://'
-  end
-
   should 'display categories if environment disable_categories disabled' do
     Environment.any_instance.stubs(:enabled?).with(anything).returns(false)
     a = profile.articles.create!(:name => 'test')
@@ -987,7 +959,7 @@ class CmsControllerTest < Test::Unit::TestCase
 
     post :upload_files, :profile => profile.identifier, :parent_id => folder.id, :back_to => @request.referer, :uploaded_files => [fixture_file_upload('files/rails.png', 'image/png')]
     assert_template nil
-    assert_redirected_to folder.view_url
+    assert_redirected_to 'http://colivre.net/testinguser/test-folder'
   end
 
   should 'record when coming from public view on edit files with view true' do
@@ -1444,7 +1416,7 @@ class CmsControllerTest < Test::Unit::TestCase
   should 'update file and be redirect to cms' do
     file = UploadedFile.create!(:profile => @profile, :uploaded_data => fixture_file_upload('files/test.txt', 'text/plain'))
     post :edit, :profile => @profile.identifier, :id => file.id, :article => { }
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'cms', :profile => profile.identifier, :action => 'index'
   end
 
   should 'update file and be redirect to cms folder' do

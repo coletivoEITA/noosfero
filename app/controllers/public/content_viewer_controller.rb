@@ -31,14 +31,6 @@ class ContentViewerController < ApplicationController
       end
     end
 
-    if !@page.public? && !request.ssl?
-      return if redirect_to_ssl
-    end
-
-    if @page.public?
-      return unless avoid_ssl
-    end
-
     if !@page.display_to?(user)
       if profile.display_info_to?(user) || !profile.visible?
         message = _('You are not allowed to view this content. You can contact the owner of this profile to request access then.')
@@ -54,7 +46,7 @@ class ContentViewerController < ApplicationController
       return
     end
 
-    redirect_to_translation
+    redirect_to_translation if @page.profile.redirect_l10n
 
     # At this point the page will be showed
     @page.hit
@@ -119,7 +111,7 @@ class ContentViewerController < ApplicationController
   def add_comment
     @comment.author = user if logged_in?
     @comment.article = @page
-    if (logged_in? || @comment.reply_of_id || verify_recaptcha(:model => @comment, :message => _('Please type the words correctly'))) && @comment.save
+    if (logged_in? || verify_recaptcha(:model => @comment, :message => _('Please type the words correctly'))) && @comment.save
       @page.touch
       @comment = nil # clear the comment form
       redirect_to :action => 'view_page', :profile => params[:profile], :page => @page.explode_path, :view => params[:view]

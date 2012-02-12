@@ -5,7 +5,7 @@
 #ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.1.0' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -64,7 +64,7 @@ Rails::Initializer.run do |config|
     makemo
   ]
   unless $PROGRAM_NAME =~ /rake$/ && (ignore_rake_commands.include?(ARGV.first))
-    config.active_record.observers = :article_sweeper, :role_assignment_sweeper, :friendship_sweeper, :category_sweeper
+    config.active_record.observers = :article_sweeper, :role_assignment_sweeper, :friendship_sweeper, :category_sweeper, :block_sweeper
   end
   # Make Active Record use UTC-base instead of local time
   # config.active_record.default_timezone = :utc
@@ -92,7 +92,7 @@ Rails::Initializer.run do |config|
   end
 end
 extra_controller_dirs.each do |item|
-  Dependencies.load_paths << item
+  (ActiveSupport.const_defined?('Dependencies') ? ActiveSupport::Dependencies : ::Dependencies).load_paths << item
 end
 
 # Add new inflection rules using the following format 

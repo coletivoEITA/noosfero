@@ -4,7 +4,7 @@ require 'content_viewer_controller'
 # Re-raise errors caught by the controller.
 class ContentViewerController; def rescue_action(e) raise e end; end
 
-class ContentViewerControllerTest < Test::Unit::TestCase
+class ContentViewerControllerTest < ActionController::TestCase
 
   all_fixtures
 
@@ -78,7 +78,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     get :view_page, :profile => 'someone', :page => [ 'testfeed' ]
 
     assert_response :success
-    assert_match /^text\/xml/, @response.headers['type']
+    assert_match /^text\/xml/, @response.headers['Content-Type']
 
     assert_equal feed.data, @response.body
   end
@@ -131,7 +131,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     login_as 'testuser'
     assert_difference Comment, :count, -1 do
       post :view_page, :profile => profile.identifier, :page => [ 'test' ], :remove_comment => comment.id
-      assert_redirected_to :profile => 'testuser', :action => 'view_page', :page => [ 'test' ]
+      assert_redirected_to :controller => 'content_viewer', :profile => 'testuser', :action => 'view_page', :page => [ 'test' ]
     end
   end
 
@@ -183,7 +183,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
       post :view_page, :profile => profile.identifier, :page => [ image.filename ], :remove_comment => comment.id, :view => true
 
       assert_response :redirect
-      assert_redirected_to :profile => profile.identifier, :page => image.explode_path, :view => true
+      assert_redirected_to :controller => 'content_viewer', :action => 'view_page', :profile => profile.identifier, :page => image.explode_path, :view => true
     end
   end
 
@@ -296,7 +296,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     community.add_member(profile)
     login_as(profile.identifier)
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => community.identifier, :page => [ folder.path ]
 
     assert_template 'access_denied.rhtml'
@@ -309,7 +308,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
 
     login_as(profile.identifier)
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => community.identifier, :page => [ 'test' ]
     assert_response :success
   end
@@ -321,7 +319,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
 
     login_as(profile.identifier)
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => community.identifier, :page => [ 'test' ]
     assert_response :success
   end
@@ -380,7 +377,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
     intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
     assert_template 'access_denied.rhtml'
@@ -391,7 +387,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
     intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
     assert_template 'access_denied.rhtml'
@@ -404,7 +399,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     profile.affiliate(person, Profile::Roles.member(profile.environment.id))
     login_as('test_user')
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
     assert_template 'access_denied.rhtml'
@@ -417,7 +411,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     profile.affiliate(person, Profile::Roles.moderator(profile.environment.id))
     login_as('test_user')
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
     assert_template 'view_page'
@@ -430,7 +423,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     profile.affiliate(person, Profile::Roles.admin(profile.environment.id))
     login_as('test_user')
 
-    @request.stubs(:ssl?).returns(true)
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
     assert_template 'view_page'
@@ -453,28 +445,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     assert_tag :tag => 'a', :attributes => {:href => ('/myprofile/' + profile.identifier + '/cms/publish/' + page.id.to_s)}
   end
 
-  should 'require SSL for viewing non-public articles' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    page = profile.articles.create!(:name => 'myarticle', :body => 'top secret', :published => false)
-    get :view_page, :profile => 'testinguser', :page => [ 'myarticle' ]
-    assert_redirected_to :protocol => 'https://', :profile => 'testinguser', :page => [ 'myarticle' ]
-  end
-
-  should 'avoid SSL for viewing public articles' do
-    @request.expects(:ssl?).returns(true).at_least_once
-    page = profile.articles.create!(:name => 'myarticle', :body => 'top secret', :published => true)
-    get :view_page, :profile => 'testinguser', :page => [ 'myarticle' ]
-    assert_redirected_to :protocol => 'http://', :profile => 'testinguser', :page => [ 'myarticle' ]
-  end
-
-  should 'not redirect to SSL if already on SSL' do
-    @request.expects(:ssl?).returns(true).at_least_once
-    page = profile.articles.create!(:name => 'myarticle', :body => 'top secret', :published => false)
-    login_as('testinguser')
-    get :view_page, :profile => 'testinguser', :page => [ 'myarticle' ]
-    assert_response :success
-  end
-  
   should 'not show link to publication on view if not on person profile' do
     prof = Community.create!(:name => 'test comm', :identifier => 'test_comm')
     page = prof.articles.create!(:name => 'myarticle', :body => 'the body of the text')
@@ -484,14 +454,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     xhr :get, :view_page, :profile => prof.identifier, :page => ['myarticle'], :toolbar => true
 
     assert_no_tag :tag => 'a', :attributes => {:href => ('/myprofile/' + prof.identifier + '/cms/publish/' + page.id.to_s)}
-  end
-
-  should 'deny access before trying SSL when SSL is disabled' do
-    @controller.expects(:redirect_to_ssl).returns(false)
-    profile = create_user('testuser', {}, :visible => false).person
-
-    get :view_page, :profile => 'testuser', :page => profile.home_page.explode_path
-    assert_response 403
   end
 
   should 'redirect to new article path under an old path' do
@@ -625,17 +587,17 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     blog = Blog.create!(:name => "blog", :profile => profile)
     profile.articles << blog
 
-    past_post = TextileArticle.create!(:name => "past post", :profile => profile, :parent => blog, :created_at => blog.created_at - 1.year)
-    actual_post = TextileArticle.create!(:name => "actual post", :profile => profile, :parent => blog)
+    past_post = TextileArticle.create!(:name => "past post", :profile => profile, :parent => blog, :published_at => blog.created_at - 1.year)
+    current_post = TextileArticle.create!(:name => "current post", :profile => profile, :parent => blog)
     blog.children << past_post
-    blog.children << actual_post
+    blog.children << current_post
 
     year, month = profile.blog.created_at.year.to_s, '%02d' % profile.blog.created_at.month
 
     get :view_page, :profile => profile.identifier, :page => [profile.blog.path], :year => year, :month => month
 
     assert_no_tag :tag => 'a', :content => past_post.title
-    assert_tag :tag => 'a', :content => actual_post.title
+    assert_tag :tag => 'a', :content => current_post.title
   end
 
   should 'give link to create new article inside folder when view child of folder' do
@@ -980,9 +942,10 @@ class ContentViewerControllerTest < Test::Unit::TestCase
   should 'display first page of forum posts' do
     forum = Forum.create!(:name => 'My forum', :profile => profile, :posts_per_page => 5)
     for n in 1..10
-      forum.children << art = TextileArticle.create!(:name => "Post #{n}", :profile => profile, :parent => forum)
+      art = TextileArticle.create!(:name => "Post #{n}", :profile => profile, :parent => forum)
       art.updated_at = (10 - n).days.ago
-      art.send :update_without_callbacks
+      art.stubs(:record_timestamps).returns(false)
+      art.save!
     end
     assert_equal 10, forum.posts.size
 
@@ -997,10 +960,10 @@ class ContentViewerControllerTest < Test::Unit::TestCase
 
   should 'display others pages of forum posts' do
     forum = Forum.create!(:name => 'My forum', :profile => profile, :posts_per_page => 5)
+    now = Time.now
     for n in 1..10
+      Time.stubs(:now).returns(now - 10.days + n.days)
       forum.children << art = TextileArticle.create!(:name => "Post #{n}", :profile => profile, :parent => forum)
-      art.updated_at = (10 - n).days.ago
-      art.send :update_without_callbacks
     end
     assert_equal 10, forum.posts.size
 
@@ -1017,17 +980,17 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     forum = Forum.create!(:name => "forum", :profile => profile)
     profile.articles << forum
 
-    past_post = TextileArticle.create!(:name => "past post", :profile => profile, :parent => forum, :created_at => forum.created_at - 1.year)
-    actual_post = TextileArticle.create!(:name => "actual post", :profile => profile, :parent => forum)
+    past_post = TextileArticle.create!(:name => "past post", :profile => profile, :parent => forum, :published_at => forum.created_at - 1.year)
+    current_post = TextileArticle.create!(:name => "current post", :profile => profile, :parent => forum)
     forum.children << past_post
-    forum.children << actual_post
+    forum.children << current_post
 
-    year, month = profile.forum.created_at.year.to_s, '%02d' % profile.forum.created_at.month
+    year, month = forum.created_at.year.to_s, '%02d' % forum.created_at.month
 
     get :view_page, :profile => profile.identifier, :page => [profile.forum.path], :year => year, :month => month
 
     assert_no_tag :tag => 'a', :content => past_post.title
-    assert_tag :tag => 'a', :content => actual_post.title
+    assert_tag :tag => 'a', :content => current_post.title
   end
 
   should "display 'New discussion topic' when create children of forum" do
@@ -1113,26 +1076,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     assert_tag :a, :attributes => { :class => /article-translations-menu/, :onclick => /toggleSubmenu/ }
   end
 
-  should 'be redirected to translation if article is a root' do
-    @request.env['HTTP_REFERER'] = 'http://some.path'
-    FastGettext.stubs(:locale).returns('es')
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => es_article.explode_path
-    assert_equal es_article, assigns(:page)
-  end
-
-  should 'be redirected to translation' do
-    @request.env['HTTP_REFERER'] = 'http://some.path'
-    FastGettext.stubs(:locale).returns('en')
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    get :view_page, :profile => @profile.identifier, :page => es_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => en_article.explode_path
-    assert_equal en_article, assigns(:page)
-  end
-
   should 'not be redirected if already in translation' do
     en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
     es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
@@ -1159,16 +1102,6 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
     assert_response :success
     assert_equal en_article, assigns(:page)
-  end
-
-  should 'be redirected if http_referer is nil' do
-    en_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'en_article', :language => 'en')
-    es_article = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'es_article', :language => 'es', :translation_of_id => en_article)
-    @request.env['HTTP_REFERER'] = nil
-    FastGettext.stubs(:locale).returns('es')
-    get :view_page, :profile => @profile.identifier, :page => en_article.explode_path
-    assert_redirected_to :profile => @profile.identifier, :page => es_article.explode_path
-    assert_equal es_article, assigns(:page)
   end
 
   should 'not be redirected to transition if came from edit' do
@@ -1247,7 +1180,7 @@ class ContentViewerControllerTest < Test::Unit::TestCase
     login_as @profile.identifier
     page = profile.articles.create!(:name => 'myarticle', :body => 'the body of the text')
     post :view_page, :profile => @profile.identifier, :page => [ 'myarticle' ], :comment => { :title => 'title', :body => 'body' }, :confirm => 'true'
-    assert_redirected_to :profile => @profile.identifier, :page => page.explode_path
+    assert_redirected_to :controller => 'content_viewer', :action => 'view_page', :profile => @profile.identifier, :page => page.explode_path
   end
 
   should 'display reply to comment button if authenticated' do

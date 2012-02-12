@@ -174,6 +174,7 @@ class Environment < ActiveRecord::Base
   acts_as_accessible
 
   has_many :units, :order => 'position'
+  has_many :production_costs, :as => :owner
 
   def superior_intances
     [self, nil]
@@ -221,7 +222,6 @@ class Environment < ActiveRecord::Base
   settings_items :layout_template, :type => String, :default => 'default'
   settings_items :homepage, :type => String
   settings_items :description, :type => String, :default => '<div style="text-align: center"><a href="http://noosfero.org/"><img src="/images/noosfero-network.png" alt="Noosfero"/></a></div>'
-  settings_items :enable_ssl
   settings_items :local_docs, :type => Array, :default => []
   settings_items :news_amount_by_folder, :type => Integer, :default => 4
   settings_items :help_message_to_add_enterprise, :type => String, :default => ''
@@ -562,8 +562,8 @@ class Environment < ActiveRecord::Base
     domain
   end
 
-  def top_url(ssl = false)
-    protocol = (ssl ? 'https' : 'http')
+  def top_url
+    protocol = 'http'
     result = "#{protocol}://#{default_hostname}"
     if Noosfero.url_options.has_key?(:port)
       result << ':' << Noosfero.url_options[:port].to_s

@@ -115,6 +115,7 @@ class Profile < ActiveRecord::Base
 
   acts_as_having_settings :field => :data
 
+  settings_items :redirect_l10n, :type => :boolean, :default => false
   settings_items :public_content, :type => :boolean, :default => true
   settings_items :description
 
@@ -147,6 +148,7 @@ class Profile < ActiveRecord::Base
   doc
   chat
   plugin
+  site
   ]
 
   belongs_to :user
@@ -609,7 +611,7 @@ private :generate_url, :url_options
   include ActionView::Helpers::TextHelper
   def short_name(chars = 40)
     if self[:nickname].blank?
-      truncate self.name, chars, '...'
+      truncate self.name, :length => chars, :omission => '...'
     else
       self[:nickname]
     end
@@ -806,15 +808,10 @@ private :generate_url, :url_options
   end
 
   def disable
-    self.visible = false
-    user.password = Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{identifier}--")
-    user.password_confirmation = user.password
-    save!
-    user.save!
   end
 
   def control_panel_settings_button
-    {:title => _('Profile Info and settings'), :icon => 'edit-profile'}
+    {:title => _('Edit Profile'), :icon => 'edit-profile'}
   end
 
   def self.identification
