@@ -10,6 +10,7 @@ class ContentViewerController < ApplicationController
 
     if path.blank?
       redirect_to :controller => 'profile', :action => 'index', :profile => profile.identifier
+      return
     else
       @page = profile.articles.find_by_path(path)
       unless @page
