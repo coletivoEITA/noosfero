@@ -26,13 +26,12 @@
       <% end %>
       <% if !(profile.kind_of?(Enterprise) && environment.enabled?('disable_cms')) %>
         <% if !@page.gallery? %>
-          
           <%= link_to _('Add translation'),
               profile.admin_url.merge(:controller => 'cms', :action => 'new',
                                       :parent_id => (@page.folder? ? @page : (@page.parent.nil? ? nil : @page.parent)),
                                       :type => @page.type, :article => { :translation_of_id => @page.native_translation.id }),
               :class => 'button with-text icon-locale' if @page.translatable? && !@page.native_translation.language.blank? %>
-            <%= lightbox_remote_button(:new, label_for_new_article(@page), profile.admin_url.merge(:controller => 'cms', :action => 'new', :parent_id => (@page.folder? ? @page : (@page.parent.nil? ? nil : @page.parent)))) %>
+          <%= lightbox_remote_button(:new, label_for_new_article(@page), profile.admin_url.merge(:controller => 'cms', :action => 'new', :parent_id => (@page.folder? ? @page : (@page.parent.nil? ? nil : @page.parent)))) %>
         <% end %>
       <% end %>
       <% if @page.accept_uploads? %>

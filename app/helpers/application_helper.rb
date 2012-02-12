@@ -278,18 +278,15 @@ module ApplicationHelper
       return name if File.exists?(File.join(path))
     end
 
-    return nil
+    partial_for_class_in_view_path(klass.superclass, view_path)
   end
 
   def partial_for_class(klass)
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
-
-    while(klass != nil)do
-      @controller.view_paths.each do |view_path|
-       partial = partial_for_class_in_view_path(klass, view_path)
-       return partial if partial
-      end
-      klass = klass.superclass
+    name = klass.name.underscore
+    @controller.view_paths.each do |view_path|
+      partial = partial_for_class_in_view_path(klass, view_path)
+      return partial if partial
     end
 
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?'
