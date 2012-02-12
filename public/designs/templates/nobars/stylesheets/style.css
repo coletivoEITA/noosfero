@@ -1,0 +1,33 @@
+.box-1 {
+  margin: 0;
+}
+
+.box-1 .block {
+  float: left;
+}
+
+.box-1 .block-25percent {
+  width: 233px;
+  margin-right: 20px;
+}
+.box-1 .block-33percent {
+  width: 291px;
+  margin-right: 20px;
+}
+.box-1 .block-50percent {
+  width: 447px;
+  margin-right: 20px;
+}
+.box-1 .block-75percent {
+  width: 681px;
+  margin-right: 20px;
+}
+.box-1 .block-100percent {
+  width: 935px;
+}
+
+#profile-activity ul,
+#profile-network ul,
+#profile-wall ul {
+  width: 935px;
+}
