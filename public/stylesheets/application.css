@@ -1999,6 +1999,10 @@ input.disabled {
   background-position: top right;
 }
 
+.box-organizer div.blocks {
+  min-height: 20px;
+}
+
 .block-edit-buttons {
   display: none;
 }
