@@ -7,8 +7,12 @@ Given /^the following users?$/ do |table|
   table.hashes.each do |item|
     person_data = item.dup
     person_data.delete("login")
-    User.create!(:login => item[:login], :password => '123456', :password_confirmation => '123456', :email => item[:login] + "@example.com", :person_data => person_data)
+    User.create!(:login => item[:login], :password => '123456', :password_confirmation => '123456', :email => item[:login] + "@example.com", :person_data => person_data).activate
   end
+end
+
+Given /^"(.+)" is (invisible|visible)$/ do |user, visibility|
+  User.find_by_login(user).person.update_attributes(:visible => (visibility == 'visible'))
 end
 
 Given /^"(.+)" is (online|offline|busy) in chat$/ do |user, status|
@@ -18,6 +22,36 @@ end
 
 Given /^the following (community|communities|enterprises?|organizations?)$/ do |kind,table|
   klass = kind.singularize.camelize.constantize
+  table.hashes.each do |row|
+    owner = row.delete("owner")
+    domain = row.delete("domain")
+    organization = klass.create!(row)
+    if owner
+      organization.add_admin(Profile[owner])
+    end
+    if domain
+      d = Domain.new :name => domain, :owner => organization
+      d.save(false)
+    end
+  end
+end
+
+Given /^"([^\"]*)" is associated with "([^\"]*)"$/ do |enterprise, bsc|
+  enterprise = Enterprise.find_by_name(enterprise) || Enterprise[enterprise]
+  bsc = BscPlugin::Bsc.find_by_name(bsc) || BscPlugin::Bsc[bsc]
+
+  bsc.enterprises << enterprise
+end
+
+Then /^"([^\"]*)" should be associated with "([^\"]*)"$/ do |enterprise, bsc|
+  enterprise = Enterprise.find_by_name(enterprise) || Enterprise[enterprise]
+  bsc = BscPlugin::Bsc.find_by_name(bsc) || BscPlugin::Bsc[bsc]
+
+  bsc.enterprises.should include(enterprise)
+end
+
+Given /^the folllowing "([^\"]*)" from "([^\"]*)"$/ do |kind, plugin, table|
+  klass = (plugin.camelize+'::'+kind.singularize.camelize).constantize
   table.hashes.each do |row|
     owner = row.delete("owner")
     domain = row.delete("domain")
@@ -60,7 +94,20 @@ Given /^the following (articles|events|blogs|folders|forums|galleries)$/ do |con
     parent = item.delete("parent")
     owner = Profile[owner_identifier]
     home = item.delete("homepage")
-    result = klass.new(item.merge(:profile => owner))
+    language = item.delete("lang")
+    translation_of_id = nil
+    if item["translation_of"]
+      if item["translation_of"] != "nil"
+        article = owner.articles.find_by_name(item["translation_of"])
+        translation_of_id = article.id if article
+      end
+      item.delete("translation_of")
+    end
+    result = klass.new(item.merge(
+      :profile => owner,
+      :language => language,
+      :translation_of_id => translation_of_id
+    ))
     if parent
       result.parent = Article.find_by_name(parent)
     end
@@ -116,8 +163,16 @@ Given /^the following products?$/ do |table|
     data = item.dup
     owner = Enterprise[data.delete("owner")]
     category = Category.find_by_slug(data.delete("category").to_slug)
-    img = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
-    product = Product.create!(data.merge(:enterprise => owner, :product_category => category, :image_id => img.id))
+    data.merge!(:enterprise => owner, :product_category => category)
+    if data[:img]
+      img = Image.create!(:uploaded_data => fixture_file_upload('/files/'+data.delete("img")+'.png', 'image/png'))
+      data.merge!(:image_id => img.id)
+    end
+    if data[:qualifier]
+      qualifier = Qualifier.find_by_name(data.delete("qualifier"))
+      data.merge!(:qualifiers => [qualifier])
+    end
+    product = Product.create!(data)
   end
 end
 
@@ -180,6 +235,22 @@ Given /^the following certifiers$/ do |table|
   end
 end
 
+Given /^the following production costs?$/ do |table|
+  table.hashes.map{|item| item.dup}.each do |item|
+    owner_type = item.delete('owner')
+    owner = owner_type == 'environment' ? Environment.default : Profile[owner_type]
+    ProductionCost.create!(item.merge(:owner => owner))
+  end
+end
+
+Given /^the following price details?$/ do |table|
+  table.hashes.map{|item| item.dup}.each do |item|
+    product = Product.find_by_name item.delete('product')
+    production_cost = ProductionCost.find_by_name item.delete('production_cost')
+    product.price_details.create!(item.merge(:production_cost => production_cost))
+  end
+end
+
 Given /^I am logged in as "(.+)"$/ do |username|
   visit('/account/logout')
   visit('/account/login')
@@ -195,6 +266,7 @@ end
 Given /^I am logged in as admin$/ do
   visit('/account/logout')
   user = User.create!(:login => 'admin_user', :password => '123456', :password_confirmation => '123456', :email => 'admin_user@example.com')
+  user.activate
   e = Environment.default
   e.add_admin(user.person)
   visit('/account/login')
@@ -293,12 +365,12 @@ Given /^"(.+)" is friend of "(.+)"$/ do |person, friend|
   Person[person].add_friend(Person[friend])
 end
 
-Given /^(.+) is blocked$/ do |enterprise_name|
+Given /^enterprise "([^\"]*)" is blocked$/ do |enterprise_name|
   enterprise = Enterprise.find_by_name(enterprise_name)
   enterprise.block
 end
 
-Given /^(.+) is disabled$/ do |enterprise_name|
+Given /^enterprise "([^\"]*)" is disabled$/ do |enterprise_name|
   enterprise = Enterprise.find_by_name(enterprise_name)
   enterprise.enabled = false
   enterprise.save
@@ -345,6 +417,10 @@ Then /^I should be logged in as "(.+)"$/ do |login|
   User.find(session[:user]).login.should == login
 end
 
+Then /^I should not be logged in$/ do
+  session[:user].nil?
+end
+
 Given /^the profile "(.+)" has no blocks$/ do |profile|
   profile = Profile[profile]
   profile.boxes.map do |box|
@@ -359,7 +435,6 @@ Given /^the articles of "(.+)" are moderated$/ do |organization|
 end
 
 Given /^the following comments?$/ do |table|
-  Comment.skip_captcha!
   table.hashes.each do |item|
     data = item.dup
     article = Article.find_by_name(data.delete("article"))
@@ -379,7 +454,6 @@ Given /^the community "(.+)" is closed$/ do |community|
 end
 
 Given /^someone suggested the following article to be published$/ do |table|
-  SuggestArticle.skip_captcha!
   table.hashes.map{|item| item.dup}.each do |item|
     target = Community[item.delete('target')]
     task = SuggestArticle.create!(:target => target, :data => item)
@@ -413,6 +487,77 @@ Given /^the environment domain is "([^\"]*)"$/ do |domain|
   d.save(false)
 end
 
-Given /^skip comments captcha$/ do
-  Comment.any_instance.stubs(:skip_captcha?).returns(true)
+When /^([^\']*)'s account is activated$/ do |person|
+  Person.find_by_name(person).user.activate
+end
+
+Then /^I should receive an e-mail on (.*)$/ do |address|
+  last_mail = ActionMailer::Base.deliveries.last
+  last_mail['to'].to_s.should == address
+end
+
+Given /^"([^\"]*)" plugin is (enabled|disabled)$/ do |plugin_name, status|
+  environment = Environment.default
+  environment.send(status.chop + '_plugin', plugin_name+'Plugin')
+end
+
+Then /^there should be an? (.+) named "([^\"]*)"$/ do |klass_name, profile_name|
+  klass = klass_name.camelize.constantize
+  klass.find_by_name(profile_name).nil?.should be_false
+end
+
+Then /^"([^\"]*)" profile should exist$/ do |profile_selector|
+  profile = nil
+  begin
+    profile = Profile.find_by_name(profile_selector)
+    profile.nil?.should be_false
+  rescue
+    profile.nil?.should be_false
+  end
+end
+
+Then /^"([^\"]*)" profile should not exist$/ do |profile_selector|
+  profile = nil
+  begin
+    profile = Profile.find_by_name(profile_selector)
+    profile.nil?.should be_true
+  rescue
+    profile.nil?.should be_true
+  end
+end
+
+Then /^I should be taken to "([^\"]*)" product page$/ do |product_name|
+  product = Product.find_by_name(product_name)
+  path = url_for(product.enterprise.public_profile_url.merge(:controller => 'manage_products', :action => 'show', :id => product, :only_path => true))
+  if response.class.to_s == 'Webrat::SeleniumResponse'
+    URI.parse(response.selenium.get_location).path.should == path_to(path)
+  else
+    URI.parse(current_url).path.should == path_to(path)
+  end
+end
+
+When /^I reload and wait for the page$/ do
+  response.selenium.refresh
+  selenium.wait_for_page
+end
+
+Given /^the following enterprise homepages?$/ do |table|
+  # table is a Cucumber::Ast::Table
+  table.hashes.each do |item|
+    data = item.dup
+    home = EnterpriseHomepage.new(:name => data[:name])
+    ent = Enterprise.find_by_identifier(data[:enterprise])
+    ent.articles << home
+  end
+end
+
+And /^I want to add "([^\"]*)" as cost$/ do |string|
+  selenium.answer_on_next_prompt(string)
+end
+
+Given /^([^\s]+) (enabled|disabled) translation redirection in (?:his|her) profile$/ do
+  |login, status|
+  profile = Profile[login]
+  profile.redirect_l10n = ( status == "enabled" )
+  profile.save
 end

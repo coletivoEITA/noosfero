@@ -1,3 +1,51 @@
+noosfero (0.35.0) unstable; urgency=low
+
+  * Features version release
+
+ -- Daniela Soares Feitosa <daniela@colivre.coop.br>  Fri, 27 Jan 2012 02:43:42 -0200
+
+noosfero (0.34.3) unstable; urgency=low
+
+  * Bugfixes version release
+
+ -- Daniela Soares Feitosa <daniela@colivre.coop.br>  Thu, 26 Jan 2012 14:11:22 -0200
+
+noosfero (0.34.2) unstable; urgency=low
+
+  * Bugfixes version release
+
+ -- Daniela Soares Feitosa <daniela@colivre.coop.br>  Tue, 10 Jan 2012 20:48:42 -0200
+
+noosfero (0.34.1) unstable; urgency=low
+
+  * Bugfixes version release
+
+ -- Daniela Soares Feitosa <daniela@colivre.coop.br>  Wed, 07 Dec 2011 00:52:59 -0200
+
+noosfero (0.34.0) unstable; urgency=low
+
+  * Features version release.
+
+ -- Joenio Costa <joenio@colivre.coop.br>  Thu, 24 Nov 2011 13:07:12 -0200
+
+noosfero (0.33.1) unstable; urgency=low
+
+  * Bugfixes version release.
+
+ -- Joenio Costa <joenio@perl.org.br>  Sun, 16 Oct 2011 15:34:25 -0300
+
+noosfero (0.33.0) unstable; urgency=low
+
+  * Features version release
+
+ -- Joenio Costa <joenio@perl.org.br>  Mon, 10 Oct 2011 09:30:36 -0300
+
+noosfero (0.32.1) unstable; urgency=low
+
+  * Bugfix version release.
+
+ -- Joenio Costa <joenio@perl.org.br>  Tue, 27 Sep 2011 11:24:07 -0300
+
 noosfero (0.32.0) unstable; urgency=low
 
   * Features version release

@@ -2,8 +2,6 @@ class ContentViewerController < ApplicationController
 
   needs_profile
 
-  inverse_captcha :field => 'e_mail'
-
   helper ProfileHelper
   helper TagsHelper
 
@@ -56,7 +54,7 @@ class ContentViewerController < ApplicationController
       return
     end
 
-    redirect_to_translation
+    redirect_to_translation if @page.profile.redirect_l10n
 
     # At this point the page will be showed
     @page.hit
@@ -76,7 +74,7 @@ class ContentViewerController < ApplicationController
 
     @form_div = params[:form]
 
-    if params[:comment] && params[self.icaptcha_field].blank? && params[:confirm] == 'true'
+    if params[:comment] && params[:confirm] == 'true'
       @comment = Comment.new(params[:comment])
       if request.post? && @page.accept_comments?
         add_comment
@@ -121,7 +119,7 @@ class ContentViewerController < ApplicationController
   def add_comment
     @comment.author = user if logged_in?
     @comment.article = @page
-    if @comment.save
+    if (logged_in? || verify_recaptcha(:model => @comment, :message => _('Please type the words correctly'))) && @comment.save
       @page.touch
       @comment = nil # clear the comment form
       redirect_to :action => 'view_page', :profile => params[:profile], :page => @page.explode_path, :view => params[:view]

@@ -117,6 +117,7 @@ class Environment < ActiveRecord::Base
       'enable_organization_url_change' => _("Allow organizations to change their URL"),
       'admin_must_approve_new_communities' => _("Admin must approve creation of communities"),
       'enterprises_are_disabled_when_created' => __('Enterprises are disabled when created'),
+      'enterprises_are_validated_when_created' => __('Enterprises are validated when created'),
       'show_balloon_with_profile_links_when_clicked' => _('Show a balloon with profile links when a profile image is clicked'),
       'xmpp_chat' => _('XMPP/Jabber based chat'),
       'show_zoom_button_on_article_images' => _('Show a zoom link on all article images')
@@ -173,6 +174,7 @@ class Environment < ActiveRecord::Base
   acts_as_accessible
 
   has_many :units, :order => 'position'
+  has_many :production_costs, :as => :owner
 
   def superior_intances
     [self, nil]
@@ -255,9 +257,20 @@ class Environment < ActiveRecord::Base
     self.settings["#{feature}_enabled".to_sym] = true
   end
 
+  def enable_plugin(plugin)
+    self.enabled_plugins += [plugin]
+    self.enabled_plugins.uniq!
+    self.save!
+  end
+
   # Disables a feature identified by its name
   def disable(feature)
     self.settings["#{feature}_enabled".to_sym] = false
+  end
+
+  def disable_plugin(plugin)
+    self.enabled_plugins.delete(plugin)
+    self.save!
   end
 
   # Tells if a feature, identified by its name, is enabled
@@ -518,6 +531,7 @@ class Environment < ActiveRecord::Base
   xss_terminate :only => [ :message_for_disabled_enterprise ], :with => 'white_list', :on => 'validation'
 
   validates_presence_of :theme
+  validates_numericality_of :reports_lower_bound, :allow_nil => false, :only_integer => true, :greater_than_or_equal_to => 0
 
   include WhiteListFilter
   filter_iframes :message_for_disabled_enterprise, :whitelist => lambda { trusted_sites_for_iframe }
@@ -726,6 +740,4 @@ class Environment < ActiveRecord::Base
   def image_galleries
     portal_community ? portal_community.image_galleries : []
   end
-
 end
-

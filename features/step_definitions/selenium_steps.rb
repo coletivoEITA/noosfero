@@ -93,12 +93,6 @@ When /^I type "([^\"]*)" in TinyMCE field "([^\"]*)"$/ do |value, field_id|
   response.selenium.type("dom=document.getElementById('#{field_id}_ifr').contentDocument.body", value)
 end
 
-When /^I answer the captcha$/ do
-  question = response.selenium.get_text("//label[@for='task_captcha_solution']").match(/What is the result of '(.+) = \?'/)[1]
-  answer = eval(question)
-  response.selenium.type("id=task_captcha_solution", answer)
-end
-
 When /^I refresh the page$/ do
   response.selenium.refresh
 end
@@ -122,4 +116,18 @@ Then /^the select for category "([^\"]*)" should be visible$/ do |name|
   sleep 2 # FIXME horrible hack to wait categories selection scolling to right
   category = Category.find_by_name(name)
   selenium.is_visible(string_to_element_locator("option=#{category.id}")).should be_true
+end
+
+When /^I follow "([^\"]*)" and sleep ([^\"]*) seconds?$/ do |link, time|
+  click_link(link)
+  sleep time.to_i
+end
+
+When /^I follow "([^\"]*)" and wait for jquery$/ do |link|
+  click_link(link)
+  selenium.wait_for(:wait_for => :ajax, :javascript_framework => framework)
+end
+
+When /^I leave the "([^\"]+)" field$/ do |field|
+   selenium.fire_event("css=#{field}", "blur")
 end

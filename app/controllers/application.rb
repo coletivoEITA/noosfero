@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   include ApplicationHelper
   layout :get_layout
   def get_layout
+    prepend_view_path('public/' + theme_path)
     theme_option(:layout) || 'application'
   end
 
@@ -128,6 +129,21 @@ class ApplicationController < ActionController::Base
 
   def init_noosfero_plugins
     @plugins = Noosfero::Plugin::Manager.new(self)
+    @plugins.enabled_plugins.map(&:class).each do |plugin|
+      prepend_view_path(plugin.view_path)
+    end
+    init_noosfero_plugins_controller_filters
+  end
+
+  # This is a generic method that initialize any possible filter defined by a
+  # plugin to the current controller being initialized.
+  def init_noosfero_plugins_controller_filters
+    @plugins.enabled_plugins.each do |plugin|
+      plugin.send(self.class.name.underscore + '_filters').each do |plugin_filter|
+        self.class.send(plugin_filter[:type], plugin.class.name.underscore + '_' + plugin_filter[:method_name], (plugin_filter[:options] || {}))
+        self.class.send(:define_method, plugin.class.name.underscore + '_' + plugin_filter[:method_name], plugin_filter[:block])
+      end
+    end
   end
 
   def load_terminology

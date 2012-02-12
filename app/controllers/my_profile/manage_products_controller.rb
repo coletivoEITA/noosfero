@@ -4,12 +4,20 @@ class ManageProductsController < ApplicationController
   protect 'manage_products', :profile, :except => [:show]
   before_filter :check_environment_feature
   before_filter :login_required, :except => [:show]
+  before_filter :create_product?, :only => [:new]
 
   protected  
 
   def check_environment_feature
     if profile.environment.enabled?('disable_products_for_enterprises')
       render_not_found
+      return
+    end
+  end
+
+  def create_product?
+    if !profile.create_product?
+      render_access_denied
       return
     end
   end
@@ -103,6 +111,36 @@ class ManageProductsController < ApplicationController
     end
   end
 
+  def manage_product_details
+    @product = @profile.products.find(params[:id])
+    if request.post?
+      @product.update_price_details(params[:price_details]) if params[:price_details]
+      render :partial => 'display_price_details'
+    else
+      render :partial => 'manage_product_details'
+    end
+  end
+
+  def remove_price_detail
+    @product = @profile.products.find(params[:product])
+    @price_detail = @product.price_details.find(params[:id])
+    @product = @price_detail.product
+    if request.post?
+      @price_detail.destroy
+      render :nothing => true
+    end
+  end
+
+  def display_price_composition_bar
+    @product = @profile.products.find(params[:id])
+    render :partial => 'price_composition_bar'
+  end
+
+  def display_inputs_cost
+    @product = @profile.products.find(params[:id])
+    render :inline => "<%= float_to_currency(@product.inputs_cost) %>"
+  end
+
   def destroy
     @product = @profile.products.find(params[:id])
     if @product.destroy
@@ -159,4 +197,18 @@ class ManageProductsController < ApplicationController
     end
   end
 
+  def create_production_cost
+    cost = @profile.production_costs.create(:name => params[:id])
+    if cost.valid?
+      cost.save
+      render :text => {:name => cost.name,
+                       :id => cost.id,
+                       :ok => true
+                      }.to_json
+    else
+      render :text => {:ok => false,
+                       :error_msg => _(cost.errors['name']) % {:fn => _('Name')}
+                      }.to_json
+    end
+  end
 end

@@ -46,7 +46,7 @@ class CatalogControllerTest < Test::Unit::TestCase
 
     assert_equal 12, @enterprise.products.count
     get :index, :profile => @enterprise.identifier
-    assert_equal 10, assigns(:products).count
+    assert_equal 9, assigns(:products).count
     assert_tag :a, :attributes => {:class => 'next_page'}
   end
 
@@ -63,21 +63,13 @@ class CatalogControllerTest < Test::Unit::TestCase
   should 'not show product price when listing products if not informed' do
     prod = @enterprise.products.create!(:name => 'Product test', :product_category => @product_category)
     get :index, :profile => @enterprise.identifier
-    assert_no_tag :tag => 'li', :attributes => { :class => 'product_price' }, :content => /Price:/
+    assert_no_tag :tag => 'span', :attributes => { :class => 'product-price with-discount' }, :content => /50.00/
   end
 
   should 'show product price when listing products if informed' do
     prod = @enterprise.products.create!(:name => 'Product test', :price => 50.00, :product_category => @product_category)
     get :index, :profile => @enterprise.identifier
-    assert_tag :tag => 'li', :attributes => { :class => 'product_price' }, :content => /Price:/
-  end
-
-  should 'link to assets products wiht product category in the link to product category on index' do
-    pc = ProductCategory.create!(:name => 'some product', :environment => enterprise.environment)
-    prod = enterprise.products.create!(:name => 'Product test', :price => 50.00, :product_category => pc)
-
-    get :index, :profile => enterprise.identifier
-    assert_tag :tag => 'a', :attributes => {:href => /assets\/products\?product_category=#{pc.id}/}
+    assert_tag :tag => 'span', :attributes => { :class => 'product-price with-discount' }, :content => /50.00/
   end
 
   should 'add an zero width space every 4 caracters of comment urls' do
@@ -94,23 +86,27 @@ class CatalogControllerTest < Test::Unit::TestCase
   end
 
   should 'include extra content supplied by plugins on catalog item extras' do
-    product = fast_create(Product, :enterprise_id => @enterprise.id)
-    plugin1_local_variable = "Plugin1"
-    plugin1_content = lambda {"<span id='plugin1'>This is #{plugin1_local_variable} speaking!</span>"}
-    plugin2_local_variable = "Plugin2"
-    plugin2_content = lambda {"<span id='plugin2'>This is #{plugin2_local_variable} speaking!</span>"}
-    contents = [plugin1_content, plugin2_content]
+    class Plugin1 < Noosfero::Plugin
+      def catalog_item_extras(product)
+        lambda {"<span id='plugin1'>This is Plugin1 speaking!</span>"}
+      end
+    end
 
-    plugins = mock()
-    plugins.stubs(:enabled_plugins).returns([])
-    plugins.stubs(:map).with(:body_beginning).returns([])
-    plugins.stubs(:map).with(:catalog_item_extras, product).returns(contents)
-    Noosfero::Plugin::Manager.stubs(:new).returns(plugins)
+    class Plugin2 < Noosfero::Plugin
+      def catalog_item_extras(product)
+        lambda {"<span id='plugin2'>This is Plugin2 speaking!</span>"}
+      end
+    end
+
+    product = fast_create(Product, :enterprise_id => @enterprise.id)
+    environment = Environment.default
+    environment.enable_plugin(Plugin1.name)
+    environment.enable_plugin(Plugin2.name)
 
     get :index, :profile => @enterprise.identifier
 
-    assert_tag :tag => 'span', :content => 'This is ' + plugin1_local_variable + ' speaking!', :attributes => {:id => 'plugin1'}
-    assert_tag :tag => 'span', :content => 'This is ' + plugin2_local_variable + ' speaking!', :attributes => {:id => 'plugin2'}
+    assert_tag :tag => 'span', :content => 'This is Plugin1 speaking!', :attributes => {:id => 'plugin1'}
+    assert_tag :tag => 'span', :content => 'This is Plugin2 speaking!', :attributes => {:id => 'plugin2'}
   end
 
 end
