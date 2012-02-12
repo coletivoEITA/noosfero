@@ -14,12 +14,14 @@ set :enabled_plugins, []
 # Server access
 set :application, "localhost"
 set :user, "noosfero"
+#set :password, ""
 set :port, 22
 
 # Deploy destination
-set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :application}"
+set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :domain}"
 set :deploy_via, :remote_cache
 set :use_sudo, false
+set :keep_releases, 10
 
 # Repository
 set :scm, "git"
@@ -34,6 +36,8 @@ set :smtp_tls_support, false
 set :exception_notification, true
 set :apache_conf_path, '/etc/apache2'
 set :rails_env, "production"
+
+default_run_options[:pty] = true # for sudo and environments without tty
 
 # RVM (comment if not using), see http://beginrescueend.com/integration/capistrano
 $:.unshift File.expand_path('./lib', ENV['rvm_path'])
@@ -69,8 +73,9 @@ namespace :deploy do
     deploy.dirs.create
     deploy.configs.copy
     deploy.update_code
+    deploy.db.user.create
     deploy.db.create
-    deploy.symlink
+    run "ln -nfs #{release_path} #{current_path}" # deploy:symlink without triggers
     deploy.db.schema_load
     deploy.translations.compile
     deploy.db.data.create_env_and_domain
@@ -229,7 +234,7 @@ namespace :db do
   namespace :user do
 
     desc "Create database user."
-    task :create do
+    task :create, :on_error => :continue do
       sudo "createuser #{fetch :user} -S -d -R", :as => "postgres"
     end
 
@@ -395,6 +400,16 @@ namespace :cache do
 end
 
 
+namespace :bundle do
+
+  desc "Run bundle install."
+  task :install do
+    run "cd #{current_path}; bundle install"
+  end
+
+end
+
+
 namespace :dependencies do
 
   desc "Install deps using Debian's Lenny packages."
@@ -405,10 +420,11 @@ namespace :dependencies do
   # See http://noosfero.org/Development/RVMGemBasedInstallation
   desc "Install deps using RVM and bundler."
   task :rvm_install do
+    self[:default_shell] = "/bin/bash -li" # we don't yet have RVM
     deploy.dirs.create # needed for a first time
 
-    sudo "apt-get -y install po4a iso-codes tango-icon-theme"
-    sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev"
+    sudo "apt-get -y install po4a iso-codes tango-icon-theme curl"
+    sudo "apt-get -y install libmagick9-dev libpq-dev libreadline-dev libsqlite3-dev libxslt1-dev"
 
     run "bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )"
     run "echo '[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && source \"$HOME/.rvm/scripts/rvm\"' >> $HOME/.bashrc"
@@ -457,8 +473,4 @@ namespace :extras do
 
 end
 
-
-# Workarounds
-default_run_options[:pty] = true # for sudo and ssh on lxc
-set :default_shell, "/bin/bash -li" #needed for rvm_install
 
