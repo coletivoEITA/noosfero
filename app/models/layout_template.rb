@@ -7,7 +7,7 @@ class LayoutTemplate
   end
 
   def self.all
-    Dir.glob(File.join(RAILS_ROOT, 'public', 'designs', 'templates', '*')).map {|item| find(File.basename(item)) }
+    @templates ||= Dir.glob(File.join(RAILS_ROOT, 'public', 'designs', 'templates', '*')).map {|item| find(File.basename(item)) }
   end
 
   attr_reader :id

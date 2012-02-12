@@ -7,23 +7,23 @@
 }
 
 .box-1 .block-25percent {
-  width: 95px;
+  width: 113px;
   margin-right: 20px;
 }
 .box-1 .block-33percent {
-  width: 133px;
+  width: 158px;
   margin-right: 20px;
 }
 .box-1 .block-50percent {
-  width: 210px;
+  width: 247px;
   margin-right: 20px;
 }
 .box-1 .block-75percent {
-  width: 328px;
+  width: 381px;
   margin-right: 20px;
 }
 .box-1 .block-100percent {
-  width: 460px;
+  width: 535px;
 }
 
 .box-2 {
@@ -42,5 +42,5 @@
 #profile-activity ul,
 #profile-network ul,
 #profile-wall ul {
-  width: 460px;
+  width: 535px;
 }
