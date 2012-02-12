@@ -277,6 +277,7 @@ namespace :db do
     # Translations must be done before, so we get template data localized
     desc "Create default environment and domain, if them don't exist yet."
     task :create_env_and_domain do
+      deploy.smtp.install_tls_support if fetch(:smtp_tls_support, false)
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.create!(:name => \"#{fetch :name}\", :is_default => true) if Environment.default.blank?'"
       run "cd #{current_path}; RAILS_ENV=#{fetch :rails_env} script/runner 'Environment.default.domains << Domain.new(:name => \"#{fetch :domain}\") if Environment.default.domains.blank?'"
     end
