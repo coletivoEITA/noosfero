@@ -2,12 +2,7 @@
   float:left;
 }
 
-#cms-learning-edit-kinds {
-  float: right;
-}
-
-#cms-learning-edit-products,
-#cms-learning-edit-kinds {
+#cms-learning-edit-products {
   margin: 0px 0 10px 0px;
 }
 

@@ -9,15 +9,12 @@ class CmsLearningPluginLearning < Article
 
   has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :readonly => true,
     :class_name => 'ProductCategory', :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
-  def kinds
-    CmsLearningPlugin.learning_field.values.all(:conditions => {:instance_id => self.id}, :order => 'id asc')
-  end
 
   validates_presence_of :body
   validates_presence_of :summary
   validates_presence_of :good_practices
 
-  attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids, :kind_option_contents
+  attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids
 
   def self.type_name
     _('Learning')
@@ -70,26 +67,11 @@ class CmsLearningPluginLearning < Article
     end
   end
 
-  def kind_option_contents
-    ''
-  end
-  def kind_option_contents=(contents)
-    contents = contents.split(',')
-    field = CmsLearningPlugin.learning_field
-    r = field.options.all :conditions => {:name => contents}
-    kinds.each{ |k| k.destroy }
-    options = contents.collect{ |c| r.detect{ |x| x.name == c } }
-    @res_kinds = options.map do |o|
-      FormerPluginValue.new :field => field, :option => o
-    end
-  end
-
   protected
 
   after_save :save_associated
   def save_associated
     @res_product_categories.each{ |c| c.article_id = self.id; c.save! } unless @res_product_categories.blank?
-    @res_kinds.each{ |v| v.instance_id = self.id; v.save! } unless @res_kinds.blank?
   end
 
 end
