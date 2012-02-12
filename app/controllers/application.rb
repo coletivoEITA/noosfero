@@ -99,6 +99,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def boxes_controller
+    @boxes_controller ||= (self.respond_to?(:profile) and profile) ? :profile_design : :environment_design
+  end
+
   protected
 
   def boxes_editor?

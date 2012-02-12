@@ -1939,6 +1939,13 @@ input.disabled {
 }
 
 .invisible-block {
+  display: none;
+}
+.box-organizer .invisible-block {
+  display: block;
+}
+
+.invisible-block {
   background: url(/images/hachure.png);
   opacity: 0.25;
 }
@@ -1960,55 +1967,77 @@ input.disabled {
 
 .block-target {
   margin: 5px;
-  height: 2px;
-  height: 15px;
   border: 1px dashed #e0e0e0;
 }
 
 .block-target-hover {
   background: #ffd;
   border: 1px solid red;
-  height: 30px;
 }
 
 /***********************************************************
  * put borders around boxes and blocks when organizing boxes
  ***********************************************************/
 
-#box-organizer div.box {
+#boxes-edit-bar {
+  margin-bottom: 10px;
+}
+
+#boxes-edit-bar a.icon-edit,
+#boxes-edit-buttons {
+  float: right;
+}
+
+#boxes-edit-buttons {
+  margin-right: 25px;
+}
+
+.box-organizer div.box {
   border: 1px solid #ccc;
   background-color: white;
   background-repeat: no-repeat;
   background-position: top right;
 }
 
+.block-edit-buttons {
+  display: none;
+}
+.box-organizer .block-edit-buttons {
+  display: block;
+}
 
-#box-organizer div.box-1 {
+.box-organizer div.box {
+  padding-top: 51px;
+  background-position: right -7px;
+}
+.box-organizer div.box-1 {
   background-image: url(../images/blocks/1.png);
 }
-#box-organizer div.box-2 {
+.box-organizer div.box-2 {
   background-image: url(../images/blocks/2.png);
 }
-#box-organizer div.box-3 {
+.box-organizer div.box-3 {
   background-image: url(../images/blocks/3.png);
 }
 
-#box-organizer div.box-1 .block {
+.box-organizer div.box-1 .block {
   outline: 2px dashed green;
 }
-.msie #box-organizer div.box-1 .block {
+.msie .box-organizer div.box-1 .block {
   border: 2px dashed green;
 }
-#box-organizer div.box-2 .block {
+
+.box-organizer div.box-2 .block {
   outline: 2px dashed red;
 }
-.msie #box-organizer div.box-1 .block {
+.msie .box-organizer div.box-2 .block {
   border: 2px dashed red;
 }
-#box-organizer div.box-3 .block {
+
+.box-organizer div.box-3 .block {
   outline: 2px dashed blue;
 }
-.msie #box-organizer div.box-1 .block {
+.msie .box-organizer div.box-3 .block {
   border: 2px dashed blue;
 }
 

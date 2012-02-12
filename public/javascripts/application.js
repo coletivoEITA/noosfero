@@ -5,6 +5,31 @@ function noosfero_init() {
   // focus_first_field(); it is moving the page view when de form is down.
 }
 
+/*****
+ * Block drag n' drop
+ */
+
+function block_dragndrop_init(url, edit_main_box) {
+  selector = edit_main_box ? '.blocks' : '.box-2 .blocks, .box-3 .blocks';
+  jQuery(selector).sortable({disabled: true,
+      connectWith: '.blocks',
+      placeholder: 'block-target-hover',
+      forcePlaceholderSize: true,
+      update: function (event, ui) {
+        block = ui.item[0];
+        box = jQuery(block).parents('.box')[0];
+        jQuery(block).html('');
+        jQuery.post(url, {id: block.id, box_id: box.id, position: jQuery(block).index()},
+          function (data) { jQuery(block).replaceWith(data); }); 
+      }
+  });
+}
+
+function block_dragndrop_toggleAll(toggle) {
+    jQuery('.blocks').sortable('option', 'disabled', !toggle);
+}
+
+
 /* If applicable, find the first field in which the user can type and move the
  * keyboard focus to it.
  *

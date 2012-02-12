@@ -14,10 +14,7 @@ class BlockEditorPresenter < BlockPresenter
 
   # makes the given block draggable so it can be moved away.
   def block_handle(block)
-    # FIXME hardcoded
-    return '' if block.box.position == 1
-
-    draggable_element("block-#{block.id}", :revert => true)
+    ''
   end
 
   def block_edit_buttons(block)
@@ -44,10 +41,6 @@ class BlockEditorPresenter < BlockPresenter
     end
 
     content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'block-edit-buttons button-bar')
-  end
-
-  def select_blocks(arr, context)
-    arr
   end
 
 end

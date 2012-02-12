@@ -30,6 +30,12 @@ module ApplicationHelper
 
   include ProfileHelper
 
+  include BoxesHelper
+
+  def context
+    @context ||= { :article => @page, :request_path => request.path, :locale => locale }
+  end
+
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
   end

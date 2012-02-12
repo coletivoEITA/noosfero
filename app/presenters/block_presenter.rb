@@ -12,8 +12,11 @@ class BlockPresenter < BasePresenter
     ''
   end
 
-  def select_blocks(arr, context)
-    arr.select { |block| block.visible?(context) }
+  def block_css_classes(block)
+    classes = block_css_class_name(block)
+    classes += ' invisible-block' if block.display == 'never'
+    classes += " block-#{block.percentage_width}percent"
+    classes
   end
 
 end

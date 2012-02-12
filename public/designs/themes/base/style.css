@@ -294,6 +294,9 @@ body, th, td, input {
   padding: 10px 0;
   float: none;
 }
+.box-1 .block {
+  float: left;
+}
 
 /***************************** header ********************************/
 #theme-header {
