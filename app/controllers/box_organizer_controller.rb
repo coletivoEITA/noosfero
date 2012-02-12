@@ -33,8 +33,9 @@ class BoxOrganizerController < ApplicationController
     type = params[:type]
     if ! type.blank?
       if available_blocks.map(&:name).include?(type)
-        boxes_holder.boxes.find(params[:box_id]).blocks << type.constantize.new
-        redirect_to :action => 'index'
+        @box = boxes_holder.boxes.find(params[:box_id])
+        @box.blocks << type.constantize.new
+        render :partial => 'shared/page_reload'
       else
         raise ArgumentError.new("Type %s is not allowed. Go away." % type)
       end
@@ -50,27 +51,33 @@ class BoxOrganizerController < ApplicationController
     render :action => 'edit', :layout => false
   end
 
+  def update
+    @block = boxes_holder.blocks.find(params[:id])
+    @block.update_attributes(params[:block])
+    expire_timeout_fragment(@block.cache_key)
+    render :nothing => true
+  end
+
   def save
     @block = boxes_holder.blocks.find(params[:id])
     @block.update_attributes(params[:block])
     expire_timeout_fragment(@block.cache_key)
-    redirect_to :action => 'index'
-  end
-
-  def boxes_editor?
-    true
+    render :partial => 'shared/page_reload'
   end
 
   def remove
     @block = Block.find(params[:id])
     if @block.destroy
       expire_timeout_fragment(@block.cache_key)
-      redirect_to :action => 'index'
     else
       session[:notice] = _('Failed to remove block')
     end
   end
 
-  protected :boxes_editor?
+  protected
+
+  def boxes_editor?
+    true
+  end
 
 end

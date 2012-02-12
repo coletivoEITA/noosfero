@@ -99,6 +99,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter :boxes_controller
   def boxes_controller
     @boxes_controller ||= (self.respond_to?(:profile) and profile) ? :profile_design : :environment_design
   end

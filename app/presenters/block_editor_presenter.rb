@@ -21,11 +21,12 @@ class BlockEditorPresenter < BlockPresenter
     buttons = []
 
     if block.editable?
-      buttons << lightbox_icon_button(:edit, _('Edit'), { :action => 'edit', :id => block.id })
+      buttons << lightbox_icon_button(:edit, _('Edit'), { :controller => @boxes_controller, :action => 'edit', :id => block.id })
     end
 
     if !block.main?
-      buttons << icon_button(:delete, _('Remove block'), { :action => 'remove', :id => block.id }, { :method => 'post', :confirm => _('Are you sure you want to remove this block?')})
+      buttons << icon_button_to_remote(:delete, _('Remove block'), {:url => { :controller => @boxes_controller, :action => 'remove', :id => block.id }},
+                                  {:confirm => _('Are you sure you want to remove this block?')})
     end
 
     if block.respond_to?(:help)

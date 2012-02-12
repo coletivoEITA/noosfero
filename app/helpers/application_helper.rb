@@ -37,6 +37,10 @@ module ApplicationHelper
       :profile => self.respond_to?(:profile) ? self.profile : nil }
   end
 
+  def on_homepage?
+    context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
+  end
+
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
   end
@@ -264,6 +268,15 @@ module ApplicationHelper
     end
 
     link_to(content_tag('span', text), url, html_options.merge(:class => the_class, :title => text))
+  end
+
+  def icon_button_to_remote(type, text, options, html_options = {})
+    the_class = "button icon-button icon-#{type}"
+    if html_options.has_key?(:class)
+      the_class << ' ' << html_options[:class]
+    end
+
+    link_to_remote(content_tag('span', text), options, html_options.merge(:class => the_class, :title => text))
   end
 
   def button_bar(options = {}, &block)

@@ -3,6 +3,9 @@ module NeedsProfile
   module ClassMethods
     def needs_profile
       before_filter :load_profile
+      # put it after so that the profile can be seen
+      skip_before_filter :boxes_controller
+      before_filter :boxes_controller
     end
   end
 

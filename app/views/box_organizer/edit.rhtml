@@ -1,6 +1,6 @@
 <h2><%= _('Editing block') %></h2>
 
-<% form_tag(:action => 'save', :id => @block.id) do %>
+<% form_remote_tag :url => {:action => 'save', :id => @block.id} do %>
 
   <%= labelled_form_field(_('Custom title for this block: '), text_field(:block, :title, :maxlength => 20)) %>
 
