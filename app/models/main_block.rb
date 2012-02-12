@@ -24,4 +24,13 @@ class MainBlock < Block
    false
   end
 
+  def visible?(context = nil)
+    if context
+      on_homepage = context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
+      !on_homepage
+    else
+      true
+    end
+  end
+
 end

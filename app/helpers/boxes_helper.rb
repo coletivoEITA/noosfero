@@ -16,7 +16,7 @@ module BoxesHelper
     profile_admin = logged_in? and profile and profile.admins.include?(current_user.person)
     env_admin = @controller.is_a?(EnvironmentDesignController)
 
-    if profile_admin or env_admin
+    if !environment.enabled?('cant_change_homepage') and (profile_admin or env_admin)
       self.box_presenter = BlockEditorPresenter
       render :partial => 'shared/boxes/edit_bar', :locals => {:editing => editing}
     else

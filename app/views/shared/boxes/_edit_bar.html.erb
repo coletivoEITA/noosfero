@@ -3,8 +3,8 @@
   <% editing = false unless defined? editing %>
 
   <% if for_profile %>
-    <% is_on_homepage = context[:article] ? (context[:article] == owner.home_page) : false %>
-    <% edit_main_box = is_on_homepage %>
+    <% on_homepage = profile.on_homepage?(request.path) %>
+    <% edit_main_box = on_homepage %>
   <% else %>
     <% edit_main_box = false %>
   <% end %>
@@ -28,7 +28,7 @@
     <%= lightbox_button 'add', _('Add a block'), :controller => @controller.boxes_controller, :action => :add_block %> 
 
     <% if for_profile %>
-      <% selected = profile.is_on_homepage?(request.path, @page) ? 'homepage' : 'pages' %>
+      <% selected = on_homepage ? 'homepage' : 'pages' %>
       <%= select_tag 'page', options_for_select([[_('Homepage'), 'homepage'], [_("Profile's pages"), 'pages']], selected),
         :onchange => "window.location.href = jQuery(this).val() == 'pages' ? " +
         "'#{url_for :controller => @controller.boxes_controller, :action => :index}' : '#{url_for profile.url}' " %>

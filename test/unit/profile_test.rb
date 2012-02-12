@@ -1688,20 +1688,8 @@ class ProfileTest < Test::Unit::TestCase
   should 'know if url is the profile homepage' do
     profile = fast_create(Profile)
 
-    assert !profile.is_on_homepage?("/#{profile.identifier}/any_page")
-    assert profile.is_on_homepage?("/#{profile.identifier}")
-  end
-
-  should 'know if page is the profile homepage' do
-    profile = fast_create(Profile)
-    not_homepage = fast_create(Article, :profile_id => profile.id)
-
-    homepage = fast_create(Article, :profile_id => profile.id)
-    profile.home_page = homepage
-    profile.save
-
-    assert !profile.is_on_homepage?("/#{profile.identifier}/#{not_homepage.slug}",not_homepage)
-    assert profile.is_on_homepage?("/#{profile.identifier}/#{homepage.slug}", homepage)
+    assert !profile.on_homepage?("/#{profile.identifier}/any_page")
+    assert profile.on_homepage?("/#{profile.identifier}")
   end
 
   should 'find profiles with image' do

@@ -38,7 +38,7 @@
     " controller-"+ @controller.controller_name() +
     " action-"+ @controller.controller_name() +"-"+ @controller.action_name() +
     " template-"+ ( profile.nil? ? "default" : profile.layout_template ) +
-    (!profile.nil? && profile.is_on_homepage?(request.path,@page) ? " profile-homepage" : "")
+    (!profile.nil? && profile.on_homepage?(request.path) ? " profile-homepage" : "")
     %>" >
 
     <a href="#content" id="link-go-content"><span><%= _("Go to the content") %></span></a>

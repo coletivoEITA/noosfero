@@ -1,7 +1,5 @@
 class CmsController < MyProfileController
 
-  protect 'edit_profile', :profile, :only => [:set_home_page]
-
   def self.protect_if(*args)
     before_filter(*args) do |c|
       user, profile = c.send(:user), c.send(:profile)
@@ -15,7 +13,7 @@ class CmsController < MyProfileController
   end
 
   before_filter :login_required, :except => [:suggest_an_article]
-  protect_if :except => [:suggest_an_article, :set_home_page, :edit, :destroy, :publish] do |c, user, profile|
+  protect_if :except => [:suggest_an_article, :edit, :destroy, :publish] do |c, user, profile|
     user && (user.has_permission?('post_content', profile) || user.has_permission?('publish_content', profile))
   end
 
@@ -164,15 +162,6 @@ class CmsController < MyProfileController
     end
 
     render :action => 'edit'
-  end
-
-  post_only :set_home_page
-  def set_home_page
-    @article = profile.articles.find(params[:id])
-    profile.home_page = @article
-    profile.save(false)
-    session[:notice] = _('"%s" configured as home page.') % @article.name
-    redirect_to (request.referer || profile.url)
   end
 
   def upload_files

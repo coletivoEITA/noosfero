@@ -157,7 +157,6 @@ class Profile < ActiveRecord::Base
   belongs_to :environment
 
   has_many :articles, :dependent => :destroy
-  belongs_to :home_page, :class_name => Article.name, :foreign_key => 'home_page_id'
 
   acts_as_having_image
 
@@ -537,9 +536,6 @@ private :generate_url, :url_options
       original_article.update_attributes!(:name => new_name)
     end
     article_copy = article.copy(:profile => self, :parent => parent, :advertise => false)
-    if article.profile.home_page == article
-      self.home_page = article_copy
-    end
     article.children.each do |a|
       copy_article_tree a, article_copy
     end
@@ -801,14 +797,8 @@ private :generate_url, :url_options
     "#{jid(options)}/#{short_name}"
   end
 
-  def is_on_homepage?(url, page=nil)
-    if page
-      page == self.home_page
-    elsif home_page.nil?
-      url == "/profile/#{self.identifier}"
-    else
-      url == '/' + self.identifier
-    end
+  def on_homepage?(url)
+    url == "/#{self.identifier}" || url == "/profile/#{self.identifier}"
   end
 
   def opened_abuse_complaint

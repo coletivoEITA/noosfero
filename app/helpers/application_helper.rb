@@ -33,7 +33,8 @@ module ApplicationHelper
   include BoxesHelper
 
   def context
-    @context ||= { :article => @page, :request_path => request.path, :locale => locale }
+    @context ||= { :article => @page, :request_path => request.path, :locale => locale,
+      :profile => self.respond_to?(:profile) ? self.profile : nil }
   end
 
   def locale

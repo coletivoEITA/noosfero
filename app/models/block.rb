@@ -22,27 +22,27 @@ class Block < ActiveRecord::Base
   # * <tt>:language</tt>: in which language the block will be displayed
   def visible?(context = nil)
     if display == 'never'
-      return false
-    end
-    if context
+      false
+    elsif context
       if language != 'all' && language != context[:locale]
         return false
       end
-      if display == 'home_page_only'
-        if context[:article]
-          return context[:article] == owner.home_page
-        else
-          return context[:request_path] == '/'
-        end
+
+      on_homepage = context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
+
+      if !on_homepage and box.main? and display != 'except_home_page'
+        # force display only on homepage
+        false
+      elsif display == 'home_page_only'
+        on_homepage
       elsif display == 'except_home_page'
-        if context[:article]
-          return context[:article] != owner.home_page
-        else
-          return context[:request_path] != '/' + owner.identifier
-        end
+        !on_homepage
+      else # always
+        true
       end
+    else
+      true
     end
-    true
   end
 
   PERCENTAGE_WIDTHS = ['25', '33', '50', '75', '100']
