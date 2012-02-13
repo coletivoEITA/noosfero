@@ -20,6 +20,10 @@ class CmsLearningPlugin < Noosfero::Plugin
     []
   end
 
+  def profile_blocks(profile)
+    CmsLearningPlugin::LearningsBlock
+  end
+
   def article_types
      {
       :name => CmsLearningPluginLearning.name,

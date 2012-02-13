@@ -15,7 +15,6 @@
     jQuery.TokenList(jQuery("#article_product_category_string_ids"), '<%= url_for(:controller => :cms_learning_plugin_myprofile, :action => :product_categories) %>',
     {searchDelay: 150, prePopulate: <%= array.to_json %>, preventDuplicates: true, theme: 'cms-learning', <%= jquery_token_input_messages_json("") %>});
   <% end %>
-
 </div>
 <div style="clear: both"></div>
 

@@ -12,6 +12,8 @@ class CmsLearningPluginLearning < Article
 
   attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids
 
+  named_scope :by_profile, lambda { |profile| { :conditions => {:profile_id => profile.id} } }
+
   def self.type_name
     _('Learning')
   end
