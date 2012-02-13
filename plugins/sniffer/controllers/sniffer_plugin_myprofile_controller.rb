@@ -66,12 +66,7 @@ class SnifferPluginMyprofileController < MyProfileController
   protected
 
   def fetch_sniffer_profile
-    @sniffer_profile = SnifferPluginProfile.find_by_profile_id profile.id
-    if @sniffer_profile.nil?
-      @sniffer_profile = SnifferPluginProfile.new(:profile => profile, :enabled => true)
-      @sniffer_profile.profile = profile
-      @sniffer_profile.save!
-    end
+    @sniffer_profile = SnifferPluginProfile.find_or_create profile
   end
 
   def build_products(data)

@@ -7,6 +7,15 @@ class SnifferPluginProfile < ActiveRecord::Base
 
   validates_presence_of :profile
 
+  def self.find_or_create(profile)
+    sniffer = SnifferPluginProfile.find_by_profile_id profile.id
+    if sniffer.nil?
+      sniffer = SnifferPluginProfile.new(:profile => profile, :enabled => true)
+      sniffer.profile = profile
+      sniffer.save!
+    end
+  end
+
   attr_accessible :product_category_string_ids
   def product_category_string_ids
     ''

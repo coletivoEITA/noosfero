@@ -1,0 +1,7 @@
+<%= block_title(block.title) %>
+
+<ul>
+  <% interests.each do |interest| %>
+    <li><%= interest.opportunity.name %></li>
+  <% end %>
+</ul>

@@ -26,4 +26,8 @@ class SnifferPlugin < Noosfero::Plugin
     ['sniffer.js']
   end
 
+  def profile_blocks(profile)
+    SnifferPlugin::InterestsBlock
+  end
+
 end
