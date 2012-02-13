@@ -1,5 +1,7 @@
+<%= block_title(block.title) %>
+
 <ul>
-  <% CmsLearningPluginLearning.by_profile(block.owner).each do |learning| %>
+  <% learnings.each do |learning| %>
     <li>
       <%= learning.name %>
     </li>

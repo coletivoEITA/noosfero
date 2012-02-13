@@ -19,7 +19,9 @@ class CmsLearningPlugin::LearningsBlock < Block
   def content
     block = self
     lambda do
-      render :file => 'blocks/cms_learning_plugin/learnings_block', :locals => {:block => block}
+      learnings = CmsLearningPluginLearning.by_profile(block.owner)
+      render :file => 'blocks/cms_learning_plugin/learnings_block',
+        :locals => {:block => block, :learnings => learnings}
     end
   end
 
