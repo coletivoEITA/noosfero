@@ -42,6 +42,8 @@ class ProfileDesignController < BoxOrganizerController
       blocks << RawHTMLBlock
     end
 
+    blocks += @plugins.map(:profile_blocks, profile)
+
     blocks
   end
 
