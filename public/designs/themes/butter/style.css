@@ -9,8 +9,8 @@
 
 /************************** content ***************************/
 
-#content .block-title,
-#content .main-block h1, #not-found h1, #access-denied h1 {
+.block-title,
+.main-block h1, #not-found h1, #access-denied h1 {
   border-bottom:2px solid #C4A000;
   color: #C4A000;
 }
@@ -37,17 +37,17 @@
   color: #FFF;
 }
 
-#content .link-list-block li a:hover {
+.link-list-block li a:hover {
   background-color: #C4A000;
 }
 
-#content .link-list-block li a.link-this-page {
+.link-list-block li a.link-this-page {
   background-color: #EDD400;
   border-right:2px solid #C4A000;
 }
 
-.template-rightbar #content .link-list-block li a.link-this-page,
-#content .box-3 .link-list-block li a.link-this-page {
+.template-rightbar .link-list-block li a.link-this-page,
+.box-3 .link-list-block li a.link-this-page {
   border-left: 2px solid #C4A000;
 }
 

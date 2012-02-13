@@ -66,8 +66,8 @@ body {
   max-width: none;
 }
 
-.template-rightbar #content .link-list-block li a.link-this-page,
-#content .box-3 .link-list-block li a.link-this-page {
+.template-rightbar .link-list-block li a.link-this-page,
+.box-3 .link-list-block li a.link-this-page {
   border-right: none;
   margin-left: -5px;
   margin-right: 0px;

@@ -282,7 +282,7 @@ body, th, td, input {
 
 /************************** main content *****************************/
 
-#content .main-block h1, #not-found h1, #access-denied h1 {
+.main-block h1, #not-found h1, #access-denied h1 {
   font-variant: small-caps;
   color: #555753;
   text-align: left;
@@ -370,7 +370,7 @@ div#notice {
   text-decoration: underline;
 }
 
-#content .block {
+.block {
   padding: 0px;
   margin: 0px 0px 20px 0px;
   position: relative;
@@ -378,7 +378,7 @@ div#notice {
 }
 
 
-#content .block-title {
+.block-title {
   font-variant: small-caps;
   color: #AAA;
   font-size: 14px;
@@ -414,7 +414,7 @@ div#notice {
   padding: 0px 10px 0px 0px;
 }
 
-#content .login-block h2 {
+.login-block h2 {
   font-variant: small-caps;
   color: #AAA;
   font-size: 14px;
@@ -451,26 +451,26 @@ div#notice {
 
 /************************** Profile List *****************************/
 
-#content .people-block ul,
-#content .profile-list-block ul,
-#content .enterprises-block ul,
-#content .members-block ul,
-#content .communities-block ul,
-#content .friends-block ul,
-#content .fans-block ul {
+.people-block ul,
+.profile-list-block ul,
+.enterprises-block ul,
+.members-block ul,
+.communities-block ul,
+.friends-block ul,
+.fans-block ul {
   min-width: 196px;
   width: 192px;
   margin: 0px 0px 0px -3px;
   padding: 0px;
 }
 
-#content .tags-block .block-footer-content a,
-#content .people-block .block-footer-content a,
-#content .profile-list-block .block-footer-content a,
-#content .enterprises-block .block-footer-content a,
-#content .members-block .block-footer-content a,
-#content .communities-block .block-footer-content a,
-#content .friends-block .block-footer-content a {
+.tags-block .block-footer-content a,
+.people-block .block-footer-content a,
+.profile-list-block .block-footer-content a,
+.enterprises-block .block-footer-content a,
+.members-block .block-footer-content a,
+.communities-block .block-footer-content a,
+.friends-block .block-footer-content a {
   position: absolute;
   top: 2px;
   right: 0px;
@@ -481,24 +481,24 @@ div#notice {
   background: url(imgs/arrow-right-p.png) 100% 50% no-repeat;
 }
 
-#content .profile-list-block .block-title {
+.profile-list-block .block-title {
   text-align: left;
 }
 
-#content .profile-list li a,
-#content .common-profile-list-block li a {
+.profile-list li a,
+.common-profile-list-block li a {
   color: #555;
 }
-#content .profile-list li a:hover,
-#content .common-profile-list-block li a:hover {
+.profile-list li a:hover,
+.common-profile-list-block li a:hover {
   color: #000;
   text-decoration: none;
 }
 
 /************************* Recent Contents ***************************/
 
-#content .feed-reader-block,
-#content .recent-documents-block {
+.feed-reader-block,
+.recent-documents-block {
   overflow: hidden;
 }
 
@@ -525,7 +525,7 @@ div#notice {
 
 /************************* Profile Image *****************************/
 
-#content .profile-image-block {
+.profile-image-block {
 }
 .profile-big-image-inner1 {
   text-align: center;
@@ -548,7 +548,7 @@ div#notice {
 
 /*************************** My Network ******************************/
 
-#content .block.my-network-block {
+.block.my-network-block {
   margin: 0px 0px 10px 0px;
 }
 
@@ -569,13 +569,13 @@ div#notice {
   display: none;
 }
 
-#content .link-list-block li {
+.link-list-block li {
   background: #FFF;
   padding: 0px;
   margin: 5px 0px;
 }
 
-#content .link-list-block li a {
+.link-list-block li a {
   font-size: 14px;
   line-height: 24px;
   color: #000;
@@ -585,7 +585,7 @@ div#notice {
   -webkit-border-radius: 4px;
 }
 
-#content .link-list-block li a.link-this-page {
+.link-list-block li a.link-this-page {
   -moz-border-radius-topright: 0px;
   -moz-border-radius-bottomright: 0px;
   -webkit-border-radius-topright: 0px;
@@ -596,12 +596,12 @@ div#notice {
   border-right: 2px solid #555753;
 }
 
-#content .link-list-block li a:hover {
+.link-list-block li a:hover {
   background-color: #555753;
   color: #FFF;
   text-decoration: none;
 }
-#content .link-list-block li a.link-this-page:hover {
+.link-list-block li a.link-this-page:hover {
   border-right: 2px solid #555753;
 }
 
@@ -642,7 +642,7 @@ div#notice {
 
 /****************************** Tags *********************************/
 
-/* the style here is not only for #content .tags-block .tag_cloud */
+/* the style here is not only for .tags-block .tag_cloud */
 
 .tag_cloud {
   text-align: center;
@@ -660,11 +660,11 @@ div#notice {
 
 /********************* Environment Statistics ************************/
 
-#content .environment-statistics-block ul {
+.environment-statistics-block ul {
   margin: 0px 20px;
   padding: 0px;
 }
-#content .environment-statistics-block li {
+.environment-statistics-block li {
   list-style-image: url(imgs/li-gray.gif);
   padding: 3px 0px;
   color: #777
@@ -954,15 +954,15 @@ hr.pre-posts, hr.sep-posts {
   text-decoration: none;
 }
 
-#content .main-block .created-at {
+.main-block .created-at {
   text-align: left;
   color: #AAA;
 }
-#content .main-block .created-at a {
+.main-block .created-at a {
   color: #AAA;
   text-decoration: none;
 }
-#content .main-block .created-at a:hover {
+.main-block .created-at a:hover {
   color: #555;
   text-decoration: underline;
 }
