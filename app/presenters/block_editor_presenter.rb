@@ -21,11 +21,11 @@ class BlockEditorPresenter < BlockPresenter
     buttons = []
 
     if block.editable?
-      buttons << lightbox_icon_button(:edit, _('Edit'), { :controller => @boxes_controller, :action => 'edit', :id => block.id })
+      buttons << lightbox_icon_button(:edit, _('Edit'), { :controller => boxes_controller, :action => 'edit', :id => block.id })
     end
 
     if !block.main?
-      buttons << icon_button_to_remote(:delete, _('Remove block'), {:url => { :controller => @boxes_controller, :action => 'remove', :id => block.id }},
+      buttons << icon_button_to_remote(:delete, _('Remove block'), {:url => { :controller => boxes_controller, :action => 'remove', :id => block.id }},
                                   {:confirm => _('Are you sure you want to remove this block?')})
     end
 
@@ -37,7 +37,7 @@ class BlockEditorPresenter < BlockPresenter
       buttons << select_tag('block[percentage_width]', options_for_select(Block::PERCENTAGE_WIDTHS.map{ |p| [_("%d%") % p, p] }, block.percentage_width),
                             :onchange => "b = jQuery(this).parents('.block'); b[0].className = b[0].className.replace(/block-\\d*percent/g, '');" +
                               "b.addClass('block-'+this.value+'percent');" +
-                              "jQuery.post('#{url_for(:controller => @boxes_controller, :action => :update, :id => block.id)}', this.serialize());",
+                              "jQuery.post('#{url_for(:controller => boxes_controller, :action => :update, :id => block.id)}', this.serialize());",
                             :onkeyup => "this.onchange()" )
     end
 

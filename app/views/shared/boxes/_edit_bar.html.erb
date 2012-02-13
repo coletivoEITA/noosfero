@@ -11,7 +11,7 @@
 
   <% javascript_tag do %>
     jQuery(document).ready(function() {
-      block_dragndrop_init('<%= url_for :controller => @controller.boxes_controller, :action => :move_block%>', <%= edit_main_box %>);
+      block_dragndrop_init('<%= url_for :controller => boxes_controller, :action => :move_block%>', <%= edit_main_box %>);
       <% if editing %>
         jQuery('#box-edit-button')[0].onclick();
       <% end %>
@@ -25,13 +25,13 @@
     :id => 'box-edit-button' %>
 
   <span id="boxes-edit-buttons" style="<%= "display: none" unless editing %>">
-    <%= lightbox_button 'add', _('Add a block'), :controller => @controller.boxes_controller, :action => :add_block %> 
+    <%= lightbox_button 'add', _('Add a block'), :controller => boxes_controller, :action => :add_block %> 
 
     <% if for_profile %>
       <% selected = on_homepage ? 'homepage' : 'pages' %>
       <%= select_tag 'page', options_for_select([[_('Homepage'), 'homepage'], [_("Profile's pages"), 'pages']], selected),
         :onchange => "window.location.href = jQuery(this).val() == 'pages' ? " +
-        "'#{url_for :controller => @controller.boxes_controller, :action => :index}' : '#{url_for profile.url}' " %>
+        "'#{url_for :controller => boxes_controller, :action => :index}' : '#{url_for profile.url}' " %>
     <% end %>
   </span>
 

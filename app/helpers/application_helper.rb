@@ -37,6 +37,10 @@ module ApplicationHelper
       :profile => self.respond_to?(:profile) ? self.profile : nil }
   end
 
+  def boxes_controller
+    @boxes_controller ||= (self.respond_to?(:profile) and profile) ? :profile_design : :environment_design
+  end
+
   def on_homepage?
     context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
   end
