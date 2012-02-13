@@ -10,10 +10,6 @@ class CmsLearningPluginLearning < Article
   has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :readonly => true,
     :class_name => 'ProductCategory', :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
 
-  validates_presence_of :body
-  validates_presence_of :summary
-  validates_presence_of :good_practices
-
   attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids
 
   def self.type_name

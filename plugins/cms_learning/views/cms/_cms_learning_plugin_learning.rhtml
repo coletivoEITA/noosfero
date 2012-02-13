@@ -2,7 +2,7 @@
 
 <%= required f.text_field(:name, :size => '64') %>
 
-<%= required labelled_form_field(_('Summary:'), text_area(:article, :summary, :rows => 3)) %>
+<%= labelled_form_field(_('Summary:'), text_area(:article, :summary, :rows => 3)) %>
 
 <%= javascript_include_tag 'jquery.tokeninput.js' %>
 <%= stylesheet_link_tag 'token-input' %>
@@ -20,8 +20,8 @@
 <div style="clear: both"></div>
 
 <%= render :file => 'shared/tiny_mce' %>
-<%= render :partial => 'shared/lead_and_body', :locals => {:tiny_mce => true, :body_label => _("Learning's detail"), :body_required => true, :abstract => false} %>
+<%= render :partial => 'shared/lead_and_body', :locals => {:tiny_mce => true, :body_label => _("Learning's detail"), :abstract => false} %>
 
-<%= required labelled_form_field(_('Good practices:'), text_area(:article, :good_practices, :rows => 3)) %>
+<%= labelled_form_field(_('Good practices:'), text_area(:article, :good_practices, :rows => 3)) %>
 
 <div style="clear: both"></div>
