@@ -1,9 +1,10 @@
 class MigrateHomepageToBlocks < ActiveRecord::Migration
   def self.up
     Profile.all.each do |profile|
-      if profile.home_page
+      home_page = Article.find_by_id profile.attributes['home_page_id']
+      if home_page
         b = ArticleBlock.new
-        b.settings[:article_id] = profile.home_page.id
+        b.article = home_page
       else
         b = ProfileBlock.new
       end
