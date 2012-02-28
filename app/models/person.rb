@@ -225,7 +225,7 @@ class Person < Profile
       {:name => _('Blog'), :address => '/{profile}/blog', :icon => 'edit'},
     ]
     [
-      [MainBlock.new],
+      [ProfileBlock.new, MainBlock.new],
       [ProfileImageBlock.new(:show_name => true), LinkListBlock.new(:links => links), RecentDocumentsBlock.new],
       [FriendsBlock.new, CommunitiesBlock.new]
     ]

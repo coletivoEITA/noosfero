@@ -131,7 +131,7 @@ class Enterprise < Organization
       {:name => _('Products'), :address => '/catalog/{profile}', :icon => 'new'},
     ]
     blocks = [
-      [MainBlock.new],
+      [ProfileBlock.new, MainBlock.new],
       [ProfileImageBlock.new, LinkListBlock.new(:links => links)],
       []
     ]

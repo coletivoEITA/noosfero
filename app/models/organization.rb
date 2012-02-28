@@ -120,7 +120,7 @@ class Organization < Profile
       {:name => _('Blog'), :address => '/{profile}/blog', :icon => 'edit'},
     ]
     [
-      [MainBlock.new],
+      [ProfileBlock.new, MainBlock.new],
       [ProfileImageBlock.new, LinkListBlock.new(:links => links)],
       [MembersBlock.new, RecentDocumentsBlock.new]
     ]
