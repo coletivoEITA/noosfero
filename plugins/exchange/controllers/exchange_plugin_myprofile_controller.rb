@@ -72,20 +72,49 @@ class ExchangePluginMyprofileController < MyProfileController
     #state machine for buttons and redirecting for evaluation
     if (@exchange.state == "proposed") && (!@exchange.target?(profile))
       @button = nil     
+      @no_button_message = _('Waiting for the other to accept the exchange proposal') 
+    
     elsif (@exchange.state == "conclusion_proposed_by_origin") && (!@exchange.target?(profile))
       @button = nil     
+      @no_button_message = _('Waiting for a response by the other part of the exchange') 
+
     elsif (@exchange.state == "conclusion_proposed_by_target") && (@exchange.target?(profile))
-      @button = nil     
+      @button = nil    
+      @no_button_message = _('Waiting for a response by the other part of the exchange') 
+
     elsif (@exchange.state == "concluded") 
       redirect_to :action => "evaluate", :id => @exchange.id
+
     elsif (@exchange.state == "evaluated_by_target") && (@exchange.target?(profile))
-      redirect_to :action => "index"
+      ev = @exchange.evaluations.find_by_evaluator_id @exchange.enterprise_target_id
+      @origin_evaluation_score = ev.score
+      @origin_evaluation_desc = ev.text
+      @no_button_message = _('Waiting for evaluation by the other part of the exchange') 
+
     elsif (@exchange.state == "evaluated_by_target") && !(@exchange.target?(profile))
       redirect_to :action => "evaluate", :id => @exchange.id
+
     elsif (@exchange.state == "evaluated_by_origin") && !(@exchange.target?(profile))
-      redirect_to :action => "index"
+      ev = @exchange.evaluations.find_by_evaluator_id @exchange.enterprise_origin_id
+      @origin_evaluation_score = ev.score
+      @origin_evaluation_desc = ev.text
+      @no_button_message = _('Waiting for evaluation by the other part of the exchange') 
+
+
     elsif (@exchange.state == "evaluated_by_origin") && (@exchange.target?(profile))
       redirect_to :action => "evaluate", :id => @exchange.id
+
+    elsif (@exchange.state == "evaluated")
+      @no_button_message = _('Exchange finished and evaluated') 
+      
+      ev = @exchange.evaluations.find_by_evaluator_id @exchange.enterprise_origin_id
+      @origin_evaluation_score = ev.score
+      @origin_evaluation_desc = ev.text
+      
+      ev = @exchange.evaluations.find_by_evaluator_id @exchange.enterprise_target_id
+      @target_evaluation_score = ev.score
+      @target_evaluation_desc = ev.text
+
     end
   end
 

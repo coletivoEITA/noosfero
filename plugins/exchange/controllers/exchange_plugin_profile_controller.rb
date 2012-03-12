@@ -13,7 +13,6 @@ class ExchangePluginProfileController < ProfileController
     @enterprises = current_user.person.enterprises.find(:all, :conditions => ["profiles.id <> ?",profile.id])
     
     @target_knowledges = CmsLearningPluginLearning.all.select{|k| k.profile.id == profile.id}
-
   end
 
   def choose_origin_offers
@@ -36,21 +35,41 @@ class ExchangePluginProfileController < ProfileController
         @target_knowledge_quantities = params[:target_knowledge_quantity]
       end
 
-      @matching_products = (Product.suppliers_products_specific @origin_enterprise, profile)
-      matching_products_index = @matching_products.collect{|m| m.products_supplier_id.to_i}
-      matching_inputs_index = @matching_products.collect{|m| m.input_id.to_i}
+      #offers
+      @matching_products_inputs = (Product.products_inputs @origin_enterprise, profile)
+      index_aux1 = @matching_products_inputs.collect{|m| m.products_supplier_id.to_i}
+      @matching_products_interests = (Product.products_interests @origin_enterprise, profile)
+      index_aux2 = @matching_products_interests.collect{|m| m.id.to_i}
+      matching_products_index = index_aux1 + index_aux2
+
+      @matching_knowledges_interests = (Article.knowledges_interests @origin_enterprise, profile)
+      index_aux1 = @matching_knowledges_interests.collect{|m| m.id.to_i}
+      @matching_knowledges_inputs = (Product.knowledges_inputs @origin_enterprise, profile)
+      index_aux2 = @matching_knowledges_inputs.collect{|m| m.id.to_i}
+      matching_knowledges_index = index_aux1 + index_aux2
 
       @origin_products_filtered = @origin_enterprise.products.reject{|p| matching_products_index.index(p.id)}
-      @origin_knowledges_filtered = @origin_enterprise.articles.find(:all, :conditions => ["type = 'CmsLearningPluginLearning'"])
-      @target_inputs_filtered = profile.inputs.reject{|i| matching_inputs_index.index(i.id)}
+      @origin_knowledges_filtered = @origin_enterprise.articles.find(:all, :conditions => ["type = 'CmsLearningPluginLearning'"]).reject{|p| matching_knowledges_index.index(p.id)}
 
-      @target_interests_filtered = SnifferPluginOpportunity.all.select{|i| i.profile_id == ((SnifferPluginProfile.find_by_profile_id profile.id).id)} 
+      #interests
+      index_aux1 = @matching_products_inputs.collect{|m| m.input_category_id.to_i}
+      index_aux2 = @matching_knowledges_inputs.collect{|m| m.input_cat.to_i}
+      matching_inputs_index = index_aux1 + index_aux2
+      @target_inputs_filtered = profile.inputs.reject{|i| matching_inputs_index.index(i.product_category_id)}
+
+      index_aux1 = @matching_products_interests.collect{|m| m.opportunity_id.to_i}
+      index_aux2 = @matching_knowledges_interests.collect{|m| m.interest_cat.to_i}
+      matching_interests_index = index_aux1 + index_aux2
+ 
+      target_interests = SnifferPluginOpportunity.all.select{|i| i.profile_id == ((SnifferPluginProfile.find_by_profile_id profile.id).id)}
+      @target_interests_filtered = target_interests.reject{|i| matching_interests_index.index(i.opportunity_id)} 
       @target_interests_names_filtered = @target_interests_filtered.collect{|i| (i.opportunity_type.constantize.find i.opportunity_id).name }
 
     end
   end
 
   def conclude_exchange_proposal
+
     if request.post?
       @origin_products = (params[:origin_product_id] ? (Product.find params[:origin_product_id]) : nil )
       @origin_quantities = params[:origin_quantity]

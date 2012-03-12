@@ -8,7 +8,8 @@
     jQuery('#choose_origin').unbind('click');
     jQuery('#choose_origin').bind('click', function() {
         jQuery.colorbox.close();
-        button.form.origin_enterprise_id.value = jQuery('input[name=origin_enterprise_id]').val();
+        v=null; jQuery('input[name=origin_enterprise_id]').each(function(index, radio) { if (radio.checked) v=radio.value });
+        button.form.origin_enterprise_id.value = v;
         button.disabled = true;
         button.form.submit();
         });
@@ -34,7 +35,7 @@
       </tr>
 
       <% @target_products.each do |p|   %>
-        <tr>
+        <tr style="background:#00FFB7">
           <td><%= check_box_tag "target_product_id[]", p.id %></td>
           <td><%= p.name %></td>
           <td><%= text_field_tag "target_quantity[#{p.id}]", nil, :class => "numbers-only" %></td>
@@ -42,7 +43,7 @@
         </tr>
      <% end %>
         <% @target_knowledges.each do |k|   %>
-        <tr>
+        <tr style="background:#FFF690">
           <td><%= check_box_tag "target_knowledge_id[]", k.id %></td>
           <td><%= k.name %></td>
           <td><%= text_field_tag "target_knowledge_quantity[#{k.id}]", nil, :class => "numbers-only" %></td>
@@ -53,7 +54,7 @@
 
     <!-- Start's colorbox container -->
     <div id="choose_origin-container" style="display: none">
-    <h2><%= _('You belong to more than one Enterprise. Please choose with which one you want to exchange.') %></h2>
+      <h2><%= _('You belong to more than one Enterprise. Please choose with which one you want to exchange.') %></h2>
       <table>
         <tr>
           <th><%=  %></th>
@@ -62,28 +63,55 @@
         </tr>
 
         <% @enterprises.each_with_index do |e,k|   %>
+
+          <% matching_products_inputs = (Product.products_inputs e, profile) %>
+          <% matching_products_interests = (Product.products_interests e, profile) %>
+          <% matching_knowledges_interests = (Article.knowledges_interests e, profile) %>
+          <% matching_knowledges_inputs = (Product.knowledges_inputs e, profile) %>
+
           <tr>
             <% if k == 0 %>
               <td><%= radio_button_tag "origin_enterprise_id",  e.id, :selected %></td>
             <% else %>
               <td><%= radio_button_tag "origin_enterprise_id",  e.id %></td>
             <% end %>
-            <td><%= e.name %></td>
-            <td><% (Product.suppliers_products_specific e,profile).count %> 
+            <td><%= e.name %>
+              (<%= matching_products_inputs.count + matching_products_interests.count + matching_knowledges_inputs.count + matching_knowledges_interests.count %>)</td>
+            <td>
               <ul>
-              <% (Product.suppliers_products_specific e,profile).each do |p| %>
-                <% input_name = (Input.find p.input_id).name %>
-                <li>  <%= _("%{e_name} offers %{products_supplier_name} and %{profile_name} needs %{input_name} to make %{p_name} <br />") % 
-      {:products_supplier_name => p.products_supplier_name, :profile_name => profile.name, :input_name => input_name, :e_name => e.name, :p_name => p.name} %></li>
-              <% end %>
-          </ul>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-      <%= button_to_function :add, _('Confirm'), "return false", :id => "choose_origin" %>
-      <%= button_to_function :cancel, _('Cancel'), "jQuery.colorbox.close()" %>
-    </div> <!-- choose_origin-container -->
+                <% matching_products_inputs.each do |p| %>
+                  <% input_name = (Input.find p.input_id).name  %>
+                  <% product_supplier_name = (p.products_supplier_name ? p.products_supplier_name : (Product.find p.products_supplier_id).product_category.name) %>
+                  <li>  <%= _("%{e_name} offers %{products_supplier_name} and %{profile_name} needs %{input_name} to make %{p_name} <br />") % 
+                  {:products_supplier_name => product_supplier_name, :profile_name => profile.name, :input_name => input_name, :e_name => e.name, :p_name => p.name} %></li>
+                <% end %>
+                <% matching_products_interests.each do |p| %>
+                  <% interest_name = (Category.find p.product_category_id).name %>
+                  <li>  <%= _("%{e_name} offers %{product_name} and %{profile_name} is interested in %{interest_name} <br />") % 
+                  {:product_name => p.name, :profile_name => profile.name, :interest_name => interest_name, :e_name => e.name} %></li>
+                <% end %>
+                <% matching_knowledges_inputs.each do |k| %>
+                  <% input_name = (Category.find k.input_cat).name %>
+                  <% product_name = (k.product ? k.product : (Category.find k.product_cat).name) %>
+                  <li>  <%= _("%{e_name} knows %{knowledge_name} and %{profile_name} uses %{input_name} to make %{product_name}<br />") % 
+                  {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :input_name => input_name, 
+                    :e_name => e.name, :product_name => product_name} %></li>
+                  <% end %>
+                  <% matching_knowledges_interests.each do |k| %>
+                    <% interest_name = (Category.find k.interest_cat).name %>
+                    <li><%= _("%{e_name} knows %{knowledge_name} and %{profile_name} is interested in %{interest_name}<br />") % 
+                    {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :interest_name => interest_name, 
+                      :e_name => e.name} %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+          <%= button_to_function :add, _('Confirm'), "return false", :id => "choose_origin" %>
+          <%= button_to_function :cancel, _('Cancel'), "jQuery.colorbox.close()" %>
+        </div> <!-- choose_origin-container -->
 
     <script type="text/javascript">
       jQuery(document).bind('cbox_cleanup', function() {

@@ -1,4 +1,6 @@
-<li id="<%= enterprise %>_element_<%= element.id %>"><%= (eval(element.element_type).find element.element_id).name %> | <%= text_field_tag "#{enterprise}_quantity[" +
-    element.element_id.to_s + "]", element.quantity %><%= link_to_remote "[-]", 
-    :url => {:action => :remove_element, :enterprise => enterprise, :element_id => element.id, :exchange_id => @exchange.id} %></li>
- 
+<li id="<%= enterprise %>_element_<%= element.id %>">
+<%= (eval(element.element_type).find element.element_id).name %> | 
+<%= text_field_tag "#{enterprise}_quantity[" + element.element_id.to_s + "]", element.quantity, 
+:onBlur => "jQuery.post('#{url_for :action => 'update_quantity', :element_id => element.id}', {quantity: jQuery(this).val()});" %>
+<%= link_to_remote "[-]", :url => {:action => :remove_element, :enterprise => enterprise, :element_id => element.id, :exchange_id => @exchange.id} %></li>
+

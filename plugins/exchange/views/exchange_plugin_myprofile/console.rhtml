@@ -21,22 +21,28 @@
 
   <ul>
     <li><%= _('Proposer: %s') % @exchange.enterprise_origin.name %></li>
-    <li><%= _('Exchange Elements:') %> <%if @edit_allowed %>[<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>] <% end %></li>
+    <% if @origin_evaluation_score %>
+      <li><%= _('Evaluation Score: %s') % @origin_evaluation_score %>
+      <li><%= _('Evaluation Description: %s') % @origin_evaluation_desc %>
+    <% end %>
+      <li><%= _('Exchange Elements:') %> <%if @edit_allowed %>[<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>] <% end %></li>
     <ul>
-      <% @exchange.exchange_elements.select{|e| e.enterprise_id == @exchange.enterprise_origin.id}.each do |x| %>
+      <% @exchange.exchange_elements.all (:conditions => {:enterprise_id => @exchange.enterprise_origin.id}).each do |x| %>
         <li><%= "#{x.element.name} (#{x.quantity})"%></li>
       <% end %>
     </ul>
     </li>
     <li><%= _('Target: %s') % @exchange.enterprise_target.name %></li>
-    <li><%= _('Exchange Elements:') %> [<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>]</li>
+    <% if @target_evaluation_score %>
+      <li><%= _('Evaluation Score: %s') % @target_evaluation_score %>
+      <li><%= _('Evaluation Description: %s') % @target_evaluation_desc %>
+    <% end %>
+    <li><%= _('Exchange Elements:') %> <%if @edit_allowed %>[<%= link_to _('Edit'), :action => "edit", :id => @exchange.id %>] <% end %></li>
     <ul>
-      <% @exchange.exchange_elements.select{|e| e.enterprise_id == @exchange.enterprise_target.id}.each do |x| %>
+      <% @exchange.exchange_elements.all (:conditions => {:enterprise_id => @exchange.enterprise_target.id}).each do |x| %>
         <li><%= "#{x.element.name} (#{x.quantity})" %></li>
       <% end %>
     </ul>
-
-
     <li><%= _('Exchange State:') %> <%= ExchangePlugin::Exchange.state[@exchange.state] %></li>
   </ul>
 
@@ -47,7 +53,7 @@
         <%= button_to @button[1][0], {:action => @button[1][1], :id => @exchange.id} %>
       <% end %>
     <% else%>
-      <%= _('Waiting for a response by the other part of the exchange') %>
+      <%= @no_button_message %>
     <% end %>
     <%= button_to _('Back to my exchanges'), :action => "index" %>
   </div>
