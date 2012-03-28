@@ -7,12 +7,24 @@
 <%= javascript_include_tag 'jquery.tokeninput.js' %>
 <%= stylesheet_link_tag 'token-input' %>
 <%= stylesheet_link_tag 'token-input-cms-learning' %>
+
+
 <div id="cms-learning-edit-products">
   <%= label :article, :product_category_string_ids, _('Associate Products'), :class => 'formlabel' %>
   <%= text_field(:article, :product_category_string_ids) %>
   <% array = @article.product_categories.collect{ |i| {:id => i.id, :name => i.name} } %>
   <% javascript_tag do %>
     jQuery.TokenList(jQuery("#article_product_category_string_ids"), '<%= url_for(:controller => :cms_learning_plugin_myprofile, :action => :product_categories) %>',
+    {searchDelay: 150, prePopulate: <%= array.to_json %>, preventDuplicates: true, theme: 'cms-learning', <%= jquery_token_input_messages_json("") %>});
+  <% end %>
+</div>
+
+<div id="cms-learning-edit-products">
+  <%= label :article, :person_string_ids, _('Associate Persons'), :class => 'formlabel' %>
+  <%= text_field(:article, :person_string_ids) %>
+  <% array = @article.persons.collect{ |i| {:id => i.id, :name => i.name} } %>
+  <% javascript_tag do %>
+    jQuery.TokenList(jQuery("#article_person_string_ids"), '<%= url_for(:controller => :cms_learning_plugin_myprofile, :action => :persons) %>',
     {searchDelay: 150, prePopulate: <%= array.to_json %>, preventDuplicates: true, theme: 'cms-learning', <%= jquery_token_input_messages_json("") %>});
   <% end %>
 </div>

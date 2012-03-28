@@ -7,10 +7,17 @@ class CmsLearningPluginLearning < Article
   has_many :resources_product_categories, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource',
     :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
 
+  has_many :resources_persons, :foreign_key => 'article_id', :order => 'id asc', :class_name => 'ArticleResource',
+    :conditions => ['article_resources.resource_type = ?', 'Person']
+
+  
   has_many :product_categories, :through => :resources, :source => :product_category, :foreign_key => 'article_id', :readonly => true,
     :class_name => 'ProductCategory', :conditions => ['article_resources.resource_type = ?', 'ProductCategory']
 
-  attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids
+  has_many :persons, :through => :resources, :source => :person, :foreign_key => 'article_id', :readonly => true,
+    :class_name => 'Person', :conditions => ['article_resources.resource_type = ?', 'Person']
+
+  attr_accessible :name, :body, :summary, :good_practices, :product_category_string_ids, :person_string_ids
 
   named_scope :by_profile, lambda { |profile| { :conditions => {:profile_id => profile.id} } }
 
@@ -56,6 +63,11 @@ class CmsLearningPluginLearning < Article
   def product_category_string_ids
     ''
   end
+
+  def person_string_ids
+    ''
+  end
+
   def product_category_string_ids=(ids)
     ids = ids.split(',')
     r = ProductCategory.find(ids)
@@ -65,11 +77,21 @@ class CmsLearningPluginLearning < Article
     end
   end
 
+  def person_string_ids=(ids)
+    ids = ids.split(',')
+    r = Person.find(ids)
+    self.resources_persons.destroy_all
+    @res_persons = ids.collect{ |id| r.detect{ |x| x.id == id.to_i } }.map do |pc|
+      ArticleResource.new :resource_id => pc.id, :resource_type => Person.name
+    end
+  end
+
   protected
 
   after_save :save_associated
   def save_associated
     @res_product_categories.each{ |c| c.article_id = self.id; c.save! } unless @res_product_categories.blank?
+    @res_persons.each{ |p| p.article_id = self.id; p.save! } unless @res_persons.blank?
   end
 
 end

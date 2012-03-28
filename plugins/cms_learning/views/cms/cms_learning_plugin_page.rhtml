@@ -8,8 +8,15 @@
           <li><%= link_to_category pc, false %></li>
         <% end %>
       </ul>
+      <div><b><%= _('Associated Persons') %></b></div>
+      <ul>
+        <% @page.persons.each do |p| %>
+          <li><%= link_to_profile p.short_name, p.identifier, :title => p.name %></li>
+        <% end %>
+      </ul>
     </div> 
-  </div> 
+  </div>
+
   <div id="cms-learning-view-content">
     <div class='cms-learning-field'>
       <div><b><%= _('Summary') %></b></div>
