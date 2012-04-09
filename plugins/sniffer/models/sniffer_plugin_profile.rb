@@ -14,6 +14,7 @@ class SnifferPluginProfile < ActiveRecord::Base
       sniffer.profile = profile
       sniffer.save!
     end
+    sniffer
   end
 
   attr_accessible :product_category_string_ids

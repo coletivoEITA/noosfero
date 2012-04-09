@@ -1,6 +1,7 @@
 require_dependency 'ext/enterprise'
 require_dependency 'ext/product'
 require_dependency 'ext/profile'
+require_dependency 'ext/article'
 
 class SnifferPlugin < Noosfero::Plugin
 
@@ -31,3 +32,4 @@ class SnifferPlugin < Noosfero::Plugin
   end
 
 end
+

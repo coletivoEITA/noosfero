@@ -34,14 +34,15 @@ class SnifferPluginMyprofileController < MyProfileController
     @suppliers_products = @sniffer_profile.suppliers_products
     @buyers_products = @sniffer_profile.buyers_products
     @no_results = @suppliers_products.count == 0 && @buyers_products.count == 0
+
     @suppliers_hashes = build_products(@suppliers_products.collect(&:attributes))
     @buyers_hashes = build_products(@buyers_products.collect(&:attributes))
 
-    suppliers = @suppliers_products.group_by{ |p| @id_profiles[p['profile_id'].to_i] }.to_hash
+    suppliers = @suppliers_products.group_by{ |p| @id_profiles[p['profile_id'].to_i] }
     buyers = @buyers_products.group_by{ |p| @id_profiles[p['profile_id'].to_i] }
     buyers.each{ |k, v| suppliers[k] ||= [] }
     suppliers.each{ |k, v| buyers[k] ||= [] }
-    @profiles = suppliers.merge(buyers) do |profile, suppliers_products, buyers_products|
+    @profiles = suppliers.merge!(buyers) do |profile, suppliers_products, buyers_products|
       {:suppliers_products => suppliers_products, :buyers_products => buyers_products}
     end
   end
@@ -50,8 +51,10 @@ class SnifferPluginMyprofileController < MyProfileController
     @profile = Profile.find params[:id]
     supplier_products = params[:suppliers_products] ? params[:suppliers_products].values : []
     buyer_products = params[:buyers_products] ? params[:buyers_products].values : []
+
     @suppliers_hashes = build_products(supplier_products).values.first
     @buyers_hashes = build_products(buyer_products).values.first
+
     render :layout => false
   end
 
@@ -97,5 +100,17 @@ class SnifferPluginMyprofileController < MyProfileController
     results
   end
 
+end
+
+# monkey patch old rails bug
+ActiveSupport::OrderedHash.class_eval do 
+  def merge!(other_hash)
+    if block_given?
+      other_hash.each { |k, v| self[k] = key?(k) ? yield(k, self[k], v) : v }
+    else
+      other_hash.each { |k, v| self[k] = v }
+    end
+    self
+  end
 end
 
