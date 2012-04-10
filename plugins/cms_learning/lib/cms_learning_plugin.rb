@@ -24,14 +24,8 @@ class CmsLearningPlugin < Noosfero::Plugin
     CmsLearningPlugin::LearningsBlock
   end
 
-  def article_types
-     {
-      :name => CmsLearningPluginLearning.name,
-      :short_description => CmsLearningPluginLearning.short_description,
-      :description => CmsLearningPluginLearning.description,
-      :type => CmsLearningPluginLearning,
-      :view_path => CmsLearningPlugin.view_path
-     }
+  def content_types
+    [CmsLearningPluginLearning]
   end
 
   def search_controller_filter
