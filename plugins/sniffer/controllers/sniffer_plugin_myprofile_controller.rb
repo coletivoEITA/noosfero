@@ -1,5 +1,6 @@
 class SnifferPluginMyprofileController < MyProfileController
   append_view_path File.join(File.dirname(__FILE__) + '/../views')
+  helper CmsHelper
 
   protect 'edit_profile', :profile
 
@@ -30,6 +31,7 @@ class SnifferPluginMyprofileController < MyProfileController
 
   def search
     self.class.no_design_blocks
+
 
     @suppliers_products = @sniffer_profile.suppliers_products
     @buyers_products = @sniffer_profile.buyers_products
@@ -77,6 +79,7 @@ class SnifferPluginMyprofileController < MyProfileController
     @id_products ||= {}
     @id_categories ||= {}
     @id_my_products ||= {}
+    @id_knowledges ||= {}
 
     return {} if data.blank?
 
@@ -84,6 +87,7 @@ class SnifferPluginMyprofileController < MyProfileController
     Product.all(:conditions => {:id => data.map{ |h| h['id'].to_i }.uniq}, :include => :enterprise).each{ |p| @id_products[p.id] ||= p }
     ProductCategory.all(:conditions => {:id => data.map{ |h| h['product_category_id'].to_i }.uniq}).each{ |c| @id_categories[c.id] ||= c }
     Product.all(:conditions => {:id => data.map{ |h| h['my_product_id'].to_i }.uniq}, :include => :enterprise).each{ |p| @id_my_products[p.id] ||= p }
+    Article.all(:conditions => {:id => data.map{|h| h['knowledge_id'].to_i}.uniq}).each{ |k| @id_knowledges[k.id] ||= k}
 
     results = {}
     data.each do |attributes|
@@ -94,7 +98,8 @@ class SnifferPluginMyprofileController < MyProfileController
       results[profile] << {
         :profile => profile, :partial => attributes['view'], :product => @id_products[attributes['id'].to_i],
         :category => @id_categories[attributes['product_category_id'].to_i],
-        :my_product => @id_my_products[attributes['my_product_id'].to_i], :partial => attributes['view']
+        :my_product => @id_my_products[attributes['my_product_id'].to_i], :partial => attributes['view'],
+        :knowledge => @id_knowledges[attributes['knowledge_id'].to_i], :partial => attributes['view'],
       }
     end
     results

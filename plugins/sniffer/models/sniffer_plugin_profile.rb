@@ -43,14 +43,20 @@ class SnifferPluginProfile < ActiveRecord::Base
 
   def suppliers_products
     interests = Product.interests_suppliers_products(profile)
+    knowledges = Product.knowledge_suppliers_inputs(profile)
+    knowledges_interests = Product.knowledge_suppliers_interests(profile)
     return interests if !profile.enterprise?
-    (Product.suppliers_products(profile) + interests).uniq
+    (Product.suppliers_products(profile) + interests + knowledges + knowledges_interests)#.uniq
+
   end
 
   def buyers_products
     interests = Product.interests_buyers_products(profile)
+    knowledges = Product.knowledge_buyers_inputs(profile)
+    knowledges_interests = Product.knowledge_buyers_interests(profile)
+
     return interests if !profile.enterprise?
-    (Product.buyers_products(profile) + interests).uniq
+    (Product.buyers_products(profile) + interests + knowledges + knowledges_interests)#.uniq #-> ver cole de mema!
   end
 
 end
