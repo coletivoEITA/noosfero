@@ -29,7 +29,7 @@ module DisplayHelper
   def link_to_category(category, full = true, options = {})
     return _('Uncategorized product') unless category
     name = full ? category.full_name(' &rarr; ') : category.name
-    link_to name, Noosfero.url_options.merge({:controller => 'search', :action => 'category_index', :category_path => category.path.split('/'),:host => category.environment.default_hostname }), options
+    link_to name, Noosfero.url_options.merge({:controller => 'search', :action => 'category_index', :category_path => category.path.split('/'),:host => category.environment.default_hostname }).merge(options)
   end
 
   def link_to_product_category(category)

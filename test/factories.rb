@@ -457,4 +457,12 @@ module Noosfero::Factory
     { :name => 'Production cost ' + factory_num_seq.to_s }
   end
 
+  ###############################################
+  # National Region
+  ###############################################
+
+  def defaults_for_national_region
+    { :name => 'National region ' + factory_num_seq.to_s }
+  end
+
 end
