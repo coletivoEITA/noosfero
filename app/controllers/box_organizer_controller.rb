@@ -54,7 +54,6 @@ class BoxOrganizerController < ApplicationController
   def update
     @block = boxes_holder.blocks.find(params[:id])
     @block.update_attributes(params[:block])
-    expire_timeout_fragment(@block.cache_key)
     render :nothing => true
   end
 
@@ -67,11 +66,7 @@ class BoxOrganizerController < ApplicationController
 
   def remove
     @block = Block.find(params[:id])
-    if @block.destroy
-      expire_timeout_fragment(@block.cache_key)
-    else
-      session[:notice] = _('Failed to remove block')
-    end
+    session[:notice] = _('Failed to remove block') unless @block.destroy
   end
 
   protected

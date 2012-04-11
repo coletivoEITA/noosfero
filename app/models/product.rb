@@ -184,7 +184,7 @@ class Product < ActiveRecord::Base
   end
 
   def price_described?
-    return false if price.nil?
+    return false if price.blank? or price == 0
     (price - total_production_cost).zero?
   end
 
@@ -196,6 +196,7 @@ class Product < ActiveRecord::Base
   end
 
   def price_description_percentage
+    return 0 if price.blank? || price.zero?
     total_production_cost * 100 / price
   end
 

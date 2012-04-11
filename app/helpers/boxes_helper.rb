@@ -71,8 +71,8 @@ module BoxesHelper
     render :file => 'shared/block', :locals => {:block => block, :main_content => main_content, :use_cache => use_cache? }
   end
 
-  def display_block_content(block, main_content = nil)
-    content = block.main? ? main_content : block.content
+  def display_block_content(block, person, main_content = nil)
+    content = block.main? ? main_content : block.content({:person => person})
     result = extract_block_content(content)
     footer_content = extract_block_content(block.footer)
     unless footer_content.blank?
@@ -89,7 +89,7 @@ module BoxesHelper
     unless block.visible?
       options[:title] = _("This block is invisible. Your visitors will not see it.")
     end
-    @controller.send(:content_editor?) || @plugins.enabled_plugins.each do |plugin|
+    @controller.send(:content_editor?) || @plugins.each do |plugin|
       result = plugin.parse_content(result)
     end
     box_presenter.block_target(block.box, block) +
