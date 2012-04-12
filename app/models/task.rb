@@ -262,13 +262,13 @@ class Task < ActiveRecord::Base
     end
   end
 
-  named_scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
-  named_scope :finished, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
-  named_scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  named_scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
-  named_scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
+  scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
+  scope :finished, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
+  scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
+  scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
+  scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
 
-  named_scope :to, lambda { |profile|
+  scope :to, lambda { |profile|
     environment_condition = nil
     if profile.person?
       envs_ids = Environment.find(:all).select{ |env| profile.is_admin?(env) }.map { |env| "target_id = #{env.id}"}.join(' OR ')

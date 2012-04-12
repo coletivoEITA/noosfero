@@ -23,7 +23,7 @@ module ActionTracker
     # In days
     RECENT_DELAY = 30
 
-    named_scope :recent, :conditions => ['created_at >= ?', RECENT_DELAY.days.ago]
+    scope :recent, :conditions => ['created_at >= ?', RECENT_DELAY.days.ago]
 
     def self.current_user_from_model
       u = new

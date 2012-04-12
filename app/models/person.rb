@@ -4,7 +4,7 @@ class Person < Profile
   acts_as_trackable :after_add => Proc.new {|p,t| notify_activity(t)}
   acts_as_accessor
 
-  named_scope :members_of, lambda { |resource| { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.resource_type = ? AND role_assignments.resource_id = ?', resource.class.base_class.name, resource.id ] } }
+  scope :members_of, lambda { |resource| { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.resource_type = ? AND role_assignments.resource_id = ?', resource.class.base_class.name, resource.id ] } }
 
   def memberships
     Profile.memberships_of(self)
@@ -13,7 +13,7 @@ class Person < Profile
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships
 
-  named_scope :online, lambda { { :include => :user, :conditions => ["users.chat_status != '' AND users.chat_status_at >= ?", DateTime.now - User.expires_chat_status_every.minutes] } }
+  scope :online, lambda { { :include => :user, :conditions => ["users.chat_status != '' AND users.chat_status_at >= ?", DateTime.now - User.expires_chat_status_every.minutes] } }
 
   has_many :requested_tasks, :class_name => 'Task', :foreign_key => :requestor_id, :dependent => :destroy
 
@@ -23,13 +23,13 @@ class Person < Profile
 
   has_many :scraps_sent, :class_name => 'Scrap', :foreign_key => :sender_id, :dependent => :destroy
 
-  named_scope :more_popular,
+  scope :more_popular,
       :select => "#{Profile.qualified_column_names}, count(friend_id) as total",
       :group => Profile.qualified_column_names,
       :joins => "LEFT OUTER JOIN friendships on profiles.id = friendships.person_id",
       :order => "total DESC"
 
-  named_scope :more_active,
+  scope :more_active,
     :select => "#{Profile.qualified_column_names}, count(action_tracker.id) as total",
     :joins => "LEFT OUTER JOIN action_tracker ON profiles.id = action_tracker.user_id",
     :group => Profile.qualified_column_names,
