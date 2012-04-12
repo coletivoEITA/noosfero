@@ -12,7 +12,7 @@ class Kalibro::Client::Port
 
   def service_address
     if @service_address.nil?
-      service_file = "#{RAILS_ROOT}/plugins/mezuro/SERVICE"
+      service_file = "#{Rails.root}/plugins/mezuro/SERVICE"
       File.open(service_file).each_line{ | line | @service_address = line }
     end
     @service_address

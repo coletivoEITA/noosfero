@@ -26,7 +26,7 @@ class PortTest < ActiveSupport::TestCase
   private
 
   def set_default_address
-    service_file = "#{RAILS_ROOT}/plugins/mezuro/SERVICE"
+    service_file = "#{Rails.root}/plugins/mezuro/SERVICE"
     File.open(service_file).each_line{ | line | @default_address = line }
   end
 

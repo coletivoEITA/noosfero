@@ -1,14 +1,9 @@
-# Be sure to restart your web server when you modify this file.
+require File.expand_path('../boot', __FILE__)
+require 'rails/all'
 
-# Uncomment below to force Rails into production mode when 
-# you don't control web/app server and can't set it the proper way
-#ENV['RAILS_ENV'] ||= 'production'
-
-# Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
-
-# Bootstrap the Rails environment, frameworks, and default configuration
-require File.join(File.dirname(__FILE__), 'boot')
+# If you have a Gemfile, require the gems listed there, including any gems
+# you've limited to :test, :development, or :production.
+Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 # extra directories for controllers organization 
 extra_controller_dirs = %w[
@@ -16,7 +11,7 @@ extra_controller_dirs = %w[
   app/controllers/admin
   app/controllers/system
   app/controllers/public
-].map {|item| File.join(RAILS_ROOT, item) }
+].map {|item| File.join(Rails::root, item) }
 
 def noosfero_session_secret
   require 'fileutils'
@@ -39,8 +34,8 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :action_web_service, :action_mailer ]
 
   # Add additional load paths for your own custom dirs
-  # config.load_paths += %W( #{RAILS_ROOT}/extras )
-  config.load_paths += %W( #{RAILS_ROOT}/app/sweepers )
+  # config.load_paths += %W( #{Rails.root}/extras )
+  config.load_paths += %W( #{Rails.root}/app/sweepers )
 
   # Force all environments to use the same logger level 
   # (by default production uses :info, the others :debug)
@@ -125,7 +120,7 @@ require 'sqlite_extension'
 
 # load a local configuration if present, but not under test environment.
 if !['test', 'cucumber'].include?(ENV['RAILS_ENV'])
-  localconfigfile = File.join(RAILS_ROOT, 'config', 'local.rb')
+  localconfigfile = File.join(Rails.root, 'config', 'local.rb')
   if File.exists?(localconfigfile)
     require localconfigfile
   end
