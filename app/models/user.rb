@@ -12,15 +12,6 @@ class User < ActiveRecord::Base
     self.find_by_login(login)
   end
 
-  # FIXME put in config/locales
-  #def self.human_attribute_name(attrib)
-  #  case attrib.to_sym
-  #    when :login:  return _('Username')
-  #    when :email:  return _('e-Mail')
-  #    else _(self.superclass.human_attribute_name(attrib))
-  #  end
-  #end
-
   before_create :make_activation_code
 
   before_create do |user|
