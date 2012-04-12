@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 require 'themes_controller'
 
 class ThemesController; def rescue_action(e) raise e end; end

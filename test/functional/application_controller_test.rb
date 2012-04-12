@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 # encoding: utf-8
 
+=======
+>>>>>>> 182bb30... [Ruby1.9] Use require_relative for test_helper
 require_relative '../test_helper'
 require 'test_controller'
 
