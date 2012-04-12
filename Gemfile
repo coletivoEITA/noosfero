@@ -13,8 +13,7 @@ group :development, :production do
   gem 'daemons', '1.0.10'
   gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
 
-  gem 'jquery-rails'
-  gem 'jquery-rjs', :git => 'git://github.com/aaronchi/jquery-rjs.git'
+  gem 'acts_as_ferret'
 end
 
 group :production do
