@@ -79,7 +79,7 @@ class Event < Article
   # FIXME this shouldn't be needed
   include ActionView::Helpers::TagHelper
   include ActionView::Helpers::UrlHelper
-  include ActionController::UrlWriter
+  include Rails.application.routes.url_helpers
   include DatesHelper
 
   def to_html(options = {})

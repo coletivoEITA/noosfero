@@ -187,7 +187,7 @@ class Product < ActiveRecord::Base
     self.enterprise.environment.production_costs + self.enterprise.production_costs
   end
 
-  include ActionController::UrlWriter
+  include Rails.application.routes.url_helpers
   def price_composition_bar_display_url
     url_for({:host => enterprise.default_hostname, :controller => 'manage_products', :action => 'display_price_composition_bar', :profile => enterprise.identifier, :id => self.id }.merge(Noosfero.url_options))
   end
