@@ -83,13 +83,13 @@ class Invitation < Task
   def self.get_contacts(source, login, password, contact_list_id)
     contact_list = ContactList.find(contact_list_id)
     case source
-    when "gmail"
+    when "gmail" then
       email_service = Contacts::Gmail.new(login, password)
-    when "yahoo"
+    when "yahoo" then
       email_service = Contacts::Yahoo.new(login, password)
-    when "hotmail"
+    when "hotmail" then
       email_service = Contacts::Hotmail.new(login, password)
-    when "manual"
+    when "manual" then
       #do nothing
     else
       raise NotImplementedError, 'Unknown source to get contacts'

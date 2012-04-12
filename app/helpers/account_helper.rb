@@ -6,9 +6,9 @@ module AccountHelper
 
   def checking_message(key)
     case key
-    when :url
+    when :url then
       _('Checking availability of login name...')
-    when :email
+    when :email then
       _('Checking if e-mail address is already taken...')
     end
   end

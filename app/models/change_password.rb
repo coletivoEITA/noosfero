@@ -4,13 +4,13 @@ class ChangePassword < Task
 
   def self.human_attribute_name(attrib)
     case attrib.to_sym
-    when :login:
+    when :login then
       _('Username')
-    when :email
+    when :email then
       _('e-Mail')
-    when :password
+    when :password then
       _('Password')
-    when :password_confirmation
+    when :password_confirmation then
       _('Password Confirmation')
     else
       _(self.superclass.human_attribute_name(attrib))

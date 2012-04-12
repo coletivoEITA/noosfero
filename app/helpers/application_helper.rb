@@ -747,11 +747,11 @@ module ApplicationHelper
 
   def role_color(role, env_id)
     case role
-      when Profile::Roles.admin(env_id)
+      when Profile::Roles.admin(env_id) then
         'blue'
-      when Profile::Roles.member(env_id)
+      when Profile::Roles.member(env_id) then
         'green'
-      when Profile::Roles.moderator(env_id)
+      when Profile::Roles.moderator(env_id) then
         'gray'
       else
         'black'

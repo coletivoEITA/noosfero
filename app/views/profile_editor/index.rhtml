@@ -30,9 +30,9 @@
 
   <% unless profile.enterprise? %>
     <%= case profile.blogs.count
-      when 0
+      when 0 then
         control_panel_button(_('Create blog'), 'blog-disabled', :controller => 'cms', :action => 'new', :type => 'Blog')
-      when 1
+      when 1 then
         control_panel_button(_('Configure blog'), 'blog', :controller => 'cms', :action => 'edit', :id => profile.blog)
       else
         control_panel_button(_('Configure blog'), 'blog', :controller => 'cms')

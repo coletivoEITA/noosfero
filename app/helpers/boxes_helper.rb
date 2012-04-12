@@ -119,17 +119,17 @@ module BoxesHelper
 
   def extract_block_content(content)
     case content
-    when Hash
+    when Hash then
       content_tag('iframe', '', :src => url_for(content))
-    when String
+    when String then
       if content.split("\n").size == 1 and content =~ /^https?:\/\//
         content_tag('iframe', '', :src => content)
       else
         content
       end
-    when Proc
+    when Proc then
       self.instance_eval(&content)
-    when NilClass
+    when NilClass then
       ''
     else
       raise "Unsupported content for block (#{content.class})"

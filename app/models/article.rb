@@ -89,7 +89,7 @@ class Article < ActiveRecord::Base
 
   def self.human_attribute_name(attrib)
     case attrib.to_sym
-    when :name
+    when :name then
       _('Title')
     else
       _(self.superclass.human_attribute_name(attrib))
@@ -606,7 +606,7 @@ class Article < ActiveRecord::Base
   def f_type
     #join common types
     case self.class.name
-    when 'TinyMceArticle', 'TextileArticle'
+    when 'TinyMceArticle', 'TextileArticle' then
       TextArticle.name
     else
       self.class.name

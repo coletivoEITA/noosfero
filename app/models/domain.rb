@@ -45,9 +45,9 @@ class Domain < ActiveRecord::Base
   # to a Environment.
   def environment
     case owner
-    when Environment
+    when Environment then
       owner
-    when Profile
+    when Profile then
       owner.environment
     end
   end
@@ -56,9 +56,9 @@ class Domain < ActiveRecord::Base
   # not directly associated with a profile.
   def profile
     case owner
-    when Environment
+    when Environment then
       nil
-    when Profile
+    when Profile then
       owner
     end
   end
