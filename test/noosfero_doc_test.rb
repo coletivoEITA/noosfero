@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'mocha'
 
 module Noosfero::DocTest

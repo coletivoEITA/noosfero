@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 require 'maps_controller'
 
 # Re-raise errors caught by the controller.
@@ -35,7 +35,7 @@ class MapsControllerTest < ActionController::TestCase
     assert_template 'edit_location'
   end
 
-  should 'dispĺay form for address with profile address' do
+  should 'display form for address with profile address' do
     env = Environment.default
     env.custom_person_fields = { 'city' => { 'active' => 'true' } }
     env.save!

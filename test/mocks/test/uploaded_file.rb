@@ -1,4 +1,4 @@
-require 'app/models/uploaded_file'
+require "#{Rails.root}/app/models/uploaded_file.rb"
 
 class UploadedFile < Article
 

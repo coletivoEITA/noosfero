@@ -1,14 +1,14 @@
 ENV["RAILS_ENV"] = "test"
+
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'mocha'
-require 'tidy'
 require 'hpricot'
 
 require 'noosfero/test'
-require File.dirname(__FILE__) + '/factories'
-require File.dirname(__FILE__) + '/noosfero_doc_test'
-require File.dirname(__FILE__) + '/action_tracker_test_helper'
+require_relative 'factories'
+require_relative 'noosfero_doc_test'
+require_relative 'action_tracker_test_helper'
 
 FileUtils.rm_rf(File.join(Rails.root, 'index', 'test'))
 
