@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 namespace :noosfero do
 
   desc 'checks if there are uncommitted changes in the repo'
