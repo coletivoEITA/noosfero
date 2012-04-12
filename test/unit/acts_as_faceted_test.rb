@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 class TestModel < ActiveRecord::Base
   def self.f_type_proc(klass)

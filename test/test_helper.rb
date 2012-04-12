@@ -1,19 +1,18 @@
 ENV["RAILS_ENV"] = "test"
 
 # Start/stop Solr
-abort unless system 'rake solr:start'
-at_exit { system 'rake solr:stop' }
+#abort unless system 'rake solr:start'
+#at_exit { system 'rake solr:stop' }
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'mocha'
-require 'tidy'
 require 'hpricot'
 
 require 'noosfero/test'
-require File.dirname(__FILE__) + '/factories'
-require File.dirname(__FILE__) + '/noosfero_doc_test'
-require File.dirname(__FILE__) + '/action_tracker_test_helper'
+require_relative 'factories'
+require_relative 'noosfero_doc_test'
+require_relative 'action_tracker_test_helper'
 
 FileUtils.rm_rf(File.join(RAILS_ROOT, 'index', 'test'))
 
@@ -125,14 +124,6 @@ class ActiveSupport::TestCase
       post action, params
     else
       get action, params
-    end
-    tidy = Tidy.open(:show_warnings=>false)
-    tidy.options.output_xml = true
-    tidy.clean @response.body
-    if tidy.errors
-      flunk "HTML ERROR - Tidy Diagnostics:\n  "+
-            tidy.errors.join("\n  ") +"\n  "+
-            tidy.diagnostics.join("\n  ")
     end
   end
 
