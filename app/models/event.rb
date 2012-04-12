@@ -30,7 +30,7 @@ class Event < Article
     end
   end
 
-  named_scope :by_day, lambda { |date|
+  scope :by_day, lambda { |date|
     {:conditions => ['start_date = :date AND end_date IS NULL OR (start_date <= :date AND end_date >= :date)', {:date => date}]}
   }
 
@@ -49,7 +49,7 @@ class Event < Article
     'event'
   end
 
-  named_scope :by_range, lambda { |range| {
+  scope :by_range, lambda { |range| {
     :conditions => [
       'start_date BETWEEN :start_day AND :end_day OR end_date BETWEEN :start_day AND :end_day',
       { :start_day => range.first, :end_day => range.last }
