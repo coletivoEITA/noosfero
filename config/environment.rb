@@ -80,8 +80,8 @@ Rails::Initializer.run do |config|
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
   config.action_controller.session = {
-    :session_key => '_noosfero_session',
-    :secret      => noosfero_session_secret(),
+    :key => '_noosfero_session',
+    :secret => noosfero_session_secret(),
   }
 
   # Adds custom attributes to the Set of allowed html attributes for the #sanitize helper
