@@ -2,9 +2,8 @@ source :rubygems
 
 group :development, :production do
   gem 'rake', '0.8.7'
-  gem 'rails', '2.3.5'
-  gem 'gettext', '2.1.0'
-  gem 'gettext_rails', '2.1.0'
+  gem 'rails', '3.0.12'
+  gem 'gettext_i18n_rails', '0.4.6'
   gem 'rmagick', '2.13.1'
   gem 'RedCloth', '4.2.2'
   gem 'will_paginate', '2.3.12'
