@@ -46,25 +46,25 @@ module XssTerminate
           key = key.to_sym
           self[field][key] = sanitizer.sanitize(self[field][key])
         }
+      elsif self[field]
+        self[field] = sanitizer.sanitize(self[field])
+
+        if with == :full
+          self[field] = CGI.escapeHTML(self[field])
+        elsif with == :white_list
+          self[field] = CGI.escapeHTML(self[field]) if !wellformed_html_code?(self[field])
+        end
+
       else
-        if self[field]
-          self[field] = sanitizer.sanitize(self[field])
+        field = self.send("#{field}")
+        return nil unless field
 
-          if with == :full
-            self[field] = CGI.escapeHTML(self[field])
-          elsif with == :white_list
-            self[field] = CGI.escapeHTML(self[field]) if !wellformed_html_code?(self[field])
-          end
+        self.send("#{field}=", sanitizer.sanitize(field))
 
-        else
-          self.send("#{field}=", sanitizer.sanitize(self.send("#{field}")))
-
-          if with == :full
-            self.send("#{field}=", CGI.escapeHTML(self.send("#{field}")))
-          elsif with == :white_list
-            self.send("#{field}=", CGI.escapeHTML(self.send("#{field}"))) if !wellformed_html_code?(self.send("#{field}"))
-          end
-
+        if with == :full
+          self.send("#{field}=", CGI.escapeHTML(field))
+        elsif with == :white_list
+          self.send("#{field}=", CGI.escapeHTML(field)) if !wellformed_html_code?(field)
         end
       end
     end
