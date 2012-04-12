@@ -1,18 +1,19 @@
 # PostgreSQL. Versions 7.4 and 8.x are supported.
 #
-# Install the ruby-postgres driver:
-#   gem install ruby-postgres
-# On Mac OS X:
-#   gem install ruby-postgres -- --include=3D/usr/local/pgsql
+# Install the pg driver:
+#   gem install pg
+# On Mac OS X with macports:
+#   gem install pg -- --with-pg-config=/opt/local/lib/postgresql84/bin/pg_config
 # On Windows:
-#   gem install ruby-postgres
+#   gem install pg
 #       Choose the win32 build.
 #       Install PostgreSQL and put its /bin directory on your path.
 development:
   adapter: postgresql
   encoding: unicode
-  database: noosfero_development
-  username: noosfero
+  database: newrails_development
+  pool: 5
+  username: newrails
   password:
 
   # Connect on a TCP socket. Omitted by default since the client uses a
@@ -33,19 +34,18 @@ development:
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
-test: &TEST
+test:
   adapter: postgresql
   encoding: unicode
-  database: noosfero_test
-  username: noosfero
+  database: newrails_test
+  pool: 5
+  username: newrails
   password:
 
 production:
   adapter: postgresql
   encoding: unicode
-  database: noosfero_production
-  username: noosfero
+  database: newrails_production
+  pool: 5
+  username: newrails
   password:
-
-cucumber:
-  <<: *TEST
