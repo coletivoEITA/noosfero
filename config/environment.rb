@@ -39,8 +39,8 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :action_web_service, :action_mailer ]
 
   # Add additional load paths for your own custom dirs
-  # config.load_paths += %W( #{RAILS_ROOT}/extras )
-  config.load_paths += %W( #{RAILS_ROOT}/app/sweepers )
+  # config.autoload_paths += %W( #{RAILS_ROOT}/extras )
+  config.autoload_paths += %W( #{RAILS_ROOT}/app/sweepers )
 
   # Force all environments to use the same logger level 
   # (by default production uses :info, the others :debug)
@@ -98,7 +98,7 @@ Rails::Initializer.run do |config|
   end
 end
 extra_controller_dirs.each do |item|
-  (ActiveSupport.const_defined?('Dependencies') ? ActiveSupport::Dependencies : ::Dependencies).load_paths << item
+  (ActiveSupport.const_defined?('Dependencies') ? ActiveSupport::Dependencies : ::Dependencies).autoload_paths << item
 end
 
 # Add new inflection rules using the following format 

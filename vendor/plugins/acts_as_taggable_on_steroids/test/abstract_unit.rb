@@ -11,7 +11,7 @@ end
 # Search for fixtures first
 fixture_path = File.dirname(__FILE__) + '/fixtures/'
 begin
-  Dependencies.load_paths.insert(0, fixture_path)
+  Dependencies.autoload_paths.insert(0, fixture_path)
 rescue
   $LOAD_PATH.unshift(fixture_path)
 end
