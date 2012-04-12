@@ -1,20 +1,18 @@
 source :rubygems
 
 group :development, :production do
-  gem 'rake', '0.8.7'
-  gem 'rails', '2.3.5'
+  gem 'rake', '0.9.2.2'
+  gem 'rails', '2.3.14'
   gem 'gettext', '2.1.0'
   gem 'gettext_rails', '2.1.0'
   gem 'rmagick', '2.13.1'
   gem 'RedCloth', '4.2.2'
-  gem 'will_paginate', '2.3.12'
+  gem 'will_paginate', '2.3.16'
   gem 'ruby-feedparser', '0.7'
-  gem 'ferret', '0.11.6'
   gem 'hpricot', '0.8.2'
   gem 'i18n', '0.4.1'
   gem 'daemons', '1.0.10'
-  gem 'mongrel', '1.1.5'
-  gem 'mongrel_cluster', '1.0.5'
+  gem 'rdoc', '2.4.2'
 
   #Indirect, matching debian squeeze versions
   gem 'builder', '2.1.2'
@@ -22,7 +20,6 @@ group :development, :production do
   gem 'gem_plugin', '0.2.3'
   gem 'eventmachine', '0.12.10'
   gem 'log4r', '1.0.6'
-  gem 'mmap', '0.2.6'
   gem 'mocha', '0.9.8'
   gem 'nokogiri', '1.4.0'
   gem 'rest-client', '1.6.0'
@@ -35,14 +32,14 @@ group :production do
 end
 
 group :databases do
-  gem 'sqlite3-ruby', '1.2.4'
+  gem 'sqlite3', '1.3.5'
   gem 'pg', '0.8.0'
 end
 
 group :test do
-  gem 'system_timer'
+  gem 'system-timer19'
   gem 'tidy'
-  gem 'rcov'
+  gem 'simplecov'
 end
 
 group :test, :cucumber do

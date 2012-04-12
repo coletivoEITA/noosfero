@@ -12,6 +12,7 @@ config/mongrel_cluster.yml
 config/solr.yml
 config/plugins
 config/thin.yml
+/Gemfile.lock
 /index
 /locale
 /log
