@@ -1,0 +1,2 @@
+module ProfileSearchHelper
+end
