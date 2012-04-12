@@ -10,7 +10,7 @@ require File.dirname(__FILE__) + '/factories'
 require File.dirname(__FILE__) + '/noosfero_doc_test'
 require File.dirname(__FILE__) + '/action_tracker_test_helper'
 
-FileUtils.rm_rf(File.join(RAILS_ROOT, 'index', 'test'))
+FileUtils.rm_rf(File.join(Rails.root, 'index', 'test'))
 
 Image.attachment_options[:path_prefix] = 'test/tmp/public/images'
 Thumbnail.attachment_options[:path_prefix] = 'test/tmp/public/thumbnails'
@@ -52,7 +52,7 @@ class ActiveSupport::TestCase
   fixtures :environments, :roles
   
   def self.all_fixtures
-    Dir.glob(File.join(RAILS_ROOT, 'test', 'fixtures', '*.yml')).each do |item|
+    Dir.glob(File.join(Rails.root, 'test', 'fixtures', '*.yml')).each do |item|
       fixtures File.basename(item).sub(/\.yml$/, '').to_s
     end
   end
@@ -143,7 +143,7 @@ class ActiveSupport::TestCase
                      patch ? patch[1] : nil
                    end.compact
       s.each do |css_ref|
-        if ! File.exists?( RAILS_ROOT.to_s() +'/public/'+ css_ref )
+        if ! File.exists?( Rails.root.to_s() +'/public/'+ css_ref )
           flunk 'CSS reference missed on HTML: "%s"' % css_ref
         end
       end
@@ -152,7 +152,7 @@ class ActiveSupport::TestCase
     # Test image references:
     (doc/'img').each do |img|
       src = img.get_attribute( 'src' ).gsub(/\?[0-9]+$/, '')
-      if ! File.exists?( RAILS_ROOT.to_s() +'/public/'+ src )
+      if ! File.exists?( Rails.root.to_s() +'/public/'+ src )
         flunk 'Image reference missed on HTML: "%s"' % src
       end
     end
@@ -204,8 +204,8 @@ class ActiveSupport::TestCase
 
   def reload_for_ferret
     ActsAsFerret.send(:remove_const, :DEFAULT_FIELD_OPTIONS)
-    load File.join(RAILS_ROOT, 'lib', 'acts_as_searchable.rb')
-    load File.join(RAILS_ROOT, 'vendor', 'plugins', 'acts_as_ferret', 'lib', 'acts_as_ferret.rb')
+    load File.join(Rails.root, 'lib', 'acts_as_searchable.rb')
+    load File.join(Rails.root, 'vendor', 'plugins', 'acts_as_ferret', 'lib', 'acts_as_ferret.rb')
     [Article, Profile, Product].each do |clazz|
       inst_meth = clazz.instance_methods.reject{ |m| m =~ /_to_ferret$/ }
       clazz.stubs(:instance_methods).returns(inst_meth)

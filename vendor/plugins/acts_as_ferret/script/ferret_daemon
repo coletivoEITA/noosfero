@@ -45,7 +45,7 @@ module Ferret
       if options[:log]      
         @logger = Logger.new @options[:log]
       else 
-        @logger = Logger.new RAILS_ROOT + "/log/ferret_service_#{RAILS_ENV}.log"
+        @logger = Logger.new Rails.root + "/log/ferret_service_#{RAILS_ENV}.log"
       end
       
       # redirect stout and stderr to Ferret logger if running as windows service

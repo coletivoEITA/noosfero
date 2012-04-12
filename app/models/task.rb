@@ -59,14 +59,14 @@ class Task < ActiveRecord::Base
       begin
         task.send(:send_notification, :created)
       rescue NotImplementedError => ex
-        RAILS_DEFAULT_LOGGER.info ex.to_s
+        Rails.logger.info ex.to_s
       end
 
       begin
         target_msg = task.target_notification_message
         TaskMailer.deliver_target_notification(task, target_msg) if target_msg
       rescue NotImplementedError => ex
-        RAILS_DEFAULT_LOGGER.info ex.to_s
+        Rails.logger.info ex.to_s
       end
     end
   end
@@ -87,7 +87,7 @@ class Task < ActiveRecord::Base
       begin
         send_notification(:finished)
       rescue NotImplementedError => ex
-        RAILS_DEFAULT_LOGGER.info ex.to_s
+        Rails.logger.info ex.to_s
       end
     end
     after_finish
@@ -115,7 +115,7 @@ class Task < ActiveRecord::Base
       begin
         send_notification(:cancelled)
       rescue NotImplementedError => ex
-        RAILS_DEFAULT_LOGGER.info ex.to_s
+        Rails.logger.info ex.to_s
       end
     end
   end
@@ -220,14 +220,14 @@ class Task < ActiveRecord::Base
     begin
       self.send(:send_notification, :activated)
     rescue NotImplementedError => ex
-      RAILS_DEFAULT_LOGGER.info ex.to_s
+      Rails.logger.info ex.to_s
     end
 
     begin
       target_msg = target_notification_message
       TaskMailer.deliver_target_notification(self, target_msg) if target_msg
     rescue NotImplementedError => ex
-      RAILS_DEFAULT_LOGGER.info ex.to_s
+      Rails.logger.info ex.to_s
     end
   end
 

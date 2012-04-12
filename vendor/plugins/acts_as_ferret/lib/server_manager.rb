@@ -17,7 +17,7 @@ OptionParser.new do |optparser|
     exit
   end
   
-  optparser.on('-R', '--root=PATH', 'Set RAILS_ROOT to the given string') do |r|
+  optparser.on('-R', '--root=PATH', 'Set Rails.root to the given string') do |r|
     $ferret_server_options['root'] = r
   end
 
@@ -41,11 +41,11 @@ begin
   ENV['FERRET_USE_LOCAL_INDEX'] = 'true'
   ENV['RAILS_ENV'] = $ferret_server_options['environment']
   
-  # determine RAILS_ROOT unless already set
-  RAILS_ROOT = $ferret_server_options['root'] || File.join(File.dirname(__FILE__), *(['..']*4)) unless defined? RAILS_ROOT
+  # determine Rails.root unless already set
+  Rails.root = $ferret_server_options['root'] || File.join(File.dirname(__FILE__), *(['..']*4)) unless defined? Rails.root
   # check if environment.rb is present
-  rails_env_file = File.join(RAILS_ROOT, 'config', 'environment')
-  raise "Unable to find Rails environment.rb at \n#{rails_env_file}.rb\nPlease use the --root option of ferret_server to point it to your RAILS_ROOT." unless File.exists?(rails_env_file+'.rb')
+  rails_env_file = File.join(Rails.root, 'config', 'environment')
+  raise "Unable to find Rails environment.rb at \n#{rails_env_file}.rb\nPlease use the --root option of ferret_server to point it to your Rails.root." unless File.exists?(rails_env_file+'.rb')
   # load it
   require rails_env_file
 

@@ -14,7 +14,7 @@ module ActsAsFerret
 
     module ClassMethods
       def logger
-        RAILS_DEFAULT_LOGGER
+        Rails.logger
       end
       def table_name
         self.name.underscore

@@ -49,7 +49,7 @@ class FeedHandler
   end
 
   def process(container)
-    RAILS_DEFAULT_LOGGER.info("Processing %s with id = %d" % [container.class.name, container.id])
+    Rails.logger.info("Processing %s with id = %d" % [container.class.name, container.id])
     begin
       container.class.transaction do
         actually_process_container(container)
@@ -57,8 +57,8 @@ class FeedHandler
         container.finish_fetch
       end
     rescue Exception => exception
-      RAILS_DEFAULT_LOGGER.warn("Unknown error from %s ID %d\n%s" % [container.class.name, container.id, exception.to_s])
-      RAILS_DEFAULT_LOGGER.warn("Backtrace:\n%s" % exception.backtrace.join("\n"))
+      Rails.logger.warn("Unknown error from %s ID %d\n%s" % [container.class.name, container.id, exception.to_s])
+      Rails.logger.warn("Backtrace:\n%s" % exception.backtrace.join("\n"))
       container.reload
       container.update_errors += 1
       container.error_message = exception.to_s
@@ -68,8 +68,8 @@ class FeedHandler
       begin
         container.finish_fetch
       rescue Exception => finish_fetch_exception
-        RAILS_DEFAULT_LOGGER.warn("Unable to finish fetch from %s ID %d\n%s" % [container.class.name, container.id, finish_fetch_exception.to_s])
-        RAILS_DEFAULT_LOGGER.warn("Backtrace:\n%s" % finish_fetch_exception.backtrace.join("\n"))
+        Rails.logger.warn("Unable to finish fetch from %s ID %d\n%s" % [container.class.name, container.id, finish_fetch_exception.to_s])
+        Rails.logger.warn("Backtrace:\n%s" % finish_fetch_exception.backtrace.join("\n"))
       end
     end
   end
