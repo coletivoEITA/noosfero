@@ -62,7 +62,7 @@ namespace :solr do
         else
           pid = fork do
             Process.setpgrp
-            STDERR.close
+            $stderr.reopen("/dev/null", "w")
             exec cmd 
           end
         end
