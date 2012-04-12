@@ -1,4 +1,6 @@
-require File.dirname(__FILE__) + '/../test_helper'
+# encoding: utf-8
+
+require_relative '../test_helper'
 require 'test_controller'
 
 # Re-raise errors caught by the controller.
