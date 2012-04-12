@@ -87,15 +87,6 @@ class Article < ActiveRecord::Base
     self.profile
   end
 
-  def self.human_attribute_name(attrib)
-    case attrib.to_sym
-    when :name
-      _('Title')
-    else
-      _(self.superclass.human_attribute_name(attrib))
-    end
-  end
-
   def css_class_name
     self.class.name.underscore.dasherize
   end

@@ -2,21 +2,6 @@ class ChangePassword < Task
 
   attr_accessor :login, :email, :password, :password_confirmation, :environment_id
 
-  def self.human_attribute_name(attrib)
-    case attrib.to_sym
-    when :login:
-      _('Username')
-    when :email
-      _('e-Mail')
-    when :password
-      _('Password')
-    when :password_confirmation
-      _('Password Confirmation')
-    else
-      _(self.superclass.human_attribute_name(attrib))
-    end
-  end
-
   ###################################################
   # validations for creating a ChangePassword task 
   
