@@ -1,6 +1,6 @@
 require 'noosfero'
 
-ActionController::Routing::Routes.draw do |map|
+Rails3::Application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
   
   # Sample of regular route:
@@ -15,42 +15,42 @@ ActionController::Routing::Routes.draw do |map|
   ## Public controllers
   ######################################################
 
-  map.connect 'test/:controller/:action/:id'  , :controller => /.*test.*/
+  match 'test/:controller/:action/:id' => '(?-mix:.*test.*)#index'
  
   # -- just remember to delete public/index.html.
   # You can have the root of your site routed by hooking up ''
-  map.connect '', :controller => "home", :conditions => { :if => lambda { |env| !Domain.hosting_profile_at(env[:host]) } }
-  map.home 'site/:action', :controller => 'home'
+  match '' => 'home#index', :via => 
+  match 'site/:action' => 'home#index', :as => :home
 
-  map.connect 'images/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'stylesheets/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'designs/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'articles/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'javascripts/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'thumbnails/*stuff', :controller => 'not_found', :action => 'index'
-  map.connect 'user_themes/*stuff', :controller => 'not_found', :action => 'index'
+  match 'images/*stuff' => 'not_found#index'
+  match 'stylesheets/*stuff' => 'not_found#index'
+  match 'designs/*stuff' => 'not_found#index'
+  match 'articles/*stuff' => 'not_found#index'
+  match 'javascripts/*stuff' => 'not_found#index'
+  match 'thumbnails/*stuff' => 'not_found#index'
+  match 'user_themes/*stuff' => 'not_found#index'
 
   # online documentation
-  map.doc         'doc', :controller => 'doc', :action => 'index'
-  map.doc_section 'doc/:section', :controller => 'doc', :action => 'section'
-  map.doc_topic   'doc/:section/:topic', :controller => 'doc', :action => 'topic'
+  match 'doc' => 'doc#index', :as => :doc
+  match 'doc/:section' => 'doc#section', :as => :doc_section
+  match 'doc/:section/:topic' => 'doc#topic', :as => :doc_topic
   
   # user account controller
-  map.connect 'account/new_password/:code', :controller => 'account', :action => 'new_password'
-  map.connect 'account/:action', :controller => 'account'
+  match 'account/new_password/:code' => 'account#new_password'
+  match 'account/:action' => 'account#index'
 
   # enterprise registration
-  map.connect 'enterprise_registration/:action', :controller => 'enterprise_registration'
+  match 'enterprise_registration/:action' => 'enterprise_registration#index'
 
   # tags
-  map.tag 'tag', :controller => 'search', :action => 'tags'
-  map.tag 'tag/:tag', :controller => 'search', :action => 'tag', :tag => /.*/
+  match 'tag' => 'search#tags', :as => :tag
+  match 'tag/:tag' => 'search#tag', :as => :tag, :tag => /.*/
   
   # categories index
-  map.category 'cat/*category_path', :controller => 'search', :action => 'category_index'
-  map.assets 'assets/:asset/*category_path', :controller => 'search', :action => 'assets'
+  match 'cat/*category_path' => 'search#category_index', :as => :category
+  match 'assets/:asset/*category_path' => 'search#assets', :as => :assets
   # search
-  map.connect 'search/:action/*category_path', :controller => 'search'
+  match 'search/:action/*category_path' => 'search#index'
  
   # events
   map.events 'profile/:profile/events_by_day', :controller => 'events', :action => 'events_by_day', :profile => /#{Noosfero.identifier_format}/
