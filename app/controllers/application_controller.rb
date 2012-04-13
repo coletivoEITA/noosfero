@@ -2,14 +2,21 @@ require 'noosfero/multi_tenancy'
 
 class ApplicationController < ActionController::Base
 
-  include ApplicationHelper
+  helper ApplicationHelper
 
   before_filter :change_pg_schema
 
   protected
 
+  before_filter :instantiate_controller_and_action_names
+  def instantiate_controller_and_action_names
+    @action = action_name
+    @controller = self
+  end
+
   layout :get_layout
   def get_layout
+    extend ThemesHelper
     prepend_view_path('public/' + theme_path)
     theme_option(:layout) || 'application'
   end
