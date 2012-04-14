@@ -27,6 +27,7 @@ group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'mocha'
+  gem 'tidy_ffi'
 end
 
 group :cucumber do
