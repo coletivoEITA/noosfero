@@ -61,8 +61,8 @@ class InviteMemberTest < ActiveSupport::TestCase
     p1 = create_user('testuser1').person
     p2 = create_user('testuser2').person
 
-    TaskMailer.expects(:deliver_task_finished).never
-    TaskMailer.expects(:deliver_task_created).never
+    TaskMailer.expects(:task_finished).never
+    TaskMailer.expects(:task_created).never
 
     task = InviteMember.create!(:person => p1, :friend => p2, :community_id => fast_create(Community).id)
     task.finish
@@ -71,7 +71,7 @@ class InviteMemberTest < ActiveSupport::TestCase
   should 'send e-mails to friend if friend_email given' do
     p1 = create_user('testuser1').person
 
-    TaskMailer.expects(:deliver_invitation_notification).once
+    TaskMailer.expects(:invitation_notification).once
 
     task = InviteMember.create!(:person => p1, :friend_email => 'test@test.com', :message => '<url>', :community_id => fast_create(Community).id)
   end
@@ -80,7 +80,7 @@ class InviteMemberTest < ActiveSupport::TestCase
     p1 = create_user('testuser1').person
     p2 = create_user('testuser2').person
 
-    TaskMailer.expects(:deliver_invitation_notification).never
+    TaskMailer.expects(:invitation_notification).never
 
     task = InviteMember.create!(:person => p1, :friend => p2, :community_id => fast_create(Community).id)
   end
@@ -110,7 +110,7 @@ class InviteMemberTest < ActiveSupport::TestCase
 
     task = InviteMember.create!(:person => person, :friend_email => 'test@test.com', :message => '<url>', :community_id => community.id)
 
-    email = TaskMailer.deliver_invitation_notification(task)
+    email = TaskMailer.invitation_notification(task).deliver
 
     assert_match(/#{task.requestor.name} invited you to join #{community.name}/, email.subject)
   end

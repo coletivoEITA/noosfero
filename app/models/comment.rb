@@ -75,7 +75,7 @@ class Comment < ActiveRecord::Base
 
   after_create do |comment|
     if comment.article.notify_comments? && !comment.article.profile.notification_emails.empty?
-      Comment::Notifier.deliver_mail(comment)
+      Comment::Notifier.mail(comment).deliver
     end
   end
 
@@ -109,6 +109,8 @@ class Comment < ActiveRecord::Base
   end
 
   class Notifier < ActionMailer::Base
+    include ActionMailer::OldApi
+
     def mail(comment)
       profile = comment.article.profile
       recipients profile.notification_emails

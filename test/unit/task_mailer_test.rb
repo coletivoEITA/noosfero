@@ -32,7 +32,7 @@ class TaskMailerTest < ActiveSupport::TestCase
     requestor.expects(:environment).returns(environment).at_least_once
     task.expects(:environment).returns(environment).at_least_once
 
-    TaskMailer.deliver_task_finished(task)
+    TaskMailer.task_finished(task).deliver
     assert !ActionMailer::Base.deliveries.empty?
   end
 
@@ -55,7 +55,7 @@ class TaskMailerTest < ActiveSupport::TestCase
     requestor.expects(:environment).returns(environment).at_least_once
     task.expects(:environment).returns(environment).at_least_once
 
-    TaskMailer.deliver_task_cancelled(task)
+    TaskMailer.task_cancelled(task).deliver
     assert !ActionMailer::Base.deliveries.empty?
   end
 
@@ -79,7 +79,7 @@ class TaskMailerTest < ActiveSupport::TestCase
     requestor.expects(:environment).returns(environment).at_least_once
     task.expects(:environment).returns(environment).at_least_once
 
-    TaskMailer.deliver_task_created(task)
+    TaskMailer.task_created(task).deliver
     assert !ActionMailer::Base.deliveries.empty?
   end
 
@@ -100,7 +100,7 @@ class TaskMailerTest < ActiveSupport::TestCase
     task.expects(:target).returns(target).at_least_once
     task.expects(:environment).returns(environment).at_least_once
 
-    TaskMailer.deliver_target_notification(task, 'the message')
+    TaskMailer.target_notification(task, 'the message').deliver
     assert !ActionMailer::Base.deliveries.empty?
   end
 

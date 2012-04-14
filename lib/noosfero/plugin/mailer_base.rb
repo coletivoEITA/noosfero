@@ -1,4 +1,5 @@
 class Noosfero::Plugin::MailerBase < ActionMailer::Base
+  include ActionMailer::OldApi
 
   def self.inherited(child)
     child.template_root = File.expand_path(File.join(Rails.root, 'plugins', child.plugin_name, 'views'))

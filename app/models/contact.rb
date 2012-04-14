@@ -18,10 +18,12 @@ class Contact < ActiveRecord::Base #WithoutTable
 
   def deliver
     return false unless self.valid?
-    Contact::Sender.deliver_mail(self)
+    Contact::Sender.mail(self).deliver
   end
 
   class Sender < ActionMailer::Base
+    include ActionMailer::OldApi
+
     def mail(contact)
       content_type 'text/html'
       emails = contact.dest.notification_emails

@@ -1,4 +1,5 @@
 class PendingTaskNotifier < ActionMailer::Base
+  include ActionMailer::OldApi
 
   def notification(person)
     recipients person.email

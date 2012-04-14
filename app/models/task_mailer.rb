@@ -1,4 +1,5 @@
 class TaskMailer < ActionMailer::Base
+  include ActionMailer::OldApi
 
   def method_missing(name, *args)
     task = args.shift

@@ -16,7 +16,7 @@ class Scrap < ActiveRecord::Base
 
   after_create do |scrap|
     scrap.root.update_attribute('updated_at', DateTime.now) unless scrap.root.nil?
-    Scrap::Notifier.deliver_mail(scrap) if scrap.send_notification?
+    Scrap::Notifier.mail(scrap).deliver if scrap.send_notification?
   end
 
   before_validation :strip_all_html_tags
@@ -43,6 +43,8 @@ class Scrap < ActiveRecord::Base
   end
 
   class Notifier < ActionMailer::Base
+    include ActionMailer::OldApi
+
     def mail(scrap)
       sender, receiver = scrap.sender, scrap.receiver
       recipients receiver.email

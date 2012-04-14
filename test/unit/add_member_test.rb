@@ -15,7 +15,7 @@ class AddMemberTest < ActiveSupport::TestCase
 
   should 'actually add memberships when confirmed' do
     community.update_attribute(:closed, true)
-    TaskMailer.stubs(:deliver_target_notification)
+    TaskMailer.stubs(:target_notification)
     task = fast_create(AddMember, :requestor_id => person.id, :target_id => community.id, :target_type => 'Community')
     task.finish
 
@@ -47,7 +47,7 @@ class AddMemberTest < ActiveSupport::TestCase
   should 'send e-mails' do
     community.update_attribute(:closed, true)
 
-    TaskMailer.expects(:deliver_target_notification).at_least_once
+    TaskMailer.expects(:target_notification).at_least_once
 
     task = AddMember.create!(:person => person, :organization => community)
   end
@@ -58,14 +58,14 @@ class AddMemberTest < ActiveSupport::TestCase
   end
 
   should 'have roles' do
-    TaskMailer.stubs(:deliver_target_notification)
+    TaskMailer.stubs(:target_notification)
     task = AddMember.create!(:roles => [1,2,3], :person => person, :organization => community)
     assert_equal [1,2,3], task.roles
   end
 
   should 'put member with the right roles' do
     roles = [Profile::Roles.member(community.environment.id), Profile::Roles.admin(community.environment.id)]
-    TaskMailer.stubs(:deliver_target_notification)
+    TaskMailer.stubs(:target_notification)
     task = AddMember.create!(:roles => roles.map(&:id), :person => person, :organization => community)
     task.finish
 
@@ -83,7 +83,7 @@ class AddMemberTest < ActiveSupport::TestCase
 
   should 'ignore roles with id zero' do
     role = Profile::Roles.member(community.environment.id)
-    TaskMailer.stubs(:deliver_target_notification)
+    TaskMailer.stubs(:target_notification)
     task = AddMember.create!(:roles => ["0", role.id, nil], :person => person, :organization => community)
     task.finish
 
@@ -106,7 +106,7 @@ class AddMemberTest < ActiveSupport::TestCase
   should 'deliver target notification message' do
     task = AddMember.new(:person => person, :organization => community)
 
-    email = TaskMailer.deliver_target_notification(task, task.target_notification_message)
+    email = TaskMailer.target_notification(task, task.target_notification_message).deliver
     assert_match(/#{task.requestor.name} wants to be a member of this community/, email.subject)
   end
 
