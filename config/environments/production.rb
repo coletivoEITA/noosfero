@@ -20,4 +20,6 @@ Noosfero::Application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   config.cache_store = :mem_cache_store, "localhost"
+
+  config.middleware.insert_before ActionDispatch::Session::CookieStore, NoosferoHttpCaching::Middleware
 end
