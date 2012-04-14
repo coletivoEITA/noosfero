@@ -36,7 +36,7 @@ class FriendsBlockTest < ActiveSupport::TestCase
 
     expects(:link_to).with('View all', :profile => 'theuser', :controller => 'profile', :action => 'friends')
 
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   should 'count number of owner friends' do

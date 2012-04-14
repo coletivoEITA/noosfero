@@ -29,7 +29,7 @@ class PeopleBlockTest < ActiveSupport::TestCase
     expects(:profile_image_link).with(person2, :minor).returns(person2.name)
     expects(:block_title).with(anything).returns('')
 
-    content = instance_eval(&block.content)
+    content = instance_exec(&block.content)
 
     assert_match(/#{person1.name}/, content)
     assert_match(/#{person2.name}/, content)
@@ -41,7 +41,7 @@ class PeopleBlockTest < ActiveSupport::TestCase
 
     expects(:_).with('View all').returns('View all people')
     expects(:link_to).with('View all people', :controller => 'search', :action => 'people')
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   protected

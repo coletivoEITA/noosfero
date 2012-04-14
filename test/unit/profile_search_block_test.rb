@@ -17,7 +17,7 @@ class ProfileSearchBlockTest < ActiveSupport::TestCase
     block.stubs(:owner).returns(person)
 
     self.expects(:render).with(:file => 'blocks/profile_search', :locals => { :title => block.title})
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should 'provide view_title' do

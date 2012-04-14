@@ -23,7 +23,7 @@ class MembersBlockTest < ActiveSupport::TestCase
     expects(:_).with('View all').returns('View all')
     expects(:link_to).with('View all' , :profile => 'mytestuser', :controller => 'profile', :action => 'members').returns('link-to-members')
 
-    assert_equal 'link-to-members', instance_eval(&block.footer)
+    assert_equal 'link-to-members', instance_exec(&block.footer)
   end
 
   should 'pick random members' do

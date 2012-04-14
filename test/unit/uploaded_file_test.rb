@@ -116,7 +116,7 @@ class UploadedFileTest < ActiveSupport::TestCase
     stubs(:content_tag).returns('link')
     expects(:link_to).with(file.name, file.url, :class => file.css_class_name)
 
-    instance_eval(&file.to_html)
+    instance_exec(&file.to_html)
   end
 
   should 'have title' do

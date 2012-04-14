@@ -289,7 +289,7 @@ class SearchController < PublicController
       order = SortOptions[@asset][params[:order_by].to_sym]
       raise "Unknown order by" if order.nil?
       order[:solr_opts].each do |opt, value|
-        solr_options[opt] = value.is_a?(Proc) ? instance_eval(&value) : value
+        solr_options[opt] = value.is_a?(Proc) ? instance_exec(&value) : value
       end
     end
 

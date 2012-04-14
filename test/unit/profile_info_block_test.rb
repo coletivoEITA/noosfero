@@ -18,7 +18,7 @@ class ProfileInfoBlockTest < ActiveSupport::TestCase
 
   should 'display profile information' do
     self.expects(:render).with(:file => 'blocks/profile_info', :locals => { :block => block})
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should 'not be editable' do

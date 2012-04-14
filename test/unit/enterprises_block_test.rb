@@ -35,7 +35,7 @@ class EnterprisesBlockTest < ActiveSupport::TestCase
 
     expects(:link_to).with('View all', :controller => 'profile', :profile => 'theprofile', :action => 'enterprises')
 
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   should 'link to all enterprises for environment' do
@@ -44,7 +44,7 @@ class EnterprisesBlockTest < ActiveSupport::TestCase
     block.expects(:owner).returns(env)
 
     expects(:link_to).with('View all', :controller => 'search', :action => 'assets', :asset => 'enterprises')
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   should 'give empty footer for unsupported owner type' do

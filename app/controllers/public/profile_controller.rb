@@ -258,7 +258,7 @@ class ProfileController < PublicController
         abuse_report = AbuseReport.new(params[:abuse_report])
         if !params[:content_type].blank?
           article = params[:content_type].constantize.find(params[:content_id])
-          abuse_report.content = instance_eval(&article.reported_version)
+          abuse_report.content = instance_exec(&article.reported_version)
         end
 
         user.register_report(abuse_report, profile)

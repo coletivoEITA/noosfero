@@ -854,7 +854,7 @@ module ApplicationHelper
   def article_to_html(article, options = {})
     options.merge!(:page => params[:npage])
     content = article.to_html(options)
-    content = content.kind_of?(Proc) ? self.instance_eval(&content) : content
+    content = content.kind_of?(Proc) ? self.instance_exec(&content) : content
     @plugins && @plugins.each do |plugin|
       content = plugin.parse_content(content)
     end

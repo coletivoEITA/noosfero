@@ -13,7 +13,7 @@ class SellersSearchBlockTest < ActiveSupport::TestCase
   should 'not use a fixed title' do
     block = SellersSearchBlock.new(:title => 'my custom title')
     expects(:render).with(:file => 'search/_sellers_form', :locals => { :title => 'my custom title'})
-    instance_eval(&block.content)
+    instance_exec(&block.content)
   end
 
 end

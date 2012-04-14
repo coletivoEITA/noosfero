@@ -15,7 +15,7 @@ class DisabledEnterpriseMessageBlockTest < ActiveSupport::TestCase
     p.expects(:environment).returns(e)
 
     expects(:render).with(:file => 'blocks/disabled_enterprise_message', :locals => { :message => 'This message is for disabled enterprises'})
-    instance_eval(&block.content)
+    instance_exec(&block.content)
   end
 
   should 'display nothing if environment has no message' do
@@ -26,7 +26,7 @@ class DisabledEnterpriseMessageBlockTest < ActiveSupport::TestCase
     p.expects(:environment).returns(e)
 
     expects(:render).with(:file => 'blocks/disabled_enterprise_message', :locals => { :message => ''})
-    instance_eval(&block.content)
+    instance_exec(&block.content)
   end
 
   should 'not be editable' do

@@ -25,7 +25,7 @@ module WhiteListFilter
       white_list_method = options[:whitelist]
       opts.each do |field|
         before_validation do |obj|
-          obj.check_iframe_on_content(obj.send(field), obj.instance_eval(&white_list_method))
+          obj.check_iframe_on_content(obj.send(field), obj.instance_exec(&white_list_method))
         end
       end
     end

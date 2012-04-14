@@ -13,7 +13,7 @@ module Noosfero::SampleDataHelper
     begin
       if obj.save
         print '.'
-        instance_eval &block if block
+        instance_exec &block if block
         return obj
       else
         print 'F'

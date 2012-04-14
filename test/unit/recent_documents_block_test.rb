@@ -58,7 +58,7 @@ class RecentDocumentsBlockTest < ActiveSupport::TestCase
     expects(:link_to).with('All content', :controller => 'profile', :action => 'sitemap', :profile => profile.identifier)
     expects(:_).with('All content').returns('All content')
 
-    instance_eval(&(block.footer))
+    instance_exec(&(block.footer))
   end
 
   should 'not display link to sitemap when owner is environment' do

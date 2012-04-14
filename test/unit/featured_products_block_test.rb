@@ -108,7 +108,7 @@ class FeaturedProductsBlockTest < ActiveSupport::TestCase
     block = FeaturedProductsBlock.new
 
     self.expects(:render).with(:file => 'blocks/featured_products', :locals => { :block => block})
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should "return just highlighted products with image for selection" do

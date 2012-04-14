@@ -70,7 +70,7 @@ class HighlightsBlockTest < ActiveSupport::TestCase
     block = HighlightsBlock.new
     self.expects(:render).with(:file => 'blocks/highlights', :locals => { :block => block})
 
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should 'not list non existent image' do

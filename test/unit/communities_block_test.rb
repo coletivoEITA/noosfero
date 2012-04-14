@@ -35,7 +35,7 @@ class CommunitiesBlockTest < ActiveSupport::TestCase
     block.expects(:owner).returns(profile)
 
     expects(:link_to).with('View all', :controller => 'profile', :profile => 'theprofile', :action => 'communities')
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   should 'support environment as owner' do
@@ -45,7 +45,7 @@ class CommunitiesBlockTest < ActiveSupport::TestCase
 
     expects(:link_to).with('View all', :controller => "search", :action => 'communities')
 
-    instance_eval(&block.footer)
+    instance_exec(&block.footer)
   end
 
   should 'give empty footer on unsupported owner type' do

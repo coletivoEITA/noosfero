@@ -10,7 +10,7 @@ class ProfileImageBlockTest < ActiveSupport::TestCase
     block = ProfileImageBlock.new
 
     self.expects(:render).with(:file => 'blocks/profile_image', :locals => { :block => block, :show_name => false})
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should 'be editable' do

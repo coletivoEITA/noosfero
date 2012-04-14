@@ -163,7 +163,7 @@ module SearchHelper
 
   def order_by(asset)
     options = SortOptions[asset].map do |name, options|
-      next if options[:if] and ! instance_eval(&options[:if])
+      next if options[:if] and ! instance_exec(&options[:if])
       [_(options[:label]), name.to_s]
     end.compact
 

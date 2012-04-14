@@ -35,7 +35,7 @@ class ProfileListBlockTest < ActiveSupport::TestCase
     self.expects(:content_tag).returns('<div></div>').at_least_once
     self.expects(:block_title).returns('block title').at_least_once
 
-    assert_kind_of String, instance_eval(&block.content)
+    assert_kind_of String, instance_exec(&block.content)
   end
 
   should 'list private profiles' do

@@ -21,7 +21,7 @@ class CategoriesBlockTest < ActiveSupport::TestCase
     block = CategoriesBlock.new
 
     self.expects(:render).with(:file => 'blocks/categories', :locals => { :block => block})
-    instance_eval(& block.content)
+    instance_exec(& block.content)
   end
 
   should 'be editable' do

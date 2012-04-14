@@ -14,7 +14,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
     article.expects(:to_html).returns("Article content")
     block.stubs(:article).returns(article)
 
-    assert_match(/Article content/, instance_eval(&block.content))
+    assert_match(/Article content/, instance_exec(&block.content))
   end
 
   should 'refer to an article' do
@@ -89,7 +89,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
     block.expects(:title).returns('')
     block.stubs(:article).returns(article)
 
-    assert_equal "<h3 class=\"block-title empty\"><span></span></h3>Article content", instance_eval(&block.content)
+    assert_equal "<h3 class=\"block-title empty\"><span></span></h3>Article content", instance_exec(&block.content)
   end
 
   should "display title if defined" do
@@ -99,7 +99,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
     block.expects(:title).returns('Article title')
     block.stubs(:article).returns(article)
 
-    assert_equal "<h3 class=\"block-title\"><span>Article title</span></h3>Article content", instance_eval(&block.content)
+    assert_equal "<h3 class=\"block-title\"><span>Article title</span></h3>Article content", instance_exec(&block.content)
   end
 
   should 'display image if article is an image' do
@@ -112,7 +112,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
 
     expects(:image_tag).with(image.public_filename(:display), :class => image.css_class_name, :style => 'max-width: 100%').returns('image')
 
-    assert_match(/image/, instance_eval(&block.content))
+    assert_match(/image/, instance_exec(&block.content))
   end
 
   should 'not display gallery pages navigation in content' do
@@ -125,7 +125,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
 
     expects(:image_tag).with(image.public_filename(:display), :class => image.css_class_name, :style => 'max-width: 100%').returns('image')
 
-    assert_no_match(/Previous/, instance_eval(&block.content))
+    assert_no_match(/Previous/, instance_exec(&block.content))
   end
 
   should 'display link to archive if article is an archive' do
@@ -136,7 +136,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
     block.article = file
     block.save!
 
-    assert_tag_in_string instance_eval(&block.content), :tag => 'a', :content => 'test.txt'
+    assert_tag_in_string instance_exec(&block.content), :tag => 'a', :content => 'test.txt'
   end
 
   protected
