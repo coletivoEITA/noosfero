@@ -5,6 +5,7 @@ abort unless system 'rake solr:start'
 at_exit { system 'rake solr:stop' }
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require 'rails/test_help'
 require 'test_help'
 require 'mocha'
 require 'hpricot'

@@ -97,3 +97,4 @@ end
 require 'noosfero/constants'
 require 'noosfero/core_ext'
 require 'noosfero/i18n'
+require 'noosfero/caching'
