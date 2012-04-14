@@ -5,7 +5,8 @@ class EmailActivation < Task
   alias :environment :target
   alias :person :requestor
 
-  def validate_on_create
+  validate :already_requested, :on => :create
+  def already_requested
     if !self.requestor.nil? && self.requestor.user.email_activation_pending?
       self.errors.add_to_base(_('You have already requested activation of your mailbox.'))
     end

@@ -10,8 +10,6 @@ require 'rubygems'
 require 'daemons'
 require 'optparse'
 
-NOOSFERO_ROOT = File.expand_path(File.dirname(__FILE__) + '/../')
-
 options = {
   :app_name   => 'feed-updater.default',
   :dir_mode   => :normal,
@@ -29,6 +27,6 @@ OptionParser.new do |opts|
 end.parse!(ARGV)
 
 Daemons.run_proc(options[:app_name], options) do
-  require NOOSFERO_ROOT + '/config/environment'
+  require_relative '../config/environment'
   FeedUpdater.new.start
 end

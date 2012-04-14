@@ -32,6 +32,7 @@ tags
 pkg
 *~
 *.swp
+*.sqlite3
 debian/*.log
 debian/*.substvars
 debian/*.debhelper

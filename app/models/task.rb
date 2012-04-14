@@ -45,7 +45,7 @@ class Task < ActiveRecord::Base
   end
 
   attr_accessor :code_length
-  before_validation_on_create do |task|
+  before_validation :on => :create do |task|
     if task.code.nil?
       task.code = Task.generate_code(task.code_length)
       while (Task.find_by_code(task.code))
