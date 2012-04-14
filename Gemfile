@@ -32,7 +32,7 @@ end
 
 group :test do
   gem 'system-timer19'
-  gem 'tidy'
+  gem 'tidy_ffi'
 end
 
 group :test, :cucumber do
