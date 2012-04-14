@@ -145,7 +145,7 @@ class ChangePasswordTest < ActiveSupport::TestCase
 
     task = ChangePassword.create(:login => 'testuser', :email => 'test@example.com', :environment_id => Environment.default.id)
 
-    email = TaskMailer.deliver_task_created(task)
+    email = TaskMailer.task_created(task).deliver
     assert_match(/#{task.requestor.name} wants to change its password/, email.subject)
   end
 

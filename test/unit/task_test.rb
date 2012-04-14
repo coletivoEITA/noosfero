@@ -29,7 +29,7 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_call_perform_in_finish
-    TaskMailer.expects(:deliver_task_finished)
+    TaskMailer.expects(:task_finished)
     t = Task.create
     t.requestor = sample_user
     t.expects(:perform)
@@ -38,7 +38,7 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_have_cancelled_status_after_cancel
-    TaskMailer.expects(:deliver_task_cancelled)
+    TaskMailer.expects(:task_cancelled)
     t = Task.create
     t.requestor = sample_user
     t.cancel
@@ -54,7 +54,7 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:deliver_task_finished).with(t)
+    TaskMailer.expects(:task_finished).with(t)
 
     t.finish
   end
@@ -63,7 +63,7 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:deliver_task_cancelled).with(t)
+    TaskMailer.expects(:task_cancelled).with(t)
 
     t.cancel
   end
@@ -93,7 +93,7 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new
     task.requestor = sample_user
 
-    TaskMailer.expects(:deliver_task_created).with(task)
+    TaskMailer.expects(:task_created).with(task)
     task.save!
   end
 
@@ -101,7 +101,7 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new(:status => Task::Status::HIDDEN)
     task.requestor = sample_user
 
-    TaskMailer.expects(:deliver_task_created).never
+    TaskMailer.expects(:task_created).never
     task.save!
   end
 
@@ -161,14 +161,14 @@ class TaskTest < ActiveSupport::TestCase
   should 'send notification to target just after task creation' do
     task = Task.new
     task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
-    TaskMailer.expects(:deliver_target_notification).once
+    TaskMailer.expects(:target_notification).once
     task.save!
   end
 
   should 'not send notification to target if the task is hidden' do
     task = Task.new(:status => Task::Status::HIDDEN)
     task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
-    TaskMailer.expects(:deliver_target_notification).never
+    TaskMailer.expects(:target_notification).never
     task.save!
   end
 
@@ -224,7 +224,7 @@ class TaskTest < ActiveSupport::TestCase
   should 'not notify target if message is nil' do
     task = Task.new
     task.stubs(:target_notification_message).returns(nil)
-    TaskMailer.expects(:deliver_target_notification).never
+    TaskMailer.expects(:target_notification).never
     task.save!
   end
 
@@ -260,7 +260,7 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new(:status => Task::Status::HIDDEN)
     task.requestor = sample_user
 
-    TaskMailer.expects(:deliver_task_activated).with(task)
+    TaskMailer.expects(:task_activated).with(task)
     task.activate
   end
 
@@ -268,7 +268,7 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new(:status => Task::Status::HIDDEN)
     task.save!
     task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
-    TaskMailer.expects(:deliver_target_notification).once
+    TaskMailer.expects(:target_notification).once
     task.activate
   end
 

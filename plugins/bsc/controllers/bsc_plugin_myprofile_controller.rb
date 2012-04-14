@@ -66,7 +66,7 @@ class BscPluginMyprofileController < MyProfileController
       profile.admins.map { |admin| profile.remove_admin(admin) }
       profile.add_admin(person)
 
-      BscPlugin::Mailer.deliver_admin_notification(person, profile)
+      BscPlugin::Mailer.admin_notification(person, profile).deliver
 
       session[:notice] = _('Enterprise ownership transferred.')
       redirect_to :controller => 'profile_editor'

@@ -12,14 +12,14 @@ class User < ActiveRecord::Base
     self.find_by_login(login)
   end
 
-  # FIXME ugly workaround
-  def self.human_attribute_name(attrib)
-    case attrib.to_sym
-      when :login:  return _('Username')
-      when :email:  return _('e-Mail')
-      else _(self.superclass.human_attribute_name(attrib))
-    end
-  end
+  # FIXME put in config/locales
+  #def self.human_attribute_name(attrib)
+  #  case attrib.to_sym
+  #    when :login:  return _('Username')
+  #    when :email:  return _('e-Mail')
+  #    else _(self.superclass.human_attribute_name(attrib))
+  #  end
+  #end
 
   before_create :make_activation_code
 
@@ -51,6 +51,8 @@ class User < ActiveRecord::Base
   end
 
   class Mailer < ActionMailer::Base
+    include ActionMailer::OldApi
+
     def activation_email_notify(user)
       user_email = "#{user.login}@#{user.email_domain}"
       recipients user_email
@@ -83,6 +85,7 @@ class User < ActiveRecord::Base
   end
   
   has_one :person, :dependent => :destroy
+  validates_associated :person
   belongs_to :environment
 
   attr_protected :activated_at
@@ -291,7 +294,7 @@ class User < ActiveRecord::Base
     end
 
     def deliver_activation_code
-      User::Mailer.deliver_activation_code(self) unless self.activation_code.blank?
+      User::Mailer.activation_code(self).deliver unless self.activation_code.blank?
     end
 
     def delay_activation_check

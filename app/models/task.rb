@@ -64,7 +64,7 @@ class Task < ActiveRecord::Base
 
       begin
         target_msg = task.target_notification_message
-        TaskMailer.deliver_target_notification(task, target_msg) if target_msg
+        TaskMailer.target_notification(task, target_msg).deliver if target_msg
       rescue NotImplementedError => ex
         Rails.logger.info ex.to_s
       end
@@ -225,7 +225,7 @@ class Task < ActiveRecord::Base
 
     begin
       target_msg = target_notification_message
-      TaskMailer.deliver_target_notification(self, target_msg) if target_msg
+      TaskMailer.target_notification(self, target_msg).deliver if target_msg
     rescue NotImplementedError => ex
       Rails.logger.info ex.to_s
     end
@@ -257,7 +257,7 @@ class Task < ActiveRecord::Base
   def send_notification(action)
     if sends_email?
       if self.requestor
-        TaskMailer.send("deliver_task_#{action}", self)
+        TaskMailer.send("task_#{action}", self).deliver
       end
     end
   end

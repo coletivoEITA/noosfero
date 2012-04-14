@@ -30,12 +30,14 @@ class Mailing < ActiveRecord::Base
 
   def deliver
     each_recipient do |recipient|
-      Mailing::Sender.deliver_mail(self, recipient.email)
+      Mailing::Sender.mail(self, recipient.email).deliver
       self.mailing_sents.create(:person => recipient)
     end
   end
 
   class Sender < ActionMailer::Base
+    include ActionMailer::OldApi
+
     def mail(mailing, recipient)
       content_type 'text/html'
       recipients recipient

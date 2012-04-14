@@ -81,8 +81,8 @@ class InviteFriendTest < ActiveSupport::TestCase
     p1 = create_user('testuser1').person
     p2 = create_user('testuser2').person
 
-    TaskMailer.expects(:deliver_task_finished).never
-    TaskMailer.expects(:deliver_task_created).never
+    TaskMailer.expects(:task_finished).never
+    TaskMailer.expects(:task_created).never
 
     task = InviteFriend.create!(:person => p1, :friend => p2)
     task.finish
@@ -91,7 +91,7 @@ class InviteFriendTest < ActiveSupport::TestCase
   should 'send e-mails to friend if friend_email given' do
     p1 = create_user('testuser1').person
 
-    TaskMailer.expects(:deliver_invitation_notification).once
+    TaskMailer.expects(:invitation_notification).once
 
     task = InviteFriend.create!(:person => p1, :friend_email => 'test@test.com', :message => '<url>')
   end
@@ -100,7 +100,7 @@ class InviteFriendTest < ActiveSupport::TestCase
     p1 = create_user('testuser1').person
     p2 = create_user('testuser2').person
 
-    TaskMailer.expects(:deliver_invitation_notification).never
+    TaskMailer.expects(:invitation_notification).never
 
     task = InviteFriend.create!(:person => p1, :friend => p2)
   end
@@ -133,7 +133,7 @@ class InviteFriendTest < ActiveSupport::TestCase
 
     task = InviteFriend.create!(:person => person, :friend_email => 'test@test.com', :message => '<url>')
 
-    email = TaskMailer.deliver_invitation_notification(task)
+    email = TaskMailer.invitation_notification(task).deliver
 
     assert_match(/#{task.requestor.name} wants to be your friend./, email.subject)
   end

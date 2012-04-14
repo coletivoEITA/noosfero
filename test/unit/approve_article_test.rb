@@ -358,14 +358,14 @@ class ApproveArticleTest < ActiveSupport::TestCase
     community.expects(:notification_emails).returns(['target@example.com'])
     community.expects(:moderated_articles?).returns(['true'])
 
-    email = TaskMailer.deliver_target_notification(task, task.target_notification_message)
+    email = TaskMailer.target_notification(task, task.target_notification_message).deliver
     assert_match(/#{task.requestor.name} wants to publish the article: #{article.name}/, email.subject)
   end
 
   should 'deliver target finished message' do
     task = ApproveArticle.new(:article => article, :target => community, :requestor => profile)
 
-    email = TaskMailer.deliver_task_finished(task)
+    email = TaskMailer.task_finished(task).deliver
 
     assert_match(/#{task.requestor.name} wants to publish the article: #{article.name}/, email.subject)
   end
@@ -374,7 +374,7 @@ class ApproveArticleTest < ActiveSupport::TestCase
     task = ApproveArticle.new(:article => article, :target => community, :requestor => profile)
     article.destroy
 
-    email = TaskMailer.deliver_task_finished(task)
+    email = TaskMailer.task_finished(task).deliver
 
     assert_match(/#{task.requestor.name} wanted to publish an article but it was removed/, email.subject)
   end

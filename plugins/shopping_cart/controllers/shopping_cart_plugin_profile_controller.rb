@@ -91,8 +91,8 @@ class ShoppingCartPluginProfileController < ProfileController
   def send_request
       register_order(params[:customer], session[:cart][:items])
     begin
-      ShoppingCartPlugin::Mailer.deliver_customer_notification(params[:customer], profile, session[:cart][:items])
-      ShoppingCartPlugin::Mailer.deliver_supplier_notification(params[:customer], profile, session[:cart][:items])
+      ShoppingCartPlugin::Mailer.customer_notification(params[:customer], profile, session[:cart][:items]).deliver
+      ShoppingCartPlugin::Mailer.supplier_notification(params[:customer], profile, session[:cart][:items]).deliver
       render :text => {
         :ok => true,
         :message => _('Request sent successfully. Check your email.'),
