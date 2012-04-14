@@ -13,3 +13,6 @@ require 'needs_profile'
 require 'short_filename'
 require 'white_list_filter'
 require 'user_activation_job'
+
+# reload model because of conflict with Task (alias of Rake::Task)
+require 'task'

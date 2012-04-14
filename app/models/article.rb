@@ -140,10 +140,10 @@ class Article < ActiveRecord::Base
     {:conditions => [ 'parent_id is null and profile_id = ?', profile.id ]}
   }
 
-  named_scope :public,
+  scope :public,
     :conditions => [ "advertise = ? AND published = ? AND profiles.visible = ? AND profiles.public_profile = ?", true, true, true, true ]
 
-  named_scope :more_recent,
+  scope :more_recent,
     :conditions => [ "advertise = ? AND published = ? AND profiles.visible = ? AND profiles.public_profile = ? AND
       ((articles.type != ?) OR articles.type is NULL)",
       true, true, true, true, 'RssFeed'
@@ -156,7 +156,7 @@ class Article < ActiveRecord::Base
     paginate(:order => 'comments_count DESC', :page => 1, :per_page => limit)
   end
 
-  named_scope :more_popular, :order => 'hits DESC'
+  scope :more_popular, :order => 'hits DESC'
 
   # retrieves the latest +limit+ articles, sorted from the most recent to the
   # oldest.

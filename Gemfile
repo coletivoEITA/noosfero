@@ -14,8 +14,6 @@ group :development, :production do
   gem 'will_paginate', '3.0.3'
   gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
 
-  gem 'acts_as_ferret'
-
   gem 'jquery-rails'
   gem 'jquery-rjs', :git => 'git://github.com/aaronchi/jquery-rjs.git'
 end

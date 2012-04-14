@@ -44,20 +44,14 @@ Noosfero::Application.routes.draw do
   match 'tag/:tag' => 'search#tag', :as => :tag, :tag => /.*/
   
   # categories index
-  match 'cat/*category_path' => 'search#category_index', :as => :category
-  match 'assets/:asset/*category_path' => 'search#assets', :as => :assets
+  match 'cat(/*category_path)' => 'search#category_index', :as => :category
+  match 'assets/:asset(/*category_path)' => 'search#assets', :as => :assets
   # search
-  match 'search/:action/*category_path' => 'search#index'
+  match 'search/:action(/*category_path)' => 'search#index'
  
-  # Browse
-  match 'browse/:action/:filter' => 'browse#index'
-  match 'browse/:action' => 'browse#index'
-
   # events
   match 'profile/:profile/events_by_day' => 'events#events_by_day', :as => :events, :profile => /#{Noosfero.identifier_format}/
-  match 'profile/:profile/events/:year/:month/:day' => 'events#events', :as => :events, :month => /\d*/, :year => /\d*/, :profile => /#{Noosfero.identifier_format}/, :day => /\d*/
-  match 'profile/:profile/events/:year/:month' => 'events#events', :as => :events, :month => /\d*/, :year => /\d*/, :profile => /#{Noosfero.identifier_format}/
-  match 'profile/:profile/events' => 'events#events', :as => :events, :profile => /#{Noosfero.identifier_format}/
+  match 'profile/:profile/events(/:year/:month(/:day))' => 'events#events', :as => :events, :month => /\d*/, :year => /\d*/, :profile => /#{Noosfero.identifier_format}/, :day => /\d*/
 
   # catalog
   match 'catalog/:profile' => 'catalog#index', :as => :catalog, :profile => /#{Noosfero.identifier_format}/
@@ -82,7 +76,7 @@ Noosfero::Application.routes.draw do
   match 'contact/:profile/:action(/:id)' => 'contact#index', :as => :contact, :profile => /#{Noosfero.identifier_format}/, :id => /.*/
 
   # map balloon
-  map.contact 'map_balloon/:action/:id', :controller => 'map_balloon', :id => /.*/
+  match 'map_balloon/:action(/:id)' => 'map_balloon#index', :id => /.*/
 
   # chat
   match 'chat/:action(/:id)' => 'chat#index', :as => :chat
