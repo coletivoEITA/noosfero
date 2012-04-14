@@ -1,7 +1,7 @@
 <h1><%= _('Manage plugins') %></h1>
 <%= _('Here you can enable or disable any plugin of your environment.')%>
 
-<% labelled_form_for(:environment, @environment, :url => {:action => 'update'}) do |f| %>
+<%= labelled_form_for @environment, :url => {:action => 'update'} do |f| %>
 
 <table>
   <tr>
