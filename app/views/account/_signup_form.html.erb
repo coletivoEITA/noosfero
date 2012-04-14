@@ -1,6 +1,6 @@
 <%= error_messages_for :user, :person %>
 
-<% labelled_form_for :user, @user, :html => { :multipart => true, :id => 'signup-form' } do |f| %>
+<%= labelled_form_for @user, :html => { :multipart => true, :id => 'signup-form' } do |f| %>
 
 <%= hidden_field_tag :invitation_code, @invitation_code %>
 

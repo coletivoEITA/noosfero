@@ -1,6 +1,6 @@
 <h1><%= _('Location') %></h1>
 
-<% form_for :profile_data, :url => {:action => 'edit_location'} do |f| %>
+<%= form_for :profile_data, :url => {:action => 'edit_location'} do |f| %>
 
   <div id='location-fields'>
     <%= optional_field(profile, 'country', select_country(_('Country'), 'profile_data', 'country', {:class => 'type-select'})) %>
