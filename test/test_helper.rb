@@ -126,13 +126,11 @@ class ActiveSupport::TestCase
     else
       get action, params
     end
-    tidy = Tidy.open(:show_warnings=>false)
-    tidy.options.output_xml = true
-    tidy.clean @response.body
+    tidy = TidyFFI::Tidy.new(@response.body, :output_xml => 1)
+    tidy.clean
     if tidy.errors
       flunk "HTML ERROR - Tidy Diagnostics:\n  "+
-            tidy.errors.join("\n  ") +"\n  "+
-            tidy.diagnostics.join("\n  ")
+            tidy.errors.join("\n  ")
     end
   end
 
