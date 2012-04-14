@@ -3,17 +3,21 @@ source :rubygems
 group :development, :production do
   gem 'rake', '0.9.2.2'
   gem 'rails', '3.1.4'
+
   gem 'gettext_i18n_rails', '0.4.6'
   gem 'rmagick', '2.13.1'
   gem 'RedCloth', '4.2.2'
-  gem 'will_paginate', '3.0.3'
   gem 'ruby-feedparser', '0.7'
-  gem 'ferret', '0.11.6'
   gem 'hpricot', '0.8.2'
   gem 'daemons', '1.0.10'
+
+  gem 'will_paginate', '3.0.3'
   gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
 
   gem 'acts_as_ferret'
+
+  gem 'jquery-rails'
+  gem 'jquery-rjs', :git => 'git://github.com/aaronchi/jquery-rjs.git'
 end
 
 group :production do
@@ -27,9 +31,8 @@ group :databases do
 end
 
 group :test do
-  gem 'system_timer'
+  gem 'system-timer19'
   gem 'tidy'
-  gem 'rcov'
 end
 
 group :test, :cucumber do

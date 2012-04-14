@@ -4,9 +4,9 @@ class ApplicationController < ActionController::Base
 
   helper ApplicationHelper
 
-  before_filter :change_pg_schema
-
   protected
+
+  before_filter :change_pg_schema
 
   before_filter :instantiate_controller_and_action_names
   def instantiate_controller_and_action_names

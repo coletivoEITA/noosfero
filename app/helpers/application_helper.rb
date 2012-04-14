@@ -694,14 +694,14 @@ module ApplicationHelper
 
   alias_method :display_form_field, :labelled_form_field
 
-  def labelled_fields_for(name, object = nil, options = {}, &proc)
+  def labelled_fields_for(object, options = {}, &proc)
     object ||= instance_variable_get("@#{name}")
-    fields_for(name, object, { :builder => NoosferoFormBuilder }.merge(options), &proc)
+    fields_for(object, { :builder => NoosferoFormBuilder }.merge(options), &proc)
   end
 
-  def labelled_form_for(name, object = nil, options = {}, &proc)
+  def labelled_form_for(object, options = {}, &proc)
     object ||= instance_variable_get("@#{name}")
-    form_for(name, object, { :builder => NoosferoFormBuilder }.merge(options), &proc)
+    form_for(object, { :builder => NoosferoFormBuilder }.merge(options), &proc)
   end
 
   def optional_field(profile, name, field_html = nil, only_required = false, &block)

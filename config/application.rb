@@ -29,7 +29,7 @@ module Noosfero
     # config.autoload_paths += %W(#{config.root}/extras)
     config.autoload_paths += %W( #{Rails.root}/app/sweepers #{Rails.root}/lib )
     config.paths["app/controllers"] = %w[app/controllers/my_profile app/controllers/admin app/controllers/system app/controllers/public]
-    config.paths["app/controllers"].each{ |p| ActiveSupport::Dependencies.autoload_paths << p }
+    config.paths["app/controllers"].each{ |p| $LOAD_PATH << p; ActiveSupport::Dependencies.autoload_paths << p }
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
