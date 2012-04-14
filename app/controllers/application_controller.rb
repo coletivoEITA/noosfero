@@ -1,15 +1,18 @@
+require 'noosfero/multi_tenancy'
+
 class ApplicationController < ActionController::Base
+
+  include ApplicationHelper
 
   before_filter :change_pg_schema
 
-  include ApplicationHelper
+  protected
+
   layout :get_layout
   def get_layout
     prepend_view_path('public/' + theme_path)
     theme_option(:layout) || 'application'
   end
-
-  filter_parameter_logging :password
 
   def log_processing
     super
@@ -64,8 +67,6 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_person, :current_person
 
-  protected
-
   def change_pg_schema
     if Noosfero::MultiTenancy.on? and ActiveRecord::Base.postgresql?
       Noosfero::MultiTenancy.db_by_host = request.host
@@ -79,7 +80,6 @@ class ApplicationController < ActionController::Base
   def content_editor?
     false
   end
-
 
   def user
     current_user.person if logged_in?

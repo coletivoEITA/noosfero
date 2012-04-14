@@ -239,3 +239,10 @@ class Noosfero::Plugin
   end
 
 end
+
+require 'noosfero/plugin/active_record'
+require 'noosfero/plugin/context'
+require 'noosfero/plugin/mailer_base'
+require 'noosfero/plugin/manager'
+require 'noosfero/plugin/routes'
+

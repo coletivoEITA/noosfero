@@ -34,6 +34,7 @@ doc/noosfero/*/*.xhtml
 /solr
 *~
 *.swp
+*.sqlite3
 debian/*.log
 debian/*.substvars
 debian/*.debhelper

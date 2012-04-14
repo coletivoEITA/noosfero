@@ -1,3 +1,5 @@
+require 'noosfero/multi_tenancy'
+
 module ActsAsSearchable
 
   module ClassMethods

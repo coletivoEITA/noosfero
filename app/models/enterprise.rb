@@ -103,7 +103,7 @@ class Enterprise < Organization
     if environment.replace_enterprise_template_when_enable
       apply_template(template)
     end
-    save_without_validation!
+    save!
   end
 
   def question

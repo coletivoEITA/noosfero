@@ -1,7 +1,14 @@
-class ActiveRecord::Base
-  def self.acts_as_accessor
-    has_many :role_assignments, :as => :accessor, :dependent => :destroy
+module ActsAsAccessor
 
+  module ClassMethods
+    def acts_as_accessor
+      has_many :role_assignments, :as => :accessor, :dependent => :destroy
+
+      include ActsAsAccessor::InstanceMethods
+    end
+  end
+
+  module InstanceMethods
     def has_permission?(permission, resource = nil)
       return true if resource == self
       role_assignments.any? {|ra| ra.has_permission?(permission, resource)}
@@ -58,4 +65,7 @@ class ActiveRecord::Base
       attributes
     end
   end
+
 end
+
+ActiveRecord::Base.extend ActsAsAccessor::ClassMethods

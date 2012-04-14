@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-require File.dirname(__FILE__) + '/../config/environment'
+# encoding: utf-8
+
+require_relative '../config/environment'
 include Noosfero::SampleDataHelper
 
 id = ARGV.first || ''

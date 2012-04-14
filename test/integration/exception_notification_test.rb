@@ -12,7 +12,6 @@ begin
       ActionMailer::Base.deliveries = []
       [ProfileController, AccountController].each{|klass| klass.any_instance.stubs(:signup).raises(RuntimeError)}
       [ProfileController, AccountController].each{|klass| klass.any_instance.stubs(:local_request?).returns(false)}
-      [ProfileController, AccountController].each{|klass| klass.any_instance.stubs(:consider_all_requests_local).returns(false)}
     end
 
     should 'deliver mail notification about exceptions' do

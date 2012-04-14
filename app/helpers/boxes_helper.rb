@@ -128,7 +128,7 @@ module BoxesHelper
         content
       end
     when Proc
-      self.instance_eval(&content)
+      self.instance_exec(&content)
     when NilClass
       ''
     else

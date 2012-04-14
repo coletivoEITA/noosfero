@@ -29,13 +29,15 @@ class User < ActiveRecord::Base
     end
   end
 
-  after_create do |user|
+  before_create do |user|
+    return if user.person
     user.person ||= Person.new
-    user.person.attributes = user.person_data.merge(:identifier => user.login, :user_id => user.id, :environment_id => user.environment_id)
+    user.person.attributes = user.person_data.merge(:identifier => user.login, :environment_id => user.environment_id)
     user.person.name ||= user.login
     user.person.visible = false unless user.activated?
-    user.person.save!
+    user.person.user = user
   end
+
   after_create :deliver_activation_code
   after_create :delay_activation_check
 

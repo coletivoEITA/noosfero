@@ -330,7 +330,7 @@ class Profile < ActiveRecord::Base
     self.public_profile = template.public_profile
 
     # flush
-    self.save_without_validation!
+    self.save!
   end
 
   def apply_type_specific_template(template)

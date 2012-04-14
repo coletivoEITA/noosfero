@@ -184,12 +184,6 @@ class Article < ActiveRecord::Base
                 :include => 'profile',
                 :order => 'articles.published_at desc, articles.id desc'
               }
-    if ( scoped_methods && scoped_methods.last &&
-         scoped_methods.last[:find] &&
-         scoped_methods.last[:find][:joins] &&
-         scoped_methods.last[:find][:joins].index('profiles') )
-      options.delete(:include)
-    end
     if extra_conditions == {}
       self.paginate(options)
     else
