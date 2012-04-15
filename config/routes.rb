@@ -114,7 +114,7 @@ Noosfero::Application.routes.draw do
   match 'public/:action(/:id)' => 'public#index', :as => :cache
 
   # match requests for profiles that don't have a custom domain
-  match ':profile/*page' => 'content_viewer#view_page', :as => :homepage, :profile => /#{Noosfero.identifier_format}/, :constraints => DomainConstraint.new
+  match ':profile(/*page)' => 'content_viewer#view_page', :as => :homepage, :profile => /#{Noosfero.identifier_format}/, :constraints => DomainConstraint.new
 
   # match requests for content in domains hosted for profiles
   match '*page' => 'content_viewer#view_page'

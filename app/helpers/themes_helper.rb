@@ -47,13 +47,8 @@ module ThemesHelper
   end
 
   def theme_include(template)
-    ['.rhtml', '.html.erb'].each do |ext|
-      file = (Rails.root + '/public' + theme_path + '/' + template  + ext)
-      if File.exists?(file)
-        return render :file => file, :use_full_path => false
-      end
-    end
-    nil
+    file = (Rails.root + '/public' + theme_path + '/' + template  + '.html.erb')
+    return render :file => file, :use_full_path => false if File.exists?(file)
   end
 
   def theme_favicon

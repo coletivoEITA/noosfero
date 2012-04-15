@@ -263,8 +263,6 @@ module ApplicationHelper
     concat(content_tag('div', capture(&block) + tag('br', :style => 'clear: left;'), { :class => 'button-bar' }.merge(options)))
   end
 
-  VIEW_EXTENSIONS = %w[.rhtml .html.erb]
-
   def partial_for_class_in_view_path(klass, view_path)
     return nil if klass.nil?
     name = klass.name.underscore
@@ -277,10 +275,8 @@ module ApplicationHelper
       search_name = "_" + search_name
     end
 
-    VIEW_EXTENSIONS.each do |ext|
-      path = defined?(params) && params[:controller] ? File.join(view_path, params[:controller], search_name+ext) : File.join(view_path, search_name+ext)
-      return name if File.exists?(File.join(path))
-    end
+    path = defined?(params) && params[:controller] ? File.join(view_path, params[:controller], search_name+'.html.erb') : File.join(view_path, search_name+'.html.erb')
+    return name if File.exists?(File.join(path))
 
     partial_for_class_in_view_path(klass.superclass, view_path)
   end
@@ -300,9 +296,7 @@ module ApplicationHelper
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
 
     name = "#{klass.name.underscore}_#{action.to_s}"
-    VIEW_EXTENSIONS.each do |ext|
-      return name if File.exists?(File.join(Rails.root, 'app', 'views', params[:controller], '_'+name+ext))
-    end
+    return name if File.exists?(File.join(Rails.root, 'app', 'views', params[:controller], '_'+name+'.html.erb'))
 
     partial_for_task_class(klass.superclass, action)
   end
@@ -311,9 +305,7 @@ module ApplicationHelper
     raise ArgumentError, 'No profile actions view for this class.' if klass.nil?
 
     name = klass.name.underscore
-    VIEW_EXTENSIONS.each do |ext|
-      return "blocks/profile_info_actions/"+name+ext if File.exists?(File.join(Rails.root, 'app', 'views', 'blocks', 'profile_info_actions', name+ext))
-    end
+    return "blocks/profile_info_actions/"+name+'.html.erb' if File.exists?(File.join(Rails.root, 'app', 'views', 'blocks', 'profile_info_actions', name+'.html.erb'))
 
     view_for_profile_actions(klass.superclass)
   end
@@ -997,7 +989,7 @@ module ApplicationHelper
   def render_environment_features(folder)
     result = ''
     environment.enabled_features.keys.each do |feature|
-      file = File.join(@controller.view_paths.last.to_s, 'shared', folder.to_s, "#{feature}.rhtml")
+      file = File.join(@controller.view_paths.last.to_s, 'shared', folder.to_s, "#{feature}.html.erb")
       if File.exists?(file)
         result << render(:file => file, :use_full_path => false)
       end
