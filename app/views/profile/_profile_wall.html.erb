@@ -1,7 +1,7 @@
 <h3><%= _("%s's wall") % @profile.name %></h3>
 <div id='leave_scrap'>
   <%= flash[:error] %>
-  <% form_remote_tag :url => {:controller => 'profile', :action => 'leave_scrap', :tab_action => 'wall' }, :update => 'profile_scraps', :success => "$('leave_scrap_content').value=''" do %>
+  <%= form_tag({:controller => 'profile', :action => 'leave_scrap', :tab_action => 'wall' }, :remote => true, :update => 'profile_scraps', :success => "$('leave_scrap_content').value=''") do %>
     <%= limited_text_area :scrap, :content, 420, 'leave_scrap_content', :cols => 50, :rows => 2 %>
     <%= submit_button :scrap, _('Leave a scrap') %>
   <% end %>

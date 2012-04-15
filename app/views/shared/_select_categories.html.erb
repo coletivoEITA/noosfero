@@ -7,11 +7,10 @@
     categories.push(@current_category) while @current_category = @current_category.parent
   %>
   <%= categories.compact.reverse.map{|i|
-    link_to_remote(i.name, 
-      :update => "select-categories",
-      :url => { :action => 'update_categories', :category_id => i.id, :id => @object },
-      :loaded => visual_effect(:highlight, "select-categories"),
-      :class => 'select-current-category-link')}.join(' &rarr; ')
+    link_to(i.name, { :action => 'update_categories', :category_id => i.id, :id => @object },
+            :remote => true, :update => "select-categories",
+            :loaded => visual_effect(:highlight, "select-categories"),
+            :class => 'select-current-category-link')}.join(' &rarr; ')
   %>
   <strong>
   <%= button_to_function_without_text(:save, _('Save'), nil, :id => 'save-category-button') do |page|
@@ -33,11 +32,9 @@
 <% if !@categories.empty? %>
   <h3><%= _('Categories:') %></h3>
   <% @categories.select{|i| !@object.respond_to?(:accept_category?) || @object.accept_category?(i)}.each do |category| %>
-    <%= link_to_remote category.name,
-      { :update => "select-categories",
-        :url => { :action => "update_categories", :category_id => category.id, :id => @object},
-        :loaded => visual_effect(:highlight, "select-categories")
-      },
+    <%= link_to category.name, { :action => "update_categories", :category_id => category.id, :id => @object},
+      :remote => true, :update => "select-categories",
+      :loaded => visual_effect(:highlight, "select-categories")
       :class => 'select-subcategory-link',
       :id => "select-category-#{category.id}-link"
     %>

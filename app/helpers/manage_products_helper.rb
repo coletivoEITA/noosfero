@@ -120,12 +120,9 @@ module ManageProductsHelper
     options = html_options.merge(:id => 'link-edit-product-' + field)
     options[:class] = options[:class] ? options[:class] + ' link-to-remote' : 'link-to-remote'
 
-    link_to_remote(label,
-                   {:update => "product-#{field}",
-                   :url => { :controller => 'manage_products', :action => "edit", :id => product.id, :field => field },
-                   :method => :get,
-                   :loading => "loading_for_button('#link-edit-product-#{field}')"},
-                   options)
+    link_to(label, { :controller => 'manage_products', :action => "edit", :id => product.id, :field => field },
+            {:remote => true, :update => "product-#{field}", :method => :get,
+             :loading => "loading_for_button('#link-edit-product-#{field}')"}.merge(options))
   end
 
   def edit_button(type, label, url, html_options = {})

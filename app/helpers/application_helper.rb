@@ -233,13 +233,13 @@ module ApplicationHelper
   def button_to_remote(type, label, options, html_options = {})
     html_options[:class] = "button with-text" unless html_options[:class]
     html_options[:class] << " icon-#{type}"
-    link_to_remote(label, options, html_options)
+    link_to(label, options, html_options.merge(:remote => true))
   end
 
   def button_to_remote_without_text(type, label, options, html_options = {})
     html_options[:class] = "" unless html_options[:class]
     html_options[:class] << " button icon-#{type}"
-    link_to_remote(content_tag('span', label), options, html_options.merge(:title => label))
+    link_to(content_tag('span', label), options, html_options.merge(:remote => true, :title => label))
   end
 
   def icon(icon_name, html_options = {})
@@ -870,7 +870,7 @@ module ApplicationHelper
   end
 
   def ui_button_to_remote(label, options, html_options = {})
-    link_to_remote(label, options, html_options.merge(:class => 'ui_button fg-button'))
+    link_to(label, options, html_options.merge(:remote => true, :class => 'ui_button fg-button'))
   end
 
   def jquery_theme
@@ -1023,11 +1023,11 @@ module ApplicationHelper
   end
 
   def limited_text_area(object_name, method, limit, text_area_id, options = {})
-    content_tag(:div, [
-      text_area(object_name, method, { :id => text_area_id, :onkeyup => "limited_text_area('#{text_area_id}', #{limit})" }.merge(options)),
-      content_tag(:p, content_tag(:span, limit) + ' ' + _(' characters left'), :id => text_area_id + '_left'),
-      content_tag(:p, _('Limit of characters reached'), :id => text_area_id + '_limit', :style => 'display: none')
-    ], :class => 'limited-text-area')
+    content_tag(:div, 
+      text_area(object_name, method, { :id => text_area_id, :onkeyup => "limited_text_area('#{text_area_id}', #{limit})" }.merge(options)) +
+      content_tag(:p, content_tag(:span, limit) + ' ' + _(' characters left'), :id => text_area_id + '_left') +
+      content_tag(:p, _('Limit of characters reached'), :id => text_area_id + '_limit', :style => 'display: none'),
+    :class => 'limited-text-area')
   end
 
   def pluralize_without_count(count, singular, plural = nil)

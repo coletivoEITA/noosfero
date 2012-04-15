@@ -15,7 +15,7 @@
         <div id='profile-network-message-<%= activity.id%>' style='display:none;'>
         <div id='profile-network-form-<%= activity.id%>' style='display:none;'>
         <p class='profile-network-message'>
-          <% form_remote_tag :url => {:controller => 'profile', :action => 'leave_scrap', :not_load_scraps => true}, :update => "profile-network-message-response-#{activity.id}", :success =>"hide_and_show(['#profile-network-form-#{activity.id}'],['#profile-network-message-response-#{activity.id}'])" do %>
+          <%= form_tag({:controller => 'profile', :action => 'leave_scrap', :not_load_scraps => true}, :remote => true, :update => "profile-network-message-response-#{activity.id}", :success =>"hide_and_show(['#profile-network-form-#{activity.id}'],['#profile-network-message-response-#{activity.id}'])") do %>
             <%= limited_text_area :scrap, :content, 420, "content_#{activity.id}", :cols => 50, :rows => 2 %>
             <%= hidden_field_tag 'receiver_id', activity.user.id %>
             <%= submit_button :add, _('Leave a message') %>

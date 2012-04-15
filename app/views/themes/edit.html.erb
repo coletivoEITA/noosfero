@@ -12,7 +12,7 @@
   <h2><%= _('CSS files') %></h2>
   <ul>
     <% for css in @css_files %>
-      <li><%= link_to_remote(css, :url => { :action => 'css_editor', :id => @theme.id, :css => css }, :update => { :success => 'css-code' }) %></li>
+      <li><%= link_to(css, { :action => 'css_editor', :id => @theme.id, :css => css }, :remote => true, :update => { :success => 'css-code' }) %></li>
     <% end %>
   </ul>
   <% button_bar do %>

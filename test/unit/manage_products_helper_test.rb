@@ -67,7 +67,8 @@ class ManageProductsHelperTest < ActiveSupport::TestCase
     category = fast_create(ProductCategory, :name => 'Category 1', :environment_id => @environment.id)
     product = fast_create(Product, :product_category_id => category.id)
 
-    expects(:link_to_remote).with('link to edit', {:update => "product-name", :loading => "loading_for_button('#link-edit-product-name')", :url => {:controller => 'manage_products', :action => 'edit', :id => product.id, :field => 'name'}, :method => :get}, anything).returns('LINK')
+    expects(:link_to).with('link to edit', {:controller => 'manage_products', :action => 'edit', :id => product.id, :field => 'name'},
+                           {:remote => true, :update => "product-name", :loading => "loading_for_button('#link-edit-product-name')", :method => :get}, anything).returns('LINK')
 
     assert_equal 'LINK', edit_product_link_to_remote(product, 'name', 'link to edit')
   end
