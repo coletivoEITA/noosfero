@@ -8,14 +8,13 @@ group :development, :production do
   gem 'rmagick', '2.13.1'
   gem 'RedCloth', '4.2.2'
   gem 'ruby-feedparser', '0.7'
-  gem 'hpricot', '0.8.2'
+  gem 'hpricot', '0.8.4'
   gem 'daemons', '1.0.10'
 
   gem 'will_paginate', '3.0.3'
   gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
 
-  gem 'jquery-rails'
-  gem 'jquery-rjs', :git => 'git://github.com/aaronchi/jquery-rjs.git'
+  gem 'prototype-rails'
 end
 
 group :production do
