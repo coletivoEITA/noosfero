@@ -5,9 +5,9 @@ require "yaml"
 dir = File.dirname(__FILE__)
 SOLR_PATH = File.expand_path("#{dir}/../solr") unless defined? SOLR_PATH
 
-# RAILS_ROOT isn't defined yet, so figure it out.
+puts Rails.root
 unless defined? RAILS_ROOT
-  RAILS_ROOT = File.expand_path("#{File.dirname(__FILE__)}/../test")
+  RAILS_ROOT = Rails.root.to_s
 end
 unless defined? SOLR_LOGS_PATH
   SOLR_LOGS_PATH = ENV["SOLR_LOGS_PATH"] || "#{RAILS_ROOT}/log"
@@ -26,6 +26,7 @@ unless defined? SOLR_PID_FILE
 end
 
 unless defined? SOLR_PORT
+  raise "Please copy config/solr.yml.dist to config/solr.yml" unless File.exists?(RAILS_ROOT+'/config/solr.yml')
   config = YAML::load_file(RAILS_ROOT+'/config/solr.yml')
   raise("No solr environment defined for RAILS_ENV = #{ENV['RAILS_ENV'].inspect}") unless config[ENV['RAILS_ENV']]
 

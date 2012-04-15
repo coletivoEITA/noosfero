@@ -1,6 +1,5 @@
 module CategoriesHelper
 
-
   COLORS = [
     [ N_('Do not display at the menu'), nil ],
     [ N_('Orange'), 1 ],

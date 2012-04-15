@@ -32,6 +32,7 @@ group :test do
 end
 
 group :test, :cucumber do
+  gem 'mocha', '0.9.8'
   gem 'cucumber', '0.4.0'
   gem 'webrat', '0.5.1'
   gem 'rspec', '1.2.9'

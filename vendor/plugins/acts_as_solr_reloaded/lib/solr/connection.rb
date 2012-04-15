@@ -41,7 +41,8 @@ class Solr::Connection
     # Not actually opening the connection yet, just setting up the persistent connection.
     @connection = Net::HTTP.new(@url.host, @url.port)
   
-    @connection.read_timeout = opts[:timeout].to_i || 0
+    timeout = opts[:timeout].to_i || 0
+    @connection.read_timeout = timeout.zero? ? 1000000 : timeout
     @username = opts[:username] if opts[:username]
     @password = opts[:password] if opts[:password]
   end

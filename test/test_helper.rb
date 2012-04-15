@@ -6,9 +6,6 @@ at_exit { system 'rake solr:stop' }
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
-require 'test_help'
-require 'mocha'
-require 'hpricot'
 
 require 'noosfero/test'
 require_relative 'factories'
@@ -48,7 +45,7 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 
   # for fixture_file_upload
-  include ActionController::TestProcess
+  include ActionDispatch::TestProcess
 
   include Noosfero::Factory
 

@@ -63,14 +63,14 @@ module ActiveRecord
 	def find_options_for_tag_counts(options = {})
           options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit
 
-          scope = scope(:find)
+          #scope = scope(:find)
           start_at = sanitize_sql(["#{Tagging.table_name}.created_at >= ?", options[:start_at]]) if options[:start_at]
           end_at = sanitize_sql(["#{Tagging.table_name}.created_at <= ?", options[:end_at]]) if options[:end_at]
           
           conditions = [
             "#{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}",
             options[:conditions],
-            scope && scope[:conditions],
+            #scope && scope[:conditions],
             start_at,
             end_at
           ]

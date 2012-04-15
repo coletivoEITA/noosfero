@@ -36,7 +36,7 @@ namespace :solr do
   end
 
   desc 'Starts Solr. Options accepted: RAILS_ENV=your_env, PORT=XX. Defaults to development if none.'
-  task :start => [:download, :environment] do
+  task :start => [:download] do
     require File.expand_path("#{File.dirname(__FILE__)}/../../config/solr_environment")
     FileUtils.mkdir_p(SOLR_LOGS_PATH)
     FileUtils.mkdir_p(SOLR_DATA_PATH)
