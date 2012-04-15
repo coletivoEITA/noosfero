@@ -90,7 +90,7 @@
       params = {};
     }
 
-    new Ajax.Request(url, {
+    options = {
       method: method,
       parameters: params,
       evalScripts: true,
@@ -99,7 +99,11 @@
       onComplete: function(response) { element.fire("ajax:complete", response); },
       onSuccess:  function(response) { element.fire("ajax:success",  response); },
       onFailure:  function(response) { element.fire("ajax:failure",  response); }
-    });
+    }
+    if (element.hasAttribute('update'))
+      new Ajax.Updater(element.readAttribute('update'), url, options);
+    else
+      new Ajax.Request(url, options);
 
     element.fire("ajax:after");
   }
@@ -161,7 +165,12 @@
     }
   });
 
-  document.on("click", "form input[type=submit], form button[type=submit], form button:not([type])", function(event, button) {
+  document.on("click", "form input[type=submit], form input[type=image], form button[type=submit], form button:not([type])", function(event, button) {
+    if (!allowAction(button)){
+      event.stop();
+      return false;
+    }
+    
     // register the pressed submit button
     event.findElement('form').store('rails:submit-button', button.name || false);
   });
