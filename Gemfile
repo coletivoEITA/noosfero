@@ -12,6 +12,7 @@ group :development, :production do
   gem 'daemons', '1.0.10'
 
   gem 'will_paginate', '3.0.3'
+  gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
 
   gem 'prototype-rails'
 end
