@@ -4,7 +4,6 @@ gem 'rake', '0.9.2.2'
 gem 'rails', '3.1.4'
 
 gem 'gettext_i18n_rails', '0.4.6'
-gem 'rmagick', '2.13.1'
 gem 'RedCloth', '4.2.2'
 gem 'ruby-feedparser', '0.7'
 gem 'hpricot', '0.8.4'
@@ -12,6 +11,9 @@ gem 'daemons', '1.0.10'
 
 gem 'will_paginate', '3.0.3'
 gem 'acts_as_versioned', :git => 'git://github.com/JoelJuliano/acts_as_versioned'
+
+gem 'rmagick', '2.13.1'
+gem 'dragonfly'
 
 gem 'prototype-rails'
 
@@ -21,7 +23,8 @@ gem 'pg', '0.8.0'
 
 group :production do
   gem 'thin', '1.2.4'
-  gem 'exception_notification', '1.0.20090728'
+  gem 'memcache-client'
+  gem 'exception_notification'
 end
 
 group :test do

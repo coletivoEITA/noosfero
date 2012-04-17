@@ -1,3 +1,5 @@
+require_relative '../initializers/01_load_config'
+
 Noosfero::Application.configure do
   # Settings specified here will take precedence over those in config/environment.rb
 
@@ -22,4 +24,11 @@ Noosfero::Application.configure do
   config.cache_store = :mem_cache_store, "localhost"
 
   config.middleware.insert_before ActionDispatch::Session::CookieStore, NoosferoHttpCaching::Middleware
+
+  if NOOSFERO_CONF['production'] and NOOSFERO_CONF['production']['exception_recipients']
+    config.middleware.use ExceptionNotifier,
+      :email_prefix => "[Exception] ",
+      :sender_address => %{"Exception Notifier" <support@example.com>},
+      :exception_recipients => NOOSFERO_CONF['production']['exception_recipients']
+  end
 end
