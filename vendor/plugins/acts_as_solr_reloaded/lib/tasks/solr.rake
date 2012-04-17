@@ -73,7 +73,7 @@ namespace :solr do
   end
   
   desc 'Stops Solr. Specify the environment by using: RAILS_ENV=your_env. Defaults to development if none.'
-  task :stop => :environment do
+  task :stop do
     require File.expand_path("#{File.dirname(__FILE__)}/../../config/solr_environment")
     if File.exists?(SOLR_PID_FILE)
       killed = false

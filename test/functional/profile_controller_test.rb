@@ -11,6 +11,7 @@ class ProfileControllerTest < ActionController::TestCase
     @response   = ActionController::TestResponse.new
 
     @profile = create_user('testuser').person
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
   end
   attr_reader :profile
 

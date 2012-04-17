@@ -4,8 +4,8 @@ class TinyMceArticleTest < ActiveSupport::TestCase
 
   def setup
     ActiveSupport::TestCase::setup
-    Article.rebuild_solr_index
     @profile = create_user('zezinho').person
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
   end
   attr_reader :profile
   

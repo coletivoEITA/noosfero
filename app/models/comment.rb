@@ -1,5 +1,6 @@
 class Comment < ActiveRecord::Base
 
+  acts_as_trackable
   track_actions :leave_comment, :after_create, :keep_params => ["article.title", "article.url", "title", "url", "body"], :custom_target => :action_tracker_target 
 
   validates_presence_of :body

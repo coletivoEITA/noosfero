@@ -4,6 +4,7 @@ class TextileArticleTest < ActiveSupport::TestCase
   
   def setup
     @profile = create_user('testing').person
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
   end
   attr_reader :profile
 

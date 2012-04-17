@@ -2,6 +2,10 @@ require_relative '../test_helper'
 
 class FriendshipTest < ActiveSupport::TestCase
 
+  def setup
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
+  end
+
   should 'connect a person to another' do
     p1 = create_user('person_test').person
     p2 = create_user('person_test_2').person

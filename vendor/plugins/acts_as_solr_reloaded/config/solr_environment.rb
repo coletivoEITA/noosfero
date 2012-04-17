@@ -1,7 +1,10 @@
 ENV['RAILS_ENV']  = (ENV['RAILS_ENV'] || 'development').dup
+
 require "uri"
 require "fileutils"
 require "yaml"
+require 'net/http'
+
 dir = File.dirname(__FILE__)
 SOLR_PATH = File.expand_path("#{dir}/../solr") unless defined? SOLR_PATH
 

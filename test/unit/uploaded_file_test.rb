@@ -4,6 +4,7 @@ class UploadedFileTest < ActiveSupport::TestCase
 
   def setup
     @profile = create_user('testinguser').person
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
   end
   attr_reader :profile
 

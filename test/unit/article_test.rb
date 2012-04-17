@@ -7,6 +7,7 @@ class ArticleTest < ActiveSupport::TestCase
   def setup
     ActiveSupport::TestCase::setup
     @profile = create_user('testing').person
+    ActionTracker::Record.stubs(:current_user_from_model).returns(Person.first)
   end
   attr_reader :profile
 
@@ -1077,7 +1078,7 @@ class ArticleTest < ActiveSupport::TestCase
 
   should 'not create more than one notification track action to community when update more than one artile' do
     community = fast_create(Community)
-    p1 = Person.first || fast_create(Person)
+    p1 = Person.first
     community.add_member(p1)
     assert p1.is_member_of?(community)
     Article.destroy_all
@@ -1089,8 +1090,8 @@ class ArticleTest < ActiveSupport::TestCase
     ta = ActionTracker::Record.last
     assert_equal 'Tracked Article 1', ta.get_name.last
     assert_equal article.url, ta.get_url.last
-    assert p1, ta.user
-    assert community, ta.target
+    assert_equal p1, ta.user
+    assert_equal community, ta.target
     process_delayed_job_queue
     assert_equal 2, ActionTrackerNotification.count
 

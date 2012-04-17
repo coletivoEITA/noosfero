@@ -1,10 +1,3 @@
-class UserStampSweeper < ActionController::Caching::Sweeper
-  private
-    def current_user
-      Person.first
-    end
-end
-
 module ActionTracker
   class Record
     def back_in_time(time = 25.hours)

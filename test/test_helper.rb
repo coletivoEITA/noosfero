@@ -4,8 +4,13 @@ ENV["RAILS_ENV"] = "test"
 abort unless system 'rake solr:start'
 at_exit { system 'rake solr:stop' }
 
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
+require 'mocha'
+require 'hpricot'
+
+require 'will_paginate'
+WillPaginate
 
 require 'noosfero/test'
 require_relative 'factories'
@@ -313,6 +318,13 @@ def with_constants(constants, &block)
   block.call
   old_constants.each do |constant, val|
     silence_stderr{ Object.const_set(constant, val) }
+  end
+end
+
+# forwardport old rails code to avoid replacement
+class ActiveModel::Errors
+  def invalid?(attr)
+    self[attr].any?
   end
 end
 
