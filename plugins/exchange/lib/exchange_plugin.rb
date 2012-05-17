@@ -1,4 +1,5 @@
 class ExchangePlugin < Noosfero::Plugin
+  require_dependency 'ext/product'
 
   def self.plugin_name
     "ExchangePlugin"
