@@ -15,5 +15,9 @@ class ExchangePlugin < Noosfero::Plugin
     end
   end
 
+  def stylesheet?
+    true
+  end
+
 
 end

@@ -32,4 +32,19 @@ class ExchangePlugin::Exchange < Noosfero::Plugin::ActiveRecord
     (profile.id == self.enterprise_target_id) 
   end
 
+  def the_other(profile)
+    target?(profile) ? self.enterprise_origin : self.enterprise_target
+  end
+
+  def my_elements(profile)
+    target?(profile) ? self.target_elements : self.origin_elements
+  end
+
+  def other_elements(profile)
+    target?(profile) ? self.origin_elements : self.target_elements 
+  end
+
+
+
+
 end

@@ -1,17 +1,76 @@
-<style>
-  #message{
-    width: 300px;
-    background: blue;
-    margin:auto;
-    padding: 5px;
-    margin-bottom: 10px;
-  }
 
-  #message-new{
-    background: green;
-  }
+<div id="exchange_summary">
+  <h2><%= _('Exchange Summary')%></h2>
+  <table>
+    <tr><td class="label"><%= _('Exchange State:') %></td><td> <%= ExchangePlugin::Exchange.state[@exchange.state] %> -
+    <% if @button %>
+      <% button_bar do %>
+        <%= button_to @button[0][0], {:action => @button[0][1], :id => @exchange.id} %>
+        <%= button_to @button[1][0], {:action => @button[1][1], :id => @exchange.id} %>
+      <% end %>
+    <% else%>
+      <%= @no_button_message %>
+      <% end %>
+    </td></tr>
+    <tr><td class="label"><%= _("Slug: ") %></td><td><%= @exchange.slug %></td></tr>
+    <tr><td class="label"><%= _("Exchange with: ") %></td><td><%= @exchange.the_other(profile).name %></td></tr>
+    <tr>
+      <td class="label"><%= _("I offer:") %></td>
+      <td>
+        <% @exchange.my_elements(profile).each do |x| %>
+          <%= "#{x.element.name} (#{x.quantity}) "%>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td class="label"><%= _("%{other} offers me:") % {:other => @exchange.the_other(profile).name} %></td>
+      <td>  
+        <% @exchange.other_elements(profile).each do |x| %>
+          <%= "#{x.element.name} (#{x.quantity}) "%>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>
 
-</style>
+<div id="messages">
+  <h2><%= _('Messages')%></h2>
+  <% @messages.each do |m| %> 
+    <div class="comment-ballon">
+    <div class="comment-wrapper-1">
+    <div class="comment-wrapper-2">
+    <div class="comment-wrapper-3">
+    <div class="comment-wrapper-4">
+    <div class="comment-wrapper-5">
+    <div class="comment-wrapper-6">
+    <div class="comment-wrapper-7">
+    <div class="comment-wrapper-8">
+    <div  class="comment-balloon-content">
+      <ul>
+        <% if m.enterprise_sender %><li> <%=_('From: %{enterprise} - %{person}') % {:enterprise => m.enterprise_sender.name, :person =>  m.person_sender.name} %></li><% end %>
+        <% if m.enterprise_recipient %><li> <%=_('To: %s') % m.enterprise_recipient.name %></li><% end %>
+        <li><%=_('Sent: %s') % m.created_at %></li>
+        <li><%= m.body %></li>
+      </ul>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+  <% end %>
+</div>
+
+
+
+
+
+
+
 
 <h1><%= _("Exchange between %{origin} and %{target}") % {:origin => @exchange.enterprise_origin.name, :target => @exchange.enterprise_target.name} %></h1>
 

@@ -1,0 +1,77 @@
+table {
+  width: auto;
+}
+
+tr:hover td{
+  background:transparent;
+}
+
+td {
+  border: 0px;
+}
+
+#element_quantity
+{
+  text-align:center;
+}
+
+#exchange_elements
+{
+  margin:0px auto;
+  width:800px;
+  background: #E3D63F;
+  border:1px solid black;
+  border-collapse:collapse;
+}
+
+#exchange_elements td
+{
+  border:1px solid black;
+  vertical-align:top;
+}
+
+#exchange_elements table
+{
+  margin: 0px auto;
+}
+
+
+#origin_elements td, #target_elements td,#origin_products td, #target_products td
+{
+  border:0px;
+}
+
+
+#message{
+  width: 300px;
+  background: blue;
+  margin:auto;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+#message-new{
+  background: green;
+}
+
+.label {
+  font-weight:bold;
+}
+
+#exchange_summary{
+  background: red;
+  padding: 10px;
+}
+
+#exchange_summary td{
+  width:0%;
+}
+
+.comment-ballon{
+  width: 700px;
+}
+
+.comment-balloon-content{
+  padding: 5px;
+}
+
