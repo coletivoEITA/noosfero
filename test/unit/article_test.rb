@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class ArticleTest < Test::Unit::TestCase
+class ArticleTest < ActiveSupport::TestCase
 
   fixtures :environments
 
@@ -707,9 +707,11 @@ class ArticleTest < Test::Unit::TestCase
     assert_respond_to Article.new, :published_at
   end
 
-  should 'published_at is same as created_at if not set' do
-    a = fast_create(Article, :name => 'Published at', :profile_id => profile.id)
-    assert_equal a.created_at, a.published_at
+  should 'fill published_at with current date if not set' do
+    now = Time.now
+    Time.stubs(:now).returns(now)
+    a = create(Article, :name => 'Published at', :profile_id => profile.id)
+    assert_equal now, a.published_at
   end
 
   should 'use npage to compose cache key' do
@@ -1634,6 +1636,39 @@ class ArticleTest < Test::Unit::TestCase
     c5 = fast_create(TextileArticle, :name => 'Testing article 5', :body => 'Article body 5', :profile_id => profile.id)
 
     assert_equal [c1,c2,c5], Article.text_articles
+  end
+
+  should 'not allow all community members to edit by default' do
+    community = fast_create(Community)
+    admin = create_user('community-admin').person
+    member = create_user.person
+
+    community.add_admin(admin)
+    community.add_member(member)
+    a = Article.new(:profile => community)
+
+    assert_equal false, a.allow_members_to_edit
+    assert_equal false, a.allow_edit?(member)
+  end
+
+  should 'be able to allow all members of a community to edit' do
+    community = fast_create(Community)
+    admin = create_user('community-admin').person
+    member = create_user.person
+
+    community.add_admin(admin)
+    community.add_member(member)
+    a = Article.new(:profile => community)
+
+    a.allow_members_to_edit = true
+
+    assert_equal true, a.allow_edit?(member)
+  end
+
+  should 'not crash on allow_edit without a current user' do
+    a = build(Article)
+    a.allow_members_to_edit = true
+    assert !a.allow_edit?(nil)
   end
 
 end

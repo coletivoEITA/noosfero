@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class UserTest < Test::Unit::TestCase
+class UserTest < ActiveSupport::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead.
   # Then, you can remove it from this and the functional test.
   include AuthenticatedTestHelper
@@ -476,6 +476,14 @@ class UserTest < Test::Unit::TestCase
     assert_difference Delayed::Job, :count, 1 do
       user = new_user
     end
+  end
+
+  should 'activate right after creation when confirmation is not required' do
+    e = Environment.default
+    e.enable('skip_new_user_email_confirmation')
+    e.save!
+
+    assert new_user.activated?
   end
 
   protected

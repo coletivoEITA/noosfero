@@ -4,19 +4,17 @@ require 'cms_controller'
 # Re-raise errors caught by the controller.
 class CmsController; def rescue_action(e) raise e end; end
 
-class CmsControllerTest < Test::Unit::TestCase
+class CmsControllerTest < ActionController::TestCase
 
   fixtures :environments
 
   def setup
     @controller = CmsController.new
     @request    = ActionController::TestRequest.new
-    @request.stubs(:ssl?).returns(true)
     @response   = ActionController::TestResponse.new
 
     @profile = create_user_with_permission('testinguser', 'post_content')
     login_as :testinguser
-    @controller.stubs(:user).returns(@profile)
   end
 
   attr_reader :profile
@@ -203,7 +201,7 @@ class CmsControllerTest < Test::Unit::TestCase
 
     assert_difference Article, :count, -1 do
       post :destroy, :profile => profile.identifier, :id => a.id
-      assert_redirected_to :action => 'index'
+      assert_redirected_to :controller => 'cms', :profile => profile.identifier, :action => 'index'
     end
   end
 
@@ -584,7 +582,8 @@ class CmsControllerTest < Test::Unit::TestCase
   should 'be able to add image with alignment' do
     post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => 'image-alignment', :body => "the text of the article with image <img src='#' align='right'/> right align..." }
     saved = TinyMceArticle.find_by_name('image-alignment')
-    assert_match /<img src="#" align="right" \/>/, saved.body
+    assert_match /<img.*src="#".*\/>/, saved.body
+    assert_match /<img.*align="right".*\/>/, saved.body
   end
 
   should 'not be able to add image with alignment when textile' do
@@ -601,12 +600,14 @@ class CmsControllerTest < Test::Unit::TestCase
 
   should 'not make enterprise homepage available to person' do
     @controller.stubs(:profile).returns(profile)
-    assert_not_includes @controller.available_article_types, EnterpriseHomepage
+    @controller.stubs(:user).returns(profile)
+    assert_not_includes available_article_types, EnterpriseHomepage
   end
 
   should 'make enterprise homepage available to enterprises' do
     @controller.stubs(:profile).returns(fast_create(Enterprise, :name => 'test_ent', :identifier => 'test_ent'))
-    assert_includes @controller.available_article_types, EnterpriseHomepage
+    @controller.stubs(:user).returns(profile)
+    assert_includes available_article_types, EnterpriseHomepage
   end
 
   should 'update categories' do
@@ -757,33 +758,6 @@ class CmsControllerTest < Test::Unit::TestCase
     end
   end
 
-  should 'require ssl in general' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :index, :profile => 'testinguser'
-    assert_redirected_to :protocol => 'https://'
-  end
-
-  should 'accept ajax connections to new action without ssl' do
-    @request.expects(:ssl?).returns(false).at_least_once
-    xml_http_request :get, :new, :profile => 'testinguser'
-    assert_response :success
-  end
-
-  should 'not loose type argument in new action when redirecting to ssl' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :new, :profile => 'testinguser', :type => 'Folder'
-    assert_redirected_to :protocol => 'https://', :action => 'new', :type => 'Folder'
-  end
-
-  should 'not accept non-ajax connections to new action without ssl' do
-    Environment.default.update_attribute(:enable_ssl, true)
-    @request.expects(:ssl?).returns(false).at_least_once
-    get :new, :profile => 'testinguser'
-    assert_redirected_to :protocol => 'https://'
-  end
-
   should 'display categories if environment disable_categories disabled' do
     Environment.any_instance.stubs(:enabled?).with(anything).returns(false)
     a = profile.articles.create!(:name => 'test')
@@ -865,18 +839,20 @@ class CmsControllerTest < Test::Unit::TestCase
 
   should 'not offer folder to blog articles' do
     @controller.stubs(:profile).returns(fast_create(Enterprise, :name => 'test_ent', :identifier => 'test_ent'))
+    @controller.stubs(:user).returns(profile)
     blog = Blog.create!(:name => 'Blog for test', :profile => profile)
     @controller.stubs(:params).returns({ :parent_id => blog.id })
 
-    assert_not_includes @controller.available_article_types, Folder
+    assert_not_includes available_article_types, Folder
   end
 
   should 'not offer rssfeed to blog articles' do
     @controller.stubs(:profile).returns(fast_create(Enterprise, :name => 'test_ent', :identifier => 'test_ent'))
+    @controller.stubs(:user).returns(profile)
     blog = Blog.create!(:name => 'Blog for test', :profile => profile)
     @controller.stubs(:params).returns({ :parent_id => blog.id })
 
-    assert_not_includes @controller.available_article_types, RssFeed
+    assert_not_includes available_article_types, RssFeed
   end
 
   should 'update blog posts_per_page setting' do
@@ -902,9 +878,8 @@ class CmsControllerTest < Test::Unit::TestCase
 
   should 'offer confirmation to remove article' do
     a = profile.articles.create!(:name => 'my-article')
-    get :destroy, :profile => profile.identifier, :id => a.id
-    assert_response :success
-    assert_tag :tag => 'input', :attributes => {:type => 'submit', :value => 'Yes, I want.' }
+    post :destroy, :profile => profile.identifier, :id => a.id
+    assert_response :redirect
   end
 
   should 'display notify comments option' do
@@ -987,7 +962,7 @@ class CmsControllerTest < Test::Unit::TestCase
 
     post :upload_files, :profile => profile.identifier, :parent_id => folder.id, :back_to => @request.referer, :uploaded_files => [fixture_file_upload('files/rails.png', 'image/png')]
     assert_template nil
-    assert_redirected_to folder.view_url
+    assert_redirected_to 'http://colivre.net/testinguser/test-folder'
   end
 
   should 'record when coming from public view on edit files with view true' do
@@ -1168,6 +1143,21 @@ class CmsControllerTest < Test::Unit::TestCase
     assert_template 'edit'
   end
 
+  should 'allow community members to edit articles that allow it' do
+    community = fast_create(Community)
+    admin = create_user('community-admin').person
+    member = create_user.person
+
+    community.add_admin(admin)
+    community.add_member(member)
+
+    article = community.articles.create!(:name => 'test_article', :allow_members_to_edit => true)
+
+    login_as member.identifier
+    get :edit, :profile => community.identifier, :id => article.id
+    assert_response :success
+  end
+
   should 'create thumbnails for images with delayed_job' do
     post :upload_files, :profile => profile.identifier, :uploaded_files => [fixture_file_upload('/files/rails.png', 'image/png'), fixture_file_upload('/files/test.txt', 'text/plain')]
     file_1 = profile.articles.find_by_path('rails.png')
@@ -1231,18 +1221,20 @@ class CmsControllerTest < Test::Unit::TestCase
 
   should 'not offer folder to forum articles' do
     @controller.stubs(:profile).returns(fast_create(Enterprise, :name => 'test_ent', :identifier => 'test_ent'))
+    @controller.stubs(:user).returns(profile)
     forum = Forum.create!(:name => 'Forum for test', :profile => profile)
     @controller.stubs(:params).returns({ :parent_id => forum.id })
 
-    assert_not_includes @controller.available_article_types, Folder
+    assert_not_includes available_article_types, Folder
   end
 
   should 'not offer rssfeed to forum articles' do
     @controller.stubs(:profile).returns(fast_create(Enterprise, :name => 'test_ent', :identifier => 'test_ent'))
+    @controller.stubs(:user).returns(profile)
     forum = Forum.create!(:name => 'Forum for test', :profile => profile)
     @controller.stubs(:params).returns({ :parent_id => forum.id })
 
-    assert_not_includes @controller.available_article_types, RssFeed
+    assert_not_includes available_article_types, RssFeed
   end
 
   should 'update forum posts_per_page setting' do
@@ -1351,9 +1343,15 @@ class CmsControllerTest < Test::Unit::TestCase
     assert_no_tag :select, :attributes => { :id => 'article_language'}
   end
 
-  should 'display display posts in current language input checked on edit blog' do
-    get :new, :profile => profile.identifier, :type => 'Blog'
+  should 'display display posts in current language input checked when editing blog' do
+    profile.articles << Blog.new(:name => 'Blog for test', :profile => profile, :display_posts_in_current_language => true)
+    get :edit, :profile => profile.identifier, :id => profile.blog.id
     assert_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[display_posts_in_current_language]', :checked => 'checked' }
+  end
+
+  should 'display display posts in current language input not checked on new blog' do
+    get :new, :profile => profile.identifier, :type => 'Blog'
+    assert_no_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[display_posts_in_current_language]', :checked => 'checked' }
   end
 
   should 'update to false blog display posts in current language setting' do
@@ -1444,7 +1442,7 @@ class CmsControllerTest < Test::Unit::TestCase
   should 'update file and be redirect to cms' do
     file = UploadedFile.create!(:profile => @profile, :uploaded_data => fixture_file_upload('files/test.txt', 'text/plain'))
     post :edit, :profile => @profile.identifier, :id => file.id, :article => { }
-    assert_redirected_to :action => 'index'
+    assert_redirected_to :controller => 'cms', :profile => profile.identifier, :action => 'index'
   end
 
   should 'update file and be redirect to cms folder' do
@@ -1521,6 +1519,29 @@ class CmsControllerTest < Test::Unit::TestCase
     assert_nil data[1]['error']
   end
 
+  should 'make RawHTMLArticle available only to environment admins' do
+    @controller.stubs(:profile).returns(profile)
+    @controller.stubs(:user).returns(profile)
+    assert_not_includes available_article_types, RawHTMLArticle
+    profile.environment.add_admin(profile)
+    assert_includes available_article_types, RawHTMLArticle
+  end
+
+  should 'include new contents special types from plugins' do
+    class TestContentTypesPlugin < Noosfero::Plugin
+      def content_types
+        [Integer, Float]
+      end
+    end
+
+    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestContentTypesPlugin.new])
+
+    get :index, :profile => profile.identifier
+
+    assert_includes special_article_types, Integer
+    assert_includes special_article_types, Float
+  end
+
   protected
 
   # FIXME this is to avoid adding an extra dependency for a proper JSON parser.
@@ -1530,11 +1551,12 @@ class CmsControllerTest < Test::Unit::TestCase
     eval(@response.body.gsub('":', '"=>').gsub('null', 'nil'))
   end
 
-  should 'make RawHTMLArticle available only to environment admins' do
-    @controller.stubs(:profile).returns(profile)
-    assert_not_includes @controller.available_article_types, RawHTMLArticle
-    profile.environment.add_admin(profile)
-    assert_includes @controller.available_article_types, RawHTMLArticle
+  def available_article_types
+    @controller.send(:available_article_types)
+  end
+
+  def special_article_types
+    @controller.send(:special_article_types)
   end
 
 end

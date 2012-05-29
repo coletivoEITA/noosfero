@@ -94,7 +94,6 @@ class Environment < ActiveRecord::Base
       'disable_asset_events' => _('Disable search for events'),
       'disable_products_for_enterprises' => __('Disable products for enterprises'),
       'disable_categories' => _('Disable categories'),
-      'disable_cms' => _('Disable CMS'),
       'disable_header_and_footer' => _('Disable header/footer editing by users'),
       'disable_gender_icon' => _('Disable gender icon'),
       'disable_categories_menu' => _('Disable the categories menu'),
@@ -120,7 +119,9 @@ class Environment < ActiveRecord::Base
       'enterprises_are_validated_when_created' => __('Enterprises are validated when created'),
       'show_balloon_with_profile_links_when_clicked' => _('Show a balloon with profile links when a profile image is clicked'),
       'xmpp_chat' => _('XMPP/Jabber based chat'),
-      'show_zoom_button_on_article_images' => _('Show a zoom link on all article images')
+      'show_zoom_button_on_article_images' => _('Show a zoom link on all article images'),
+      'captcha_for_logged_users' => _('Ask captcha when a logged user comments too'),
+      'skip_new_user_email_confirmation' => _('Skip e-mail confirmation for new users')
     }
   end
 
@@ -222,7 +223,6 @@ class Environment < ActiveRecord::Base
   settings_items :layout_template, :type => String, :default => 'default'
   settings_items :homepage, :type => String
   settings_items :description, :type => String, :default => '<div style="text-align: center"><a href="http://noosfero.org/"><img src="/images/noosfero-network.png" alt="Noosfero"/></a></div>'
-  settings_items :enable_ssl
   settings_items :local_docs, :type => Array, :default => []
   settings_items :news_amount_by_folder, :type => Integer, :default => 4
   settings_items :help_message_to_add_enterprise, :type => String, :default => ''
@@ -563,8 +563,8 @@ class Environment < ActiveRecord::Base
     domain
   end
 
-  def top_url(ssl = false)
-    protocol = (ssl ? 'https' : 'http')
+  def top_url
+    protocol = 'http'
     result = "#{protocol}://#{default_hostname}"
     if Noosfero.url_options.has_key?(:port)
       result << ':' << Noosfero.url_options[:port].to_s
@@ -696,8 +696,8 @@ class Environment < ActiveRecord::Base
     settings[:portal_folders] = folders ? folders.map(&:id) : nil
   end
 
-  def portal_news_cache_key
-    "home-page-news/#{cache_key}"
+  def portal_news_cache_key(language='en')
+    "home-page-news/#{cache_key}-#{language}"
   end
 
   def notification_emails

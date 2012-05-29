@@ -13,7 +13,7 @@ class Article < ActiveRecord::Base
   validates_presence_of :profile_id, :name
   validates_presence_of :slug, :path, :if => lambda { |article| !article.name.blank? }
 
-  validates_uniqueness_of :slug, :scope => ['profile_id', 'parent_id'], :message => N_('<!-- %{fn} -->The title (article name) is already being used by another article, please use another title.'), :if => lambda { |article| !article.slug.blank? }
+  validates_uniqueness_of :slug, :scope => ['profile_id', 'parent_id'], :message => N_('The title (article name) is already being used by another article, please use another title.'), :if => lambda { |article| !article.slug.blank? }
 
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
 
@@ -26,6 +26,7 @@ class Article < ActiveRecord::Base
 
   settings_items :display_hits, :type => :boolean, :default => true
   settings_items :author_name, :type => :string, :default => ""
+  settings_items :allow_members_to_edit, :type => :boolean, :default => false
 
   belongs_to :reference_article, :class_name => "Article", :foreign_key => 'reference_article_id'
 
@@ -34,7 +35,7 @@ class Article < ActiveRecord::Base
   before_destroy :rotate_translations
 
   before_create do |article|
-    article.published_at = article.created_at if article.published_at.nil?
+    article.published_at ||= Time.now
     if article.reference_article && !article.parent
       parent = article.reference_article.parent
       if parent && parent.blog? && article.profile.has_blog?
@@ -233,7 +234,7 @@ class Article < ActiveRecord::Base
 
   include ActionView::Helpers::TextHelper
   def short_title
-    truncate self.title, 15, '...'
+    truncate self.title, :length => 15, :omission => '...'
   end
 
   def belongs_to_blog?
@@ -408,6 +409,17 @@ class Article < ActiveRecord::Base
     user && user.has_permission?('view_private_content', profile)
   end
 
+  alias :allow_delete?  :allow_post_content?
+  alias :allow_spread?  :allow_post_content?
+
+  def allow_create?(user)
+    allow_post_content?(user) || allow_publish_content?(user)
+  end
+
+  def allow_edit?(user)
+    allow_post_content?(user) || user && allow_members_to_edit && user.is_member_of?(profile)
+  end
+
   def comments_updated
     ferret_update
   end
@@ -496,8 +508,8 @@ class Article < ActiveRecord::Base
   end
 
   alias :active_record_cache_key :cache_key
-  def cache_key(params = {}, the_profile = nil)
-    active_record_cache_key +
+  def cache_key(params = {}, the_profile = nil, language = 'en')
+    active_record_cache_key+'-'+language +
       (allow_post_content?(the_profile) ? "-owner" : '') +
       (params[:npage] ? "-npage-#{params[:npage]}" : '') +
       (params[:year] ? "-year-#{params[:year]}" : '') +
@@ -514,7 +526,7 @@ class Article < ActiveRecord::Base
   end
 
   def short_lead
-    truncate sanitize_html(self.lead), 170, '...'
+    truncate sanitize_html(self.lead), :length => 170, :omission => '...'
   end
 
   def creator

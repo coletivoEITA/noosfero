@@ -15,51 +15,21 @@ class CmsController < MyProfileController
   end
 
   before_filter :login_required, :except => [:suggest_an_article]
+
   protect_if :except => [:suggest_an_article, :set_home_page, :edit, :destroy, :publish] do |c, user, profile|
     user && (user.has_permission?('post_content', profile) || user.has_permission?('publish_content', profile))
   end
 
-  protect_if :only => [:edit, :destroy, :publish] do |c, user, profile|
+  protect_if :only => [:destroy, :publish] do |c, user, profile|
     profile.articles.find(c.params[:id]).allow_post_content?(user)
   end
 
-  alias :check_ssl_orig :check_ssl
-  # Redefines the SSL checking to avoid requiring SSL when creating the "New
-  # publication" button on article's public view.
-  def check_ssl
-    if ((params[:action] == 'new') && (!request.xhr?)) || (params[:action] != 'new')
-      check_ssl_orig
-    end
+  protect_if :only => :edit do |c,user,profile|
+    profile.articles.find(c.params[:id]).allow_edit?(user)
   end
 
   def boxes_holder
     profile
-  end
-
-  include CmsHelper
-
-  def available_article_types
-    articles = [
-      TinyMceArticle,
-      TextileArticle,
-      Event
-    ]
-    articles += special_article_types if params && params[:cms]
-    parent_id = params ? params[:parent_id] : nil
-    if profile.enterprise?
-      articles << EnterpriseHomepage
-    end
-    if @parent && @parent.blog?
-      articles -= Article.folder_types.map(&:constantize)
-    end
-    if user.is_admin?(profile.environment)
-      articles << RawHTMLArticle
-    end
-    articles
-  end
-
-  def special_article_types
-    [Folder, Blog, UploadedFile, Forum, Gallery, RssFeed]
   end
 
   def view
@@ -206,6 +176,7 @@ class CmsController < MyProfileController
     @article = profile.articles.find(params[:id])
     if request.post?
       @article.destroy
+      session[:notice] = _("\"#{@article.name}\" was removed.")
       redirect_to :action => (@article.parent ? 'view' : 'index'), :id => @article.parent
     end
   end
@@ -311,16 +282,39 @@ class CmsController < MyProfileController
 
   protected
 
+  include CmsHelper
+
+  def available_article_types
+    articles = [
+      TinyMceArticle,
+      TextileArticle,
+      Event
+    ]
+    articles += special_article_types if params && params[:cms]
+    parent_id = params ? params[:parent_id] : nil
+    if profile.enterprise?
+      articles << EnterpriseHomepage
+    end
+    if @parent && @parent.blog?
+      articles -= Article.folder_types.map(&:constantize)
+    end
+    if user.is_admin?(profile.environment)
+      articles << RawHTMLArticle
+    end
+    articles
+  end
+
+  def special_article_types
+    [Folder, Blog, UploadedFile, Forum, Gallery, RssFeed] + @plugins.dispatch(:content_types)
+  end
+
+
   def record_coming
     if request.post?
       @back_to = params[:back_to]
     else
       @back_to = params[:back_to] || request.referer
     end
-  end
-
-  def maybe_ssl(url)
-    [url, url.sub('https:', 'http:')]
   end
 
   def valid_article_type?(type)
@@ -365,7 +359,7 @@ class CmsController < MyProfileController
       }
     end.to_json
   end
-  
+
   def content_editor?
     true
   end
