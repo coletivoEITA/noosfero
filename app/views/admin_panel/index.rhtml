@@ -18,4 +18,5 @@
   <% @plugins.dispatch(:admin_panel_links).each do |link| %>
     <tr><td><%= link_to link[:title], link[:url] %></td></tr>
   <% end %>
+  <tr><td><%= link_to _('Terms of use'), :action => 'terms_of_use' %></td></tr>
 </table>
