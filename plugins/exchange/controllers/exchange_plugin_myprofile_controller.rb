@@ -1,3 +1,4 @@
+
 class ExchangePluginMyprofileController < MyProfileController
   no_design_blocks
   protect 'edit_profile', :profile
@@ -47,7 +48,7 @@ class ExchangePluginMyprofileController < MyProfileController
 
   def console
     @exchange = ExchangePlugin::Exchange.find params[:id]
-    @messages = ExchangePlugin::Message.all(:order => "created_at desc").select{|m| m.exchange_id == @exchange.id}
+    @messages = ExchangePlugin::Message.all(:order => "created_at desc").select{|m| (m.exchange_id == @exchange.id) && (m.enterprise_sender_id != nil)}
    
     #allowing edition
     @edit_allowed = true
@@ -73,14 +74,28 @@ class ExchangePluginMyprofileController < MyProfileController
     if (@exchange.state == "proposed") && (!@exchange.target?(profile))
       @button = nil     
       @no_button_message = _('Waiting for the other to accept the exchange proposal') 
-    
+
+    elsif (@exchange.state == "proposed") && (@exchange.target?(profile))
+      @no_button_message = _('Do you accept to start the exchange negociation?') 
+
+    elsif (@exchange.state == "happening")
+      @no_button_message = _('Exchange is happening. You can send messages, edit the exchange elements, propose the conclusion of the exchange or cancel the negociation.') 
+
     elsif (@exchange.state == "conclusion_proposed_by_origin") && (!@exchange.target?(profile))
       @button = nil     
       @no_button_message = _('Waiting for a response by the other part of the exchange') 
 
+    elsif (@exchange.state == "conclusion_proposed_by_origin") && (@exchange.target?(profile))
+      @no_button_message = _('The other part said that the exchange is concluded. If you agree, click Exchange Concluded. 
+                             If you want to continue the negotiation, click Exchange not Concluded.') 
+
     elsif (@exchange.state == "conclusion_proposed_by_target") && (@exchange.target?(profile))
       @button = nil    
       @no_button_message = _('Waiting for a response by the other part of the exchange') 
+
+    elsif (@exchange.state == "conclusion_proposed_by_target") && (!@exchange.target?(profile))
+      @no_button_message = _('The other part said that the exchange is concluded. If you agree, click Exchange Concluded. 
+                             If you want to continue the negotiation, click Exchange not Concluded.') 
 
     elsif (@exchange.state == "concluded") 
       redirect_to :action => "evaluate", :id => @exchange.id

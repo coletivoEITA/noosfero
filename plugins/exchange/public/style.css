@@ -10,7 +10,7 @@ td {
   border: 0px;
 }
 
-#element_quantity
+#exchange_element_quantity
 {
   text-align:center;
 }
@@ -36,13 +36,17 @@ td {
 }
 
 
-#origin_elements td, #target_elements td,#origin_products td, #target_products td
+#exchange_origin_elements td, #exchange_target_elements td,#exchange_origin_products td, #exchange_target_products td
 {
   border:0px;
 }
 
+#exchange_origin_elements th, #exchange_target_elements th,#exchange_origin_products th, #exchange_target_products th
+{
+  border:0px;
+}
 
-#message{
+#exchange_message{
   width: 300px;
   background: blue;
   margin:auto;
@@ -50,11 +54,17 @@ td {
   margin-bottom: 10px;
 }
 
-#message-new{
+#exchange_message-new{
   background: green;
 }
 
-.label {
+#exchange_my_message{
+  border: 4px solid blue;
+}
+#exchange_other_message{
+  border: 4px solid green;
+}
+.exchange_label {
   font-weight:bold;
 }
 
@@ -70,8 +80,28 @@ td {
 .comment-ballon{
   width: 700px;
 }
+.comment-ballon-inverted{
+  width: 714px;
+}
 
 .comment-balloon-content{
   padding: 5px;
 }
 
+.exchange_quantity_input {
+  text-align:right;
+  width: 70px;
+}
+
+.comment-wrapper-3-inverted {
+  background: url(imgs/comment-bg-L-inverted.png)  100%   0% repeat-y;
+}
+.comment-wrapper-5-inverted {
+  background: url(imgs/comment-bg-SL-inverted.png) 100% 100% no-repeat;
+}
+.comment-wrapper-7-inverted {
+  background: url(imgs/comment-bg-NL-inverted.png) 100%   0% no-repeat;
+}
+.comment-wrapper-8-inverted {
+  background: url(imgs/comment-bg-NO-inverted.png)   0%   0% no-repeat;
+}

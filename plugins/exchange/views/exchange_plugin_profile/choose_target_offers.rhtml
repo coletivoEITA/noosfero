@@ -20,7 +20,7 @@
 
 <h1> <%= _("%s's Offers") % profile.name %>  </h1>
 
-<% if @target_products.blank? %>d
+<% if @target_products.blank? && @target_knowledges.blank? %>
   <%= _("%s has no offers registered.") % profile.name %>
 <% else %>
 
