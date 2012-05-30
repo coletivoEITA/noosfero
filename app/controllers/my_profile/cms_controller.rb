@@ -329,9 +329,7 @@ class CmsController < MyProfileController
   end
 
   def refuse_blocks
-    if !type.blank? and @type.constantize.new.use_media_panel?
-      @no_design_blocks = true
-    end
+    @no_design_blocks = true if !@type.blank? and @type.constantize.new.use_media_panel?
   end
 
   def per_page
