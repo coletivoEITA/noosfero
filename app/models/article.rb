@@ -26,6 +26,7 @@ class Article < ActiveRecord::Base
 
   settings_items :display_hits, :type => :boolean, :default => true
   settings_items :author_name, :type => :string, :default => ""
+  settings_items :allow_members_to_edit, :type => :boolean, :default => false
 
   belongs_to :reference_article, :class_name => "Article", :foreign_key => 'reference_article_id'
 
@@ -408,6 +409,17 @@ class Article < ActiveRecord::Base
     user && user.has_permission?('view_private_content', profile)
   end
 
+  alias :allow_delete?  :allow_post_content?
+  alias :allow_spread?  :allow_post_content?
+
+  def allow_create?(user)
+    allow_post_content?(user) || allow_publish_content?(user)
+  end
+
+  def allow_edit?(user)
+    allow_post_content?(user) || user && allow_members_to_edit && user.is_member_of?(profile)
+  end
+
   def comments_updated
     ferret_update
   end
@@ -496,8 +508,8 @@ class Article < ActiveRecord::Base
   end
 
   alias :active_record_cache_key :cache_key
-  def cache_key(params = {}, the_profile = nil)
-    active_record_cache_key +
+  def cache_key(params = {}, the_profile = nil, language = 'en')
+    active_record_cache_key+'-'+language +
       (allow_post_content?(the_profile) ? "-owner" : '') +
       (params[:npage] ? "-npage-#{params[:npage]}" : '') +
       (params[:year] ? "-year-#{params[:year]}" : '') +
