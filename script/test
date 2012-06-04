@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+def run(*args)
+  puts "+ #{args.join(' ')}"
+  system *args
+end
+
+# load database if not yet configured
+if !File.exists?('config/database.yml')
+  run 'cp config/database.yml.sqlite3 config/database.yml'
+  run 'rake db:schema:load'
+  run 'cp db/development.db db/test.db'
+end
+
+# load spork if not running
+run 'rake -s spork:testunit:start'
+
+# finally run test command
+exec 'testdrb', '-Itest', *ARGV
+

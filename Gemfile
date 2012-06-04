@@ -9,6 +9,9 @@ gem 'database_cleaner'
 gem 'exception_notification', '1.0.20090728'
 gem 'system_timer'
 
+gem 'spork', '~> 0.8.5'
+gem 'spork-testunit'
+
 def program(name)
   unless system("which #{name} > /dev/null")
     puts "W: Program #{name} is needed, but was not found in your PATH"

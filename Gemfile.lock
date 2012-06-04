@@ -20,6 +20,9 @@ GEM
       rack (>= 1.0.0)
       rspec (>= 1.2.9)
     selenium-client (1.2.18)
+    spork (0.8.5)
+    spork-testunit (0.0.8)
+      spork (>= 0.6.0)
     system_timer (1.2.4)
     term-ansicolor (1.0.7)
     treetop (1.4.10)
@@ -40,5 +43,7 @@ DEPENDENCIES
   rspec (= 1.2.9)
   rspec-rails (= 1.2.9)
   selenium-client (>= 1.2.17)
+  spork (~> 0.8.5)
+  spork-testunit
   system_timer
   webrat (= 0.5.1)
