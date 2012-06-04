@@ -55,8 +55,13 @@ group :test, :cucumber do
   gem 'database_cleaner'
 end
 
-gem 'spork', '~> 0.8.5'
-gem 'spork-testunit'
+group :tools do
+  gem 'spork', '~> 0.8.5'
+  gem 'spork-testunit'
+
+  gem 'guard-test'
+  gem 'guard-spork'
+end
 
 def program(name)
   unless system("which #{name} > /dev/null")
