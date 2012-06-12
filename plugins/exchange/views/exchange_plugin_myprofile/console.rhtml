@@ -1,5 +1,6 @@
 
-<div id="exchange_summary">
+<div id="exchange_console_top">
+  <div id="exchange_summary">
   <h2><%= _('Exchange Summary')%></h2>
   <table>
     <!--<tr><td class="exchange_label"><%= _("Slug: ") %></td><td><%= @exchange.slug %></td></tr>-->
@@ -48,7 +49,20 @@
       </td>
     </tr>
   </table>
+  </div><!--exchange_summary--> 
+  <div id="exchange_system_messages">
+  <table>
+    <tr><th><%= _('Last Updates') %>
+    <% i = 0%>  
+  <% @system_messages.each do |m| %> 
+    <tr><td><%= m.created_at.strftime("%d de %B de %Y, às %H:%M") + "<br />" + m.body %></td></tr>
+    <% i = i + 1 %>
+    <% i == 5 ? break : true %>
+  <% end %>
+
+    </table>
 </div>
+</div><!--exchange_console_top-->
 
 <div id="exchange_messages">
   <h2><%= _('Messages')%></h2>
@@ -64,7 +78,7 @@
   <table>
   <% @messages.each do |m| %> 
     <tr>
-      <td><% if m.enterprise_sender.id == profile.id%><%= link_to profile_image(profile, :minor) +"\n", profile.url %><% end %></td>
+      <td><% if m.enterprise_sender.id == profile.id%><%= link_to profile_image(profile, :thumb) +"\n", profile.url %><% end %></td>
       <td>
     <% if m.enterprise_sender.id == profile.id%>
       <div class="exchange_my_message">
@@ -100,7 +114,7 @@
     </div>
     <br />
   </td>
-  <td><% if m.enterprise_sender.id != profile.id %><%= link_to profile_image(@exchange.the_other(profile), :minor) +"\n", profile.url %><% end %></td>
+  <td><% if m.enterprise_sender.id != profile.id %><%= link_to profile_image(@exchange.the_other(profile), :thumb) +"\n", profile.url %><% end %></td>
   </tr>
 <% end %>
 </table>

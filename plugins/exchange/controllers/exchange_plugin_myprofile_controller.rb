@@ -49,6 +49,7 @@ class ExchangePluginMyprofileController < MyProfileController
   def console
     @exchange = ExchangePlugin::Exchange.find params[:id]
     @messages = ExchangePlugin::Message.all(:order => "created_at desc").select{|m| (m.exchange_id == @exchange.id) && (m.enterprise_sender_id != nil)}
+    @system_messages = ExchangePlugin::Message.all(:order => "created_at desc").select{|m| (m.exchange_id == @exchange.id) && (m.enterprise_sender_id == nil)}
    
     #allowing edition
     @edit_allowed = true

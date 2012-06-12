@@ -1,30 +1,41 @@
 <h2><%= _('Evaluate Exchange') %></h2>
 
-<ul>
-  <li><%= _('%s offered:') % @exchange.enterprise_origin.name %></li>
-  <ul id="origin_elements">
-    <% @origin_elements.each do |p| %>
-      <li id="origin_element_<%= p.id %>"><%= (eval(p.element_type).find p.element_id).name %> | <%= p.quantity %></li>
-    <% end %>
-  </ul>
-  <li><%= _('%s offered:') % @exchange.enterprise_target.name %></li>
-  <ul id="target_elements">
-    <% @target_elements.each do |p| %>
-      <li id="target_element_<%= p.id %>"><%= (eval(p.element_type).find p.element_id).name %> | <%= p.quantity %></li>
-    <% end %>
-  </ul>
-</ul>
+<div id="exchange_summary">
+  <h2><%= _('Exchange Summary')%></h2>
+  <table>
+    <!--<tr><td class="exchange_label"><%= _("Slug: ") %></td><td><%= @exchange.slug %></td></tr>-->
+    <tr><td class="exchange_label"><%= _("Exchange with: ") %></td><td><%= @exchange.the_other(profile).name %></td></tr>
+    <tr>
+      <td class="exchange_label"><%= _("I offer:") %></td>
+      <td>
+        <% @exchange.my_elements(profile).each do |x| %>
+          <%= "#{x.element.name} (#{x.quantity}) "%>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td class="exchange_label"><%= _("%{other} offers me:") % {:other => @exchange.the_other(profile).name} %></td>
+      <td>  
+        <% @exchange.other_elements(profile).each do |x| %>
+          <%= "#{x.element.name} (#{x.quantity}) "%>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>
+
 
 <div id="evaluation">
   <% form_for :evaluation, :url => {:controller => 'exchange_plugin_myprofile', :action => 'evaluate', :exchange_id => @exchange.id} do |f| %>
-    <%= _('Give a score to the behaviour of %s during the exchange process:') % @enterprise_other.name %>
+    <h2><%= _('Give a score to the behaviour of %s during the exchange process:') % @enterprise_other.name %></h2>
     <table style="width:auto">
     <% 5.times do |i|%>
       <tr><td><%= i+1 %></td><td><%= radio_button_tag "score", i+1 %></td></tr>
     <% end %>
     </table>
-    <%= text_area_tag 'text', _('Write your evaluation message here...'), :rows => 3, :cols => 30 %>
-    <br />
-    <%= f.submit _('Submit Message')%>
+      <div id='leave_scrap' style="float:none; height:70px;">
+        <%= text_area_tag 'text',nil, :rows => 2, :cols => 30, :placeholder => _('Write your evaluation message here...') %>
+        <%= f.submit _('Submit')%>
+      </div>
   <% end %>
 </div>

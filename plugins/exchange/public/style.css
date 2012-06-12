@@ -54,6 +54,11 @@ td {
   margin-bottom: 10px;
 }
 
+
+#messages .comment-wrapper-1{
+  margin-left:  2px;
+}
+
 #exchange_message-new{
   background: green;
 }
@@ -68,9 +73,22 @@ td {
   font-weight:bold;
 }
 
-#exchange_summary{
-  background: red;
+
+#exchange_console_top{
+  background: #FFD6A3;
+  display: inline-block;
+  width: 100%;
+}
+
+#exchange_system_messages{
   padding: 10px;
+  padding-top: 30px;
+  float:right;  
+}
+#exchange_summary{
+  padding: 10px;
+  float:left;
+  max-width: 400px;
 }
 
 #exchange_summary td{
@@ -78,10 +96,10 @@ td {
 }
 
 .comment-ballon{
-  width: 700px;
+  width: 600px;
 }
 .comment-ballon-inverted{
-  width: 714px;
+  width: 614px;
 }
 
 .comment-balloon-content{
