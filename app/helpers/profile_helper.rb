@@ -34,21 +34,21 @@ module ProfileHelper
     end
     @tags = @profile.article_tags
 
-    # invisible profile is handled by needs_profile
+    # handles private profile; invisible profile is handled by needs_profile
     if !@profile.display_info_to?(user)
-      private_profile
+      @private_profile = true
+
+      if @profile.person?
+        @action = :add_friend
+        @message = _("The content here is available to %s's friends only.") % profile.short_name
+      else
+        @action = :join
+        @message = _('The contents in this community is available to members only.')
+      end
+
+      @no_design_blocks = true
     end
   end
 
-  def private_profile
-    if @profile.person?
-      @action = :add_friend
-      @message = _("The content here is available to %s's friends only.") % profile.short_name
-    else
-      @action = :join
-      @message = _('The contents in this community is available to members only.')
-    end
-    @no_design_blocks = true
-  end
 
 end

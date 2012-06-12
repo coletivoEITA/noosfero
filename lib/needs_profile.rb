@@ -26,7 +26,7 @@ module NeedsProfile
   def load_profile
     @profile ||= environment.profiles.find_by_identifier(params[:profile])
     if @profile
-      if !@profile.visible? and @profile.display_info_to?(user)
+      if !@profile.display_info_to?(user)
         render_access_denied(_("This profile is inaccessible. You don't have the permission to view the content here."), _("Oops ... you cannot go ahead here"))
       else
         profile_hostname = @profile.hostname

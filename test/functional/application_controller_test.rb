@@ -161,6 +161,7 @@ class ApplicationControllerTest < ActionController::TestCase
   end
 
   should 'generate blocks' do
+    Environment.default.boxes << Box.new
     get :index
     assert_tag :tag => 'div', :attributes => { :id => 'boxes', :class => 'boxes' }
   end
@@ -168,53 +169,7 @@ class ApplicationControllerTest < ActionController::TestCase
   should 'not generate blocks when told not to do so' do
     @controller.stubs(:uses_design_blocks?).returns(false)
     get :index
-    assert_no_tag :tag => 'div', :attributes => { :id => 'boxes', :class => 'boxes'  }
-  end
-
-  should 'display only some categories in menu' do
-    @controller.stubs(:get_layout).returns('application')
-    c1 = Environment.default.categories.create!(:name => 'Category 1', :display_color => 1, :parent => nil, :display_in_menu => true )
-    c2 = Environment.default.categories.create!(:name => 'Category 2', :display_color => nil, :parent => c1, :display_in_menu => true )
-    get :index
-    assert_tag :tag => 'a', :content => /Category 2/
-  end
-
-  should 'not display some categories in menu' do
-    @controller.stubs(:get_layout).returns('application')
-    c1 = Environment.default.categories.create!(:name => 'Category 1', :display_color => 1, :parent_id => nil, :display_in_menu => true)
-    c2 = Environment.default.categories.create!(:name => 'Category 2', :display_color => nil, :parent_id => c1)
-    get :index
-    assert_no_tag :tag => 'a', :content => /Category 2/
-  end
-
-  should 'display dropdown for select language' do
-    @controller.stubs(:get_layout).returns('application')
-    Noosfero.expects(:locales).returns({ 'en' => 'English', 'pt_BR' => 'Português Brasileiro', 'fr' => 'Français', 'it' => 'Italiano' }).at_least_once
-    get :index, :lang => 'en'
-    assert_tag :tag => 'option', :attributes => { :value => 'en', :selected => 'selected' }, :content => 'English'
-    assert_no_tag :tag => 'option', :attributes => { :value => 'pt_BR', :selected => 'selected' }, :content => 'Português Brasileiro'
-    assert_tag :tag => 'option', :attributes => { :value => 'pt_BR' }, :content => 'Português Brasileiro'
-    assert_tag :tag => 'option', :attributes => { :value => 'fr' }, :content => 'Français'
-    assert_tag :tag => 'option', :attributes => { :value => 'it' }, :content => 'Italiano'
-  end
-
-  should 'display link to webmail if enabled for system' do
-    @controller.stubs(:get_layout).returns('application')
-    login_as('ze')
-    MailConf.expects(:enabled?).returns(true)
-    MailConf.expects(:webmail_url).returns('http://web.mail/')
-
-    get :index
-    assert_tag :tag => 'div', :attributes => { :id => 'user_box' }, :descendant => { :tag => 'a', :attributes => { :href => 'http://web.mail/' } }
-  end
-
-  should 'not display link to webmail if not enabled for system' do
-    @controller.stubs(:get_layout).returns('application')
-    login_as('ze')
-    MailConf.expects(:enabled?).returns(false)
-
-    get :index
-    assert_no_tag :tag => 'div', :attributes => { :id => 'user_box' }, :descendant => { :tag => 'a', :attributes => { :href => 'http://web.mail/' } }
+    assert_no_tag :tag => 'div', :attributes => { :id => 'boxes', :class => 'boxes' }
   end
 
   should 'display theme test panel when testing theme' do
@@ -276,35 +231,6 @@ class ApplicationControllerTest < ActionController::TestCase
 
     get :index, :profile => p.identifier
     assert_tag 'title', :content => p.name + ' - ' + p.environment.name
-  end
-
-  should 'display menu links for my environment when logged in other environment' do
-    @controller.stubs(:get_layout).returns('application')
-    e = fast_create(Environment, :name => 'other_environment')
-    e.domains << Domain.new(:name => 'other.environment')
-    e.save!
-
-    login_as(create_admin_user(e))
-    uses_host 'other.environment'
-    get :index
-    assert_tag :tag => 'div', :attributes => {:id => 'user_menu_ul'}
-    assert_tag :tag => 'div', :attributes => {:id => 'user_menu_ul'},
-                :descendant => {:tag => 'a', :attributes => { :href => 'http://other.environment/adminuser' }},
-                :descendant => {:tag => 'a', :attributes => { :href => 'http://other.environment/myprofile/adminuser' }},
-                :descendant => {:tag => 'a', :attributes => { :href => '/admin' }}
-  end
-
-  should 'not display invisible blocks' do
-    @controller.expects(:uses_design_blocks?).returns(true)
-    p = create_user_full('test_user').person
-    @controller.expects(:profile).at_least_once.returns(p)
-    b = p.blocks[1]
-    b.expects(:visible?).returns(false)
-    b.save!
-
-    get :index, :profile => p.identifier
-
-    assert_no_tag :tag => 'div', :attributes => {:id => 'block-' + b.id.to_s}
   end
 
   should 'diplay name of environment in description' do

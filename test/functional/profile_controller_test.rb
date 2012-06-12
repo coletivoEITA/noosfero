@@ -180,14 +180,54 @@ class ProfileControllerTest < ActionController::TestCase
     assert_no_match /\/profile\/#{@profile.identifier}\/leave/, @response.body
   end
 
-  should 'check access before displaying profile' do
-    Person.any_instance.expects(:display_info_to?).with(anything).returns(false)
-    @profile.visible = false
-    @profile.save
+  should 'add class to body tag if is on profile homepage' do
+    get :index, :profile => @profile.identifier
+    assert_tag :tag => 'body', :attributes => { :class => /profile-homepage/ }
+  end
 
+  should 'consider display of blocks' do
+    p = create_user_full('test_user').person
+    p.blocks.last.update_attribute :display, 'except_home_page'
+    @controller.expects(:uses_design_blocks?).returns(true)
+
+    get :index, :profile => p.identifier
+
+    assert_tag :tag => 'div', :attributes => {:id => "block-#{p.blocks.first.id.to_s}"}
+    assert_no_tag :tag => 'div', :attributes => {:id => "block-#{p.blocks.last.id.to_s}"}
+  end
+
+  ###
+  # NeedsProfile tests
+  ###
+
+  should 'deny access to invisible profiles' do
+    @profile.update_attribute :visible, false
+
+    # not logged in
+    get :index, :profile => @profile.identifier
+    assert_response 403
+
+    create_user('other_person').person
+    login_as('other_person')
     get :index, :profile => @profile.identifier
     assert_response 403
   end
+
+  should 'allow access to invisible profiles only to env admins and self' do
+    @profile.update_attribute :visible, false
+
+    login_as(@profile.identifier)
+    get :index, :profile => @profile.identifier
+    assert_response 200
+
+    @profile.environment.add_admin @profile
+    get :index, :profile => @profile.identifier
+    assert_response 200
+  end
+
+  ###
+  # End NeedsProfile tests
+  ###
 
   should 'display add friend button' do
     @profile.user.activate

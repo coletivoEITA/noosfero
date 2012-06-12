@@ -72,11 +72,6 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal Environment.default, e
   end
 
-  should 'provide access to home page' do
-    profile = Profile.new
-    assert_nil profile.home_page
-  end
-
   def test_name_should_be_mandatory
     p = Profile.new
     p.valid?
@@ -938,21 +933,6 @@ class ProfileTest < ActiveSupport::TestCase
     assert_includes p.communities, c2
   end
 
-  should 'copy homepage from template' do
-    template = create_user('test_template').person
-    template.articles.destroy_all
-    a1 = fast_create(Article, :profile_id => template.id, :name => 'some xyz article')
-    template.home_page = a1
-    template.save!
-
-    Profile.any_instance.stubs(:template).returns(template)
-
-    p = create(Profile)
-
-    assert_not_nil p.home_page
-    assert_equal 'some xyz article', p.home_page.name
-  end
-
   should 'not advertise the articles copied from templates' do
     template = create_user('test_template').person
     template.articles.destroy_all
@@ -1079,19 +1059,6 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal 'my custom header', p.custom_header
   end
 
-  should 'copy homepage when applying template' do
-    template = fast_create(Profile)
-    a1 = fast_create(Article, :profile_id => template.id, :name => 'some xyz article')
-    template.home_page = a1
-    template.save!
-
-    p = fast_create(Profile)
-    p.apply_template(template)
-
-    assert_not_nil p.home_page
-    assert_equal 'some xyz article', p.home_page.name
-  end
-
   should 'not copy blocks default_title when applying template' do
     template = fast_create(Profile)
     template.boxes.destroy_all
@@ -1184,7 +1151,6 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'not be possible to have different profiles with the same identifier in the same environment' do
     env = fast_create(Environment)
-
     p1 = fast_create(Profile, :identifier => 'mytestprofile', :environment_id => env.id)
 
     p2 = Profile.new(:identifier => 'mytestprofile', :environment => env)
@@ -1195,10 +1161,10 @@ class ProfileTest < ActiveSupport::TestCase
   end
 
   should 'be possible to have different profiles with the same identifier in different environments' do
-    p1 = fast_create(Profile, :identifier => 'mytestprofile')
-
-    env = fast_create(Environment)
-    p2 = create(Profile, :identifier => 'mytestprofile', :environment => env)
+    env1 = fast_create(Environment)
+    p1 = create(Profile, :identifier => 'mytestprofile', :environment => env1)
+    env2 = fast_create(Environment)
+    p2 = create(Profile, :identifier => 'mytestprofile', :environment => env2)
 
     assert_not_equal p1.environment, p2.environment
   end

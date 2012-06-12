@@ -3643,10 +3643,9 @@ div.with_media_panel .formfield input {
 }
 
 .text-editor-sidebar {
-  position: absolute;
+  float: right;
   width: 380px;
-  right: 20px;
-  top: 70px;
+  margin-top: 60px;
 }
 
 .text-editor-sidebar-box  {

@@ -1,0 +1,37 @@
+<%= box_presenter.block_target(block.box, block) %>
+
+<div id="block-<%= block.id %>" class="block <%=box_presenter.block_css_classes(block) %>"
+  help="<%= block.help if block.respond_to?(:help) %>"
+  title="<%= _("This block is invisible. Your visitors will not see it.") unless block.visible? %>">
+  <div class='block-inner-1'>
+    <div class='block-inner-2'>
+
+      <% if block.main? %>
+        <% content = main_content %>
+      <% else %>
+        <% content = extract_block_content block.content({:person => user}) %>
+      <% end %>
+
+      <% if ! @controller.send(:content_editor?) %>
+        <% @plugins.each do |plugin| %>
+          <% content = plugin.parse_content(content) %>
+        <% end %>
+      <% end %>
+
+      <%= content %>
+
+      <% footer_content = extract_block_content(block.footer) %>
+      <% if ! footer_content.blank? %>
+        <div class='block-footer-content'>
+          <%= footer_content %>
+        </div>
+      <% end %>
+
+      <%= box_presenter.block_edit_buttons(block) %>
+
+    </div>
+  </div>
+</div>
+
+<%= box_presenter.block_handle(block) %>
+

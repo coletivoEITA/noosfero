@@ -14,6 +14,7 @@ class CmsControllerTest < ActionController::TestCase
     @response   = ActionController::TestResponse.new
 
     @profile = create_user_with_permission('testinguser', 'post_content')
+    @article = @profile.articles.first
     login_as :testinguser
   end
 
@@ -80,75 +81,6 @@ class CmsControllerTest < ActionController::TestCase
     assert_difference Article, :count do
       post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => 'a test article', :body => 'the text of the article ...' }
     end
-  end
-
-  should 'display set as home page link to non folder' do
-    a = fast_create(TextileArticle, :profile_id => profile.id, :updated_at => DateTime.now)
-    Article.stubs(:short_description).returns('bli')
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{a.id}" }
-  end
-
-  should 'display set as home page link to folder' do
-    a = Folder.new(:name => 'article folder'); profile.articles << a;  a.save!
-    Article.stubs(:short_description).returns('bli')
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{a.id}" }
-  end
-
-  should 'not display set as home page if disabled in environment' do
-    article = profile.articles.create!(:name => 'my new home page')
-    folder = Folder.new(:name => 'article folder'); profile.articles << folder;  folder.save!
-    Article.stubs(:short_description).returns('bli')
-    env = Environment.default; env.enable('cant_change_homepage'); env.save!
-    get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{article.id}" }
-    assert_no_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{folder.id}" }
-  end
-
-  should 'be able to set home page' do
-    a = profile.articles.build(:name => 'my new home page')
-    a.save!
-
-    assert_not_equal a, profile.home_page
-
-    post :set_home_page, :profile => profile.identifier, :id => a.id
-
-    profile.reload
-    assert_equal a, profile.home_page
-  end
-
-  should 'be able to set home page even when profile description is invalid' do
-    a = profile.articles.build(:name => 'my new home page')
-    a.save!
-
-    profile.description = 'a' * 600
-    profile.save(false)
-
-    assert !profile.valid?
-    assert_not_equal a, profile.home_page
-
-    post :set_home_page, :profile => profile.identifier, :id => a.id
-
-    profile.reload
-    assert_equal a, profile.home_page
-  end
-
-  should 'redirect to previous page after setting home page' do
-    a = profile.articles.build(:name => 'my new home page')
-    a.save!
-
-    @request.env['HTTP_REFERER'] = '/random_page'
-    post :set_home_page, :profile => profile.identifier, :id => a.id
-    assert_redirected_to '/random_page'
-  end
-
-  should 'redirect to profile homepage after setting home page if no referer' do
-    a = profile.articles.build(:name => 'my new home page')
-    a.save!
-
-    post :set_home_page, :profile => profile.identifier, :id => a.id
-    assert_redirected_to profile.url
   end
 
   should 'set last_changed_by when creating article' do
@@ -457,8 +389,8 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'keep informed parent_id' do
-    get :new, :profile => @profile.identifier, :parent_id => profile.home_page.id, :type => 'TextileArticle'
-    assert_tag :tag => 'input', :attributes => { :name => 'parent_id', :value => profile.home_page.id }
+    get :new, :profile => @profile.identifier, :parent_id => @article.id, :type => 'TextileArticle'
+    assert_tag :tag => 'input', :attributes => { :name => 'parent_id', :value => @article.id }
   end
 
   should 'list folders before others' do
@@ -551,7 +483,7 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'link to page explaining about categorization' do
-    get :edit, :profile => profile.identifier, :id => profile.home_page.id
+    get :edit, :profile => profile.identifier, :id => @article.id
     assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/why_categorize" }
   end
 
@@ -567,7 +499,7 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'display published option' do
-    get :edit, :profile => profile.identifier, :id => profile.home_page.id
+    get :edit, :profile => profile.identifier, :id => @article.id
     assert_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[published]', :checked => 'checked' }
   end
 
@@ -631,9 +563,9 @@ class CmsControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => /^https?:\/\/colivre.net\/testinguser\/myarticle/ }
   end
 
-  should 'detect when comming from home page' do
+  should 'keep back to article reference' do
     @request.expects(:referer).returns('http://colivre.net/testinguser').at_least_once
-    get :edit, :profile => 'testinguser', :id => @profile.home_page.id
+    get :edit, :profile => 'testinguser', :id => @article.id
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'back_to', :value => @request.referer }
     assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => @request.referer }
   end

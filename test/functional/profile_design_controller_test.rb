@@ -5,12 +5,17 @@ class ProfileDesignController; def rescue_action(e) raise e end; end
 
 class ProfileDesignControllerTest < ActionController::TestCase
   
-  COMMOM_BLOCKS = [ ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock ]
-  PERSON_BLOCKS = COMMOM_BLOCKS + [FriendsBlock, FavoriteEnterprisesBlock, CommunitiesBlock, EnterprisesBlock ]
-  PERSON_BLOCKS_WITH_MEMBERS = PERSON_BLOCKS + [MembersBlock]
-  PERSON_BLOCKS_WITH_BLOG = PERSON_BLOCKS + [BlogArchivesBlock]
+  COMMOM_BLOCKS = [ ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, 
+                    MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock ]
+  PROFILE_BLOCKS = COMMOM_BLOCKS + [ProfileBlock]
 
-  ENTERPRISE_BLOCKS = COMMOM_BLOCKS + [DisabledEnterpriseMessageBlock, HighlightsBlock, FeaturedProductsBlock, FansBlock]
+  PERSON_BLOCKS = PROFILE_BLOCKS + [FriendsBlock, FavoriteEnterprisesBlock, CommunitiesBlock, EnterprisesBlock ]
+  ORGANIZATION_BLOCKS = PROFILE_BLOCKS + [MembersBlock]
+
+  PERSON_WITH_BLOG_BLOCKS = PERSON_BLOCKS  + [BlogArchivesBlock]
+  PROFILE_WITH_BLOG_BLOCKS = PROFILE_BLOCKS + [BlogArchivesBlock]
+
+  ENTERPRISE_BLOCKS = ORGANIZATION_BLOCKS + [DisabledEnterpriseMessageBlock, HighlightsBlock, FeaturedProductsBlock, FansBlock]
   ENTERPRISE_BLOCKS_WITH_PRODUCTS_ENABLE = ENTERPRISE_BLOCKS + [ProductsBlock]
 
   attr_reader :holder
@@ -88,7 +93,8 @@ class ProfileDesignControllerTest < ActionController::TestCase
   # BEGIN - tests for BoxOrganizerController features 
   ######################################################
   def test_should_move_block_to_the_end_of_another_block
-    get :move_block, :profile => 'designtestuser', :id => "block-#{@b1.id}", :target => "end-of-box-#{@box2.id}"
+    get :move_block, :profile => 'designtestuser', :id => "block-#{@b1.id}", :box_id => "box-#{@box2.id}",
+      :position => @box2.blocks.last.position+1
 
     @b1.reload
     @box2.reload
@@ -100,7 +106,8 @@ class ProfileDesignControllerTest < ActionController::TestCase
 
   def test_should_move_block_to_the_middle_of_another_block
     # block 4 is in box 2
-    get :move_block, :profile => 'designtestuser', :id => "block-#{@b1.id}", :target => "before-block-#{@b4.id}"
+    get :move_block, :profile => 'designtestuser', :id => "block-#{@b1.id}", :box_id => "box-#{@box2.id}",
+      :position => @b4.position
 
     @b1.reload
     @b4.reload
@@ -111,7 +118,8 @@ class ProfileDesignControllerTest < ActionController::TestCase
   end
 
   def test_block_can_be_moved_up
-    get :move_block, :profile => 'designtestuser', :id => "block-#{@b4.id}", :target => "before-block-#{@b3.id}"
+    get :move_block, :profile => 'designtestuser', :id => "block-#{@b4.id}", :box_id => "box-#{@box2.id}",
+      :position => @b3.position
 
     @b4.reload
     @b3.reload
@@ -123,50 +131,16 @@ class ProfileDesignControllerTest < ActionController::TestCase
     assert_equal [1,2,3], [@b3,@b4,@b5].map {|item| item.position}
 
     # b3 -> before b5
-    get :move_block, :profile => 'designtestuser', :id => "block-#{@b3.id}", :target => "before-block-#{@b5.id}"
+    get :move_block, :profile => 'designtestuser', :id => "block-#{@b3.id}", :box_id => "box-#{@box2.id}",
+      :position => @b5.position-1
 
-    [@b3,@b4,@b5].each do |item|
-      item.reload
-    end
-
+    [@b3,@b4,@b5].each { |item| item.reload }
     assert_equal [1,2,3],  [@b4, @b3, @b5].map {|item| item.position}
-  end
-
-  def test_move_block_should_redirect_when_not_called_via_ajax
-    get :move_block, :profile => 'designtestuser', :id => "block-#{@b3.id}", :target => "before-block-#{@b5.id}"
-    assert_redirected_to :action => 'index'
-  end
-
-  def test_move_block_should_render_when_called_via_ajax
-    xml_http_request :get, :move_block, :profile => 'designtestuser', :id => "block-#{@b3.id}", :target => "before-block-#{@b5.id}"
-    assert_template 'move_block'
-  end
-
-  def test_should_be_able_to_move_block_directly_down
-    post :move_block_down, :profile => 'designtestuser', :id => @b1.id
-    assert_response :redirect
-
-    @b1.reload
-    @b2.reload
-
-    assert_equal [1,2], [@b2,@b1].map {|item| item.position}
-  end
-
-  def test_should_be_able_to_move_block_directly_up
-    post :move_block_up, :profile => 'designtestuser', :id => @b2.id
-    assert_response :redirect
-
-    @b1.reload
-    @b2.reload
-
-    assert_equal [1,2], [@b2,@b1].map {|item| item.position}
   end
 
   def test_should_remove_block
     assert_difference Block, :count, -1 do
       post :remove, :profile => 'designtestuser', :id => @b2.id
-      assert_response :redirect
-      assert_redirected_to :action => 'index'
     end
   end
 
@@ -194,7 +168,6 @@ class ProfileDesignControllerTest < ActionController::TestCase
   should 'actually add a new block' do
     assert_difference Block, :count do
       post :add_block, :profile => 'designtestuser', :box_id => @box1.id, :type => RecentDocumentsBlock.name
-      assert_redirected_to :action => 'index'
     end
   end
 
@@ -214,8 +187,6 @@ class ProfileDesignControllerTest < ActionController::TestCase
 
   should 'be able to save a block' do
     post :save, :profile => 'designtestuser', :id => @b1.id, :block => { :article_id => 999 }
-
-    assert_redirected_to :action => 'index'
 
     @b1.reload
     assert_equal 999, @b1.article_id
@@ -258,16 +229,9 @@ class ProfileDesignControllerTest < ActionController::TestCase
 
     post :save, :profile => 'testenterprise', :id => block.id, :block => { :product_ids => [p1.id.to_s, p2.id.to_s ] }
 
-    assert_response :redirect
-
     block.reload
     assert_equal [p1.id, p2.id], block.product_ids
 
-  end
-
-  should 'display back to control panel button' do
-    get :index, :profile => 'designtestuser'
-    assert_tag :tag => 'a', :content => 'Back to control panel'
   end
 
   should 'not allow products block if environment do not let' do
@@ -281,15 +245,6 @@ class ProfileDesignControllerTest < ActionController::TestCase
     get :add_block, :profile => 'test_ent'
 
     assert_no_tag :tag => 'input', :attributes => {:type => 'radio', :value => 'ProductsBlock'}
-  end
-
-  should 'create back link to profile control panel' do
-    p = Profile.create!(:name => 'test_profile', :identifier => 'test_profile')
-   
-    login_as(create_user_with_permission('test_user','edit_profile_design',p).identifier )
-    get :index, :profile => p.identifier
-    
-    assert_tag :tag => 'a', :attributes => {:href => '/myprofile/test_profile'}
   end
 
   should 'offer to create blog archives block only if has blog' do
@@ -321,10 +276,10 @@ class ProfileDesignControllerTest < ActionController::TestCase
 
   should 'be able to save FeedReaderBlock configurations' do
     @box1.blocks << FeedReaderBlock.new(:address => 'feed address')
-    holder.blocks(true)
 
     post :save, :profile => 'designtestuser', :id => @box1.blocks[-1].id, :block => {:address => 'new feed address', :limit => '20'}
 
+    @box1.reload
     assert_equal 'new feed address', @box1.blocks[-1].address
     assert_equal 20, @box1.blocks[-1].limit
   end
@@ -354,13 +309,13 @@ class ProfileDesignControllerTest < ActionController::TestCase
     environment.stubs(:enabled?).returns(false)
     @controller.stubs(:profile).returns(profile)
     @controller.stubs(:user).returns(profile)
-    assert_equal PERSON_BLOCKS, @controller.available_blocks
+    assert_equivalent PERSON_BLOCKS, @controller.send(:available_blocks)
   end
 
-  should 'the person with members blocks are all available' do
+  should 'the profile with members blocks are all available' do
     profile = mock
     profile.stubs(:has_members?).returns(true)
-    profile.stubs(:person?).returns(true)
+    profile.stubs(:person?).returns(false)
     profile.stubs(:enterprise?).returns(false)
     profile.stubs(:has_blog?).returns(false)
     profile.stubs(:is_admin?).with(anything).returns(false)
@@ -369,7 +324,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     environment.stubs(:enabled?).returns(false)
     @controller.stubs(:profile).returns(profile)
     @controller.stubs(:user).returns(profile)
-    assert_equal [], @controller.available_blocks - PERSON_BLOCKS_WITH_MEMBERS
+    assert_equal [], @controller.send(:available_blocks) - ORGANIZATION_BLOCKS
   end
 
   should 'the person with blog blocks are all available' do
@@ -384,7 +339,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     environment.stubs(:enabled?).returns(false)
     @controller.stubs(:profile).returns(profile)
     @controller.stubs(:user).returns(profile)
-    assert_equal [], @controller.available_blocks - PERSON_BLOCKS_WITH_BLOG
+    assert_equal [], @controller.send(:available_blocks) - PERSON_WITH_BLOG_BLOCKS
   end
 
   should 'the enterprise blocks are all available' do
@@ -399,7 +354,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     environment.stubs(:enabled?).returns(true)
     @controller.stubs(:profile).returns(profile)
     @controller.stubs(:user).returns(profile)
-    assert_equal [], @controller.available_blocks - ENTERPRISE_BLOCKS
+    assert_equal [], @controller.send(:available_blocks) - ENTERPRISE_BLOCKS
   end
 
   should 'the enterprise with products for enterprise enable blocks are all available' do
@@ -414,7 +369,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     environment.stubs(:enabled?).returns(false)
     @controller.stubs(:profile).returns(profile)
     @controller.stubs(:user).returns(profile)
-    assert_equal [], @controller.available_blocks - ENTERPRISE_BLOCKS_WITH_PRODUCTS_ENABLE
+    assert_equal [], @controller.send(:available_blocks) - ENTERPRISE_BLOCKS_WITH_PRODUCTS_ENABLE
   end
 
   should 'allow admins to add RawHTMLBlock' do

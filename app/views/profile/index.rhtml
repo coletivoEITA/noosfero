@@ -2,7 +2,7 @@
 
 <h1><%= h profile.name %></h1>
 
-<% if @action %>
+<% if @private_profile %>
   <%= render :partial => 'private_profile' %>
 <% else %>
   <% unless profile.description.blank? %>

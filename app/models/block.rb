@@ -20,27 +20,21 @@ class Block < ActiveRecord::Base
   #
   # * <tt>:article</tt>: the article being viewed currently
   # * <tt>:language</tt>: in which language the block will be displayed
-  def visible?(context = nil)
-    if display == 'never'
+  def visible?(context = {})
+    return false if display == 'never'
+    return false if language and language != 'all' and language != context[:locale]
+
+    context[:profile] ||= owner if owner.is_a?(Profile)
+    on_homepage = context[:request_path] == '/' || (!context[:profile].nil? && context[:profile].on_homepage?(context[:request_path]))
+
+    if !on_homepage and box and box.main? and display != 'except_home_page'
+      # force display only on homepage
       false
-    elsif context
-      if language != 'all' && language != context[:locale]
-        return false
-      end
-
-      on_homepage = context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
-
-      if !on_homepage and box.main? and display != 'except_home_page'
-        # force display only on homepage
-        false
-      elsif display == 'home_page_only'
-        on_homepage
-      elsif display == 'except_home_page'
-        !on_homepage
-      else # always
-        true
-      end
-    else
+    elsif display == 'home_page_only'
+      on_homepage
+    elsif display == 'except_home_page'
+      !on_homepage
+    else # display == always
       true
     end
   end

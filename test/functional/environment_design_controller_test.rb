@@ -23,17 +23,17 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
   end
   
   should 'indicate only actual blocks as such' do
-    assert(@controller.available_blocks.all? {|item| item.new.is_a? Block})
+    assert(@controller.send(:available_blocks).all? {|item| item.new.is_a? Block})
   end
 
   ALL_BLOCKS.map do |block|
     define_method "test_should_#{block.to_s}_is_available" do 
-      assert_includes @controller.available_blocks,block
+      assert_includes @controller.send(:available_blocks),block
     end
   end
 
   should 'all available block in test' do
-    assert_equal ALL_BLOCKS, @controller.available_blocks
+    assert_equal ALL_BLOCKS, @controller.send(:available_blocks)
   end
 
   should 'be able to edit LinkListBlock' do
@@ -175,16 +175,6 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     assert_tag :tag => 'input', :attributes => { :id => 'block_address' }
   end
 
-  should 'create back link to environment control panel' do
-    Environment.default.boxes.create!.blocks << CommunitiesBlock.new
-    Environment.default.boxes.create!.blocks << EnterprisesBlock.new
-    Environment.default.boxes.create!.blocks << LoginBlock.new
-    login_as(create_admin_user(Environment.default))
-    get :index
-
-    assert_tag :tag => 'a', :attributes => {:href => '/admin'}, :child => {:tag => 'span', :content => "Back to control panel"}
-  end
-  
   should 'render add a new block functionality' do
     login_as(create_admin_user(Environment.default))
     get :add_block

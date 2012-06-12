@@ -10,12 +10,7 @@ class BoxOrganizerController < ApplicationController
   def move_block
     @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
     @source_box = @block.box
-
-    if params[:box_id] =~ /box-([0-9]+)/
-      @target_box = boxes_holder.boxes.find($1)
-    else
-      raise "Couldn't find target box"
-    end
+    @target_box = boxes_holder.boxes.find(params[:box_id].gsub(/^box-/, ''))
 
     if @source_box != @target_box
       @block.remove_from_list
@@ -26,7 +21,7 @@ class BoxOrganizerController < ApplicationController
     @target_box.reload
 
     self.box_presenter = BlockEditorPresenter
-    render :partial => 'shared/block', :object => @block, :locals => {:main_content => false, :use_cache => false}
+    render :partial => 'boxes/show_block', :locals => {:block => @block, :main_content => false, :use_cache => false}
   end
 
   def add_block
@@ -60,7 +55,6 @@ class BoxOrganizerController < ApplicationController
   def save
     @block = boxes_holder.blocks.find(params[:id])
     @block.update_attributes(params[:block])
-    expire_timeout_fragment(@block.cache_key)
     render :partial => 'shared/page_reload'
   end
 

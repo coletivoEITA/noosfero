@@ -3,6 +3,8 @@ module ContentViewerHelper
   include BlogHelper
   include ForumHelper
 
+  ImagesPerPage = 12
+
   def number_of_comments(article)
     n = article.comments.size
     if n == 0
@@ -10,6 +12,10 @@ module ContentViewerHelper
     else
      n_('One comment', '%{comments} comments', n) % { :comments => n }
     end
+  end
+
+  def pass_without_comment_captcha?
+    logged_in? && !environment.enabled?('captcha_for_logged_users')
   end
 
   def view_page(article)

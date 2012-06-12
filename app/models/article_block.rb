@@ -11,7 +11,7 @@ class ArticleBlock < Block
   def content(args={})
     block = self
     lambda do
-      if block.box.main?
+      if block.box and block.box.main?
         if block.article 
           view_page block.article
         else
@@ -55,6 +55,14 @@ class ArticleBlock < Block
   def available_articles
     return [] if self.box.nil? or self.box.owner.nil?
     self.box.owner.kind_of?(Environment) ? self.box.owner.portal_community.articles : self.box.owner.articles
+  end
+
+  protected
+
+  after_create :own_article
+  def own_article
+    return if article.nil? or owner.nil? or article.profile == owner
+    self.article = owner.copy_article_tree article
   end
 
 end

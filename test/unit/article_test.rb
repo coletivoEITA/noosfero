@@ -341,7 +341,7 @@ class ArticleTest < ActiveSupport::TestCase
 
   should 'always display if public content' do
     person = create_user('testuser').person
-    assert_equal true, person.home_page.display_to?(nil)
+    assert_equal true, person.articles.first.display_to?(nil)
   end
 
   should 'display to owner' do

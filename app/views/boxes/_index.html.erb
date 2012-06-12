@@ -1,0 +1,50 @@
+<% profile_admin = logged_in? and profile and (profile == current_user.person or profile.admins.include?(current_user.person)) %>
+<% env_admin = @controller.is_a?(EnvironmentDesignController) %>
+<% if environment.disabled?('cant_change_homepage') and (profile_admin or env_admin) %>
+  <% self.box_presenter = BlockEditorPresenter %>
+  <% editing = @controller.send(:boxes_editor?) && @controller.send(:uses_design_blocks?) %>
+  <%= render :partial => 'boxes/edit_bar', :locals => {:editing => editing} %>
+<% end %>
+
+<% if @controller.boxes_holder.respond_to?(:custom_header_expanded) %>
+  <div id="profile-header">
+    <%= @controller.boxes_holder.custom_header_expanded %>
+  </div>
+<% end %>
+
+<% if @controller.send(:uses_design_blocks?) and @controller.boxes_holder.boxes.size > 0 %>
+  <div id="boxes" class="boxes">
+    <% @controller.boxes_holder.boxes.first(@controller.boxes_holder.boxes_limit).reverse.each do |box| %>
+      <div class="box box-<%= box.position %>" id="box-<%= box.id %>">
+        <div class="blocks">
+          <% box.blocks.select{ |block| block.visible?(context) }.each do |block| %>
+            <% if block.cacheable? and use_cache? %>
+              <% cache_timeout(block.cache_key(language), block.timeout) do %>
+                <%= render :partial => 'boxes/show_block', :locals => {:block => block, :main_content => content } %>
+              <% end %>
+            <% else %>
+              <%= render :partial => 'boxes/show_block', :locals => {:block => block, :main_content => content } %>
+            <% end %>
+            <%= box_presenter.block_target(box) %>
+
+            <div style="clear:both"></div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="no-boxes">
+    <div class="no-boxes-inner-1">
+      <div class="no-boxes-inner-2">
+        <%= content %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if @controller.boxes_holder.respond_to?(:custom_footer_expanded) %>
+  <div id="profile-footer">
+    <%= @controller.boxes_holder.custom_footer_expanded %>
+  </div>
+<% end %>

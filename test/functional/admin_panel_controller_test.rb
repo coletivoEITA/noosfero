@@ -36,7 +36,7 @@ class AdminPanelControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :attributes => { :href => '/admin/admin_panel/site_info' }
   end
 
-  should 'link to cateogries editing' do
+  should 'link to categories editing' do
     get :index
     assert_tag :tag => 'a', :attributes => { :href => '/admin/categories' }
   end

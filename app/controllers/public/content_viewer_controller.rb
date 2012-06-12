@@ -129,11 +129,6 @@ class ContentViewerController < ApplicationController
     end
   end
 
-  def pass_without_comment_captcha?
-    logged_in? && !environment.enabled?('captcha_for_logged_users')
-  end
-  helper_method :pass_without_comment_captcha?
-
   def remove_comment
     @comment = @page.comments.find(params[:remove_comment])
     if (user == @comment.author || user == @page.profile || user.has_permission?(:moderate_comments, @page.profile))
@@ -141,10 +136,6 @@ class ContentViewerController < ApplicationController
       session[:notice] = _('Comment succesfully deleted')
     end
     redirect_to :action => 'view_page', :profile => params[:profile], :page => @page.explode_path, :view => params[:view]
-  end
-
-  def per_page
-    12
   end
 
   def redirect_to_translation

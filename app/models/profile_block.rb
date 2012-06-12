@@ -8,7 +8,7 @@ class ProfileBlock < Block
     _('Show your social badge')
   end
 
-  def content
+  def content(args={})
     block = self
     lambda do
       if block.box.main?

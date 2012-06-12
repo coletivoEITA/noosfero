@@ -32,8 +32,6 @@ module ApplicationHelper
 
   include ProfileHelper
 
-  include BoxesHelper
-
   def context
     @context ||= { :article => @page, :request_path => request.path, :locale => locale,
       :profile => self.respond_to?(:profile) ? self.profile : nil }

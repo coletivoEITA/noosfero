@@ -77,7 +77,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
     block = ArticleBlock.create(:article => a)
     env.boxes.first.blocks << block
     block.save!
-    
+   
     block.reload
     assert_equal [a],block.available_articles
   end
@@ -90,6 +90,20 @@ class ArticleBlockTest < ActiveSupport::TestCase
     block.stubs(:article).returns(article)
 
     assert_equal "<h3 class=\"block-title empty\"><span></span></h3>Article content", instance_eval(&block.content)
+  end
+
+  should "clone article when clone is called" do
+    template = create_user('template').person
+    a = fast_create(TextArticle, :profile_id => template.id, :name => 'test')
+    block = ArticleBlock.new(:article => a)
+    template.boxes.first.blocks << block
+
+    person = create_user('testuser2').person
+    clone = block.clone
+    person.boxes.first.blocks << clone
+
+    assert_not_equal a.id, clone.article.id
+    assert_equal a.name, clone.article.name
   end
 
   should "display title if defined" do

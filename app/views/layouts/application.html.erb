@@ -2,29 +2,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%= html_language %>" lang="<%= html_language %>">
   <head>
     <title><%= h page_title %></title>
+
     <%= yield(:feeds) %>
+
     <!--<meta http-equiv="refresh" content="1"/>-->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="description" content="<%= @environment.name %>" />
     <link rel="shortcut icon" href="<%= image_path(theme_favicon) %>" type="image/x-icon" />
+
     <%= noosfero_javascript %>
     <%= stylesheet_link_tag noosfero_stylesheets, :cache => 'cache' %>
     <%= stylesheet_link_tag template_stylesheet_path %>
     <%= stylesheet_link_tag icon_theme_stylesheet_path %>
     <%= stylesheet_link_tag jquery_ui_theme_stylesheet_path %>
-    <%
-      plugins_stylesheets = @plugins.select(&:stylesheet?).map { |plugin| plugin.class.public_path('style.css') }
-    %>
+
+    <% plugins_stylesheets = @plugins.select(&:stylesheet?).map { |plugin| plugin.class.public_path('style.css') } %>
     <%= stylesheet_link_tag(plugins_stylesheets, :cache => 'cache/plugins-' + Digest::MD5.hexdigest(plugins_stylesheets.to_s)) unless plugins_stylesheets.empty? %>
     <%= stylesheet_link_tag theme_stylesheet_path %>
 
     <%# Add custom tags/styles/etc via content_for %>
     <%= yield :head %>
     <%= javascript_tag('render_all_jquery_ui_widgets()') %>
-    <%
-      plugins_javascripts = @plugins.map { |plugin| plugin.js_files.map { |js| plugin.class.public_path(js) } }.flatten
-    %>
+
+    <% plugins_javascripts = @plugins.map { |plugin| plugin.js_files.map { |js| plugin.class.public_path(js) } }.flatten %>
     <%= javascript_include_tag(plugins_javascripts, :cache => 'cache/plugins-' + Digest::MD5.hexdigest(plugins_javascripts.to_s)) unless plugins_javascripts.empty? %>
+
     <%=
       @plugins.dispatch(:head_ending).collect do |content|
         content.respond_to?(:call) ? content.call : content
@@ -33,10 +35,10 @@
   </head>
   <body class="<%=
     # Identify the current controller and action for the CSS:
-    " controller-"+ @controller.controller_name() +
-    " action-"+ @controller.controller_name() +"-"+ @controller.action_name() +
-    " template-"+ ( profile.nil? ? "default" : profile.layout_template ) +
-    (!profile.nil? && profile.on_homepage?(request.path) ? " profile-homepage" : "")
+    " controller-#{@controller.controller_name}" +
+    " action-#{@controller.controller_name}-#{@controller.action_name}" +
+    " template-#{profile.nil? ? "default" : profile.layout_template}" +
+    ((profile and profile.on_homepage?(request.path)) ? " profile-homepage" : "")
     %>" >
 
     <a href="#content" id="link-go-content"><span><%= _("Go to the content") %></span></a>
@@ -47,20 +49,26 @@
     %>
 
     <div id="wrap-1">
+
       <div id='theme-header'>
         <%= theme_header %>
       </div>
+
       <div id="wrap-2">
+
         <div id="user">
+
           <span class='logged-in' style='display: none;'>
             <%= usermenu_logged_in %>
           </span>
+
           <span class='not-logged-in' style='display: none'>
               <%= _("<span class='login'>%s</span> <span class='or'>or</span> <span class='signup'>%s</span>") % [thickbox_inline_popup_link('<i class="icon-menu-login"></i><strong>' + _('Login') + '</strong>', login_url, 'inlineLoginBox', :id => 'link_login'), link_to('<strong>' + _('Sign up') + '</strong>', :controller => 'account', :action => 'signup') ] %>
               <div id='inlineLoginBox' style='display: none;'>
                 <%= render :file => 'account/login', :locals => { :is_thickbox => true } %>
               </div>
           </span>
+
           <form action="/search" class="search_form clean" method="get" id="top-search">
             <input name="query" size="15" value="<%=_('Search...')%>"
                 onfocus="this.form.className='focused';
@@ -72,30 +80,39 @@
                         }" />
             <div><%=_('Press <strong>Enter</strong> to send the search query.')%></div>
           </form>
-        </div><!-- end id="user" -->
+
+        </div>
 
         <h1 id="site-title">
           <%= theme_site_title %>
         </h1>
+
         <div id="navigation">
           <ul>
             <%= theme_extra_navigation %>
           </ul>
           <div id="navigation-end"></div>
-        </div><!-- end id="navigation" -->
+        </div>
+
         <div id="content">
           <div id="content-inner">
-            <%= render :partial => 'boxes/index' %>
+            <%= render :partial => 'boxes/index', :locals => {:content => yield}  %>
             <br style='clear: both'/>
-          </div><!-- end id="content-inner" -->
-        </div><!-- end id="content" -->
-      </div><!-- end id="wrap-2" -->
-    </div><!-- end id="wrap-1" -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <%= render_environment_features(:logged_in) %>
+
     <div id="theme-footer">
       <%= theme_footer %>
-    </div><!-- end id="theme-footer" -->
+    </div>
+
     <%= noosfero_layout_features %>
+
     <%= theme_javascript_ng %>
+
   </body>
 </html>

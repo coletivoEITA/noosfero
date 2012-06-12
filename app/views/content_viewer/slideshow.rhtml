@@ -1,6 +1,6 @@
 <p class='back-button' ><%= button('', _('Back to gallery'), @page.url)%></p>
 <ul id='slideshow' >
-  <% images = @page.images.paginate(:per_page => per_page, :page => params[:npage]) unless params[:slideshow] %>
+  <% images = @page.images.paginate(:per_page => ContentViewerHelper::ImagesPerPage, :page => params[:npage]) %>
 
   <% images.each do |img| -%>
     <% if img.image? -%>

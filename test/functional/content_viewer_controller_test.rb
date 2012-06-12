@@ -14,6 +14,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     @response   = ActionController::TestResponse.new
 
     @profile = create_user('testinguser').person
+    @page = @profile.articles.first
     @environment = @profile.environment
   end
   attr_reader :profile, :environment
@@ -36,19 +37,6 @@ class ContentViewerControllerTest < ActionController::TestCase
     get :view_page, :profile => profile.identifier, :page => [ 'test' ]
     assert_response :success
     assert_equal page, assigns(:page)
-  end
-
-  def test_should_display_homepage
-    a = profile.articles.build(:name => 'test')
-    a.save!
-    profile.home_page = a
-    profile.save!
-
-    get :view_page, :profile => profile.identifier, :page => [ 'test']
-
-    assert_response :success
-    assert_template 'view_page'
-    assert_equal a, assigns(:page)
   end
 
   def test_should_get_not_found_error_for_unexisting_page
@@ -337,32 +325,32 @@ class ContentViewerControllerTest < ActionController::TestCase
 
   should 'give link to edit the article for owner' do
     login_as('testinguser')
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
+    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@page.id}" } }
   end
   should 'not give link to edit the article for non-logged-in people' do
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
+    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@page.id}" } }
   end
   should 'not give link to edit article for other people' do
     login_as(create_user('anotheruser').login)
 
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
+    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@page.id}" } }
   end
 
   should 'give link to create new article' do
     login_as('testinguser')
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
     assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
   end
   should 'give no link to create new article for non-logged in people ' do
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
     assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
   end
   should 'give no link to create new article for other people' do
     login_as(create_user('anotheruser').login)
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
+    xhr :get, :view_page, :profile => 'testinguser', :page => [@page.path], :toolbar => true
     assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
   end
 
@@ -648,13 +636,6 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :content => 'Delete', :attributes => {:href => "/myprofile/#{profile.identifier}/cms/destroy/#{t.id}"}
   end
 
-  should 'not display delete button for homepage' do
-    login_as(profile.identifier)
-    page = profile.home_page
-    xhr :get, :view_page, :profile => profile.identifier, :page => page.explode_path, :toolbar => true
-    assert_no_tag :tag => 'a', :content => 'Delete', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/destroy/#{page.id}" }
-  end
-
   should 'add meta tag to rss feed on view blog' do
     login_as(profile.identifier)
     profile.articles << Blog.new(:name => 'Blog', :profile => profile)
@@ -734,22 +715,8 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_template 'slideshow'
   end
 
-  should 'display all images from profile in the slideshow' do
-    @controller.stubs(:per_page).returns(1)
-    folder = Gallery.create!(:name => 'gallery', :profile => profile)
-
-    image1 = UploadedFile.create!(:profile => profile, :parent => folder, :uploaded_data => fixture_file_upload('/files/other-pic.jpg', 'image/jpg'))
-    image2 = UploadedFile.create!(:profile => profile, :parent => folder, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
-
-    get :view_page, :profile => profile.identifier, :page => folder.explode_path, :slideshow => true
-
-    assert_equal 2, assigns(:images).size
-  end
-
   should 'display default image in the slideshow if thumbnails were not processed' do
-    @controller.stubs(:per_page).returns(1)
     folder = Gallery.create!(:name => 'gallery', :profile => profile)
-
     image1 = UploadedFile.create!(:profile => profile, :parent => folder, :uploaded_data => fixture_file_upload('/files/other-pic.jpg', 'image/jpg'))
 
     get :view_page, :profile => profile.identifier, :page => folder.explode_path, :slideshow => true
@@ -758,9 +725,7 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
 
   should 'display thumbnail image in the slideshow if thumbnails were processed' do
-    @controller.stubs(:per_page).returns(1)
     folder = Gallery.create!(:name => 'gallery', :profile => profile)
-
     image1 = UploadedFile.create!(:profile => profile, :parent => folder, :uploaded_data => fixture_file_upload('/files/other-pic.jpg', 'image/jpg'))
 
     process_delayed_job_queue
@@ -804,8 +769,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_no_tag :tag => 'div', :attributes => { :id => 'article-source' }
   end
 
-  should 'redirect to profile controller when there is no homepage' do
-    profile.home_page.destroy
+  should 'redirect to profile controller when there is no page' do
     get :view_page, :profile => profile.identifier, :page => []
     assert_redirected_to :controller => 'profile', :action => 'index', :profile => profile.identifier
   end
@@ -1329,19 +1293,8 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_tag :tag => 'div', :attributes => { :id => 'article-header' }
   end
 
-  should 'add class to body tag if is on profile homepage' do
-    profile = fast_create(Profile)
-    blog = fast_create(Blog, :profile_id => profile.id, :path => 'blog')
-    profile.home_page = blog
-    profile.save
-    get :view_page, :profile => profile.identifier, :page => ['blog']
-    assert_tag :tag => 'body', :attributes => { :class => /profile-homepage/ }
-  end
-
   should 'not add class to body tag if is not on profile homepage' do
-    profile = fast_create(Profile)
-    blog = fast_create(Blog, :profile_id => profile.id, :path => 'blog')
-    get :view_page, :profile => profile.identifier, :page => ['blog']
+    get :view_page, :profile => @profile.identifier, :page => [@page.path]
     assert_no_tag :tag => 'body', :attributes => { :class => /profile-homepage/ }
   end
 

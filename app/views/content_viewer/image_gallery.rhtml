@@ -2,7 +2,7 @@
   <%= @page.body %>
 </div>
 
-<% images = @page.images.paginate(:per_page => per_page, :page => params[:npage]) unless params[:slideshow] %>
+<% images = @page.images.paginate(:per_page => ContentViewerHelper::ImagesPerPage, :page => params[:npage]) unless params[:slideshow] %>
 
 <div class="image-gallery">
   <% if images.empty? %>

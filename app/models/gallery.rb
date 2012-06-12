@@ -8,7 +8,6 @@ class Gallery < Folder
     _('A gallery, inside which you can put images.')
   end
 
-  include ActionView::Helpers::TagHelper
   def to_html(options={})
     lambda do
       render :file => 'content_viewer/image_gallery'

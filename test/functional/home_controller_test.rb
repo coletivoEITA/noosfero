@@ -76,14 +76,17 @@ all_fixtures
     assert_tag :attributes => { :class => 'headline' }, :content => a2.body
   end
 
-  should 'display block in index page if it\'s configured to display on homepage and its an environment block' do
+  should 'consider display of blocks' do
     env = Environment.default
-    box = Box.create(:owner_type => 'Environment', :owner_id => env.id)
-    block = Block.create(:title => "Index Block", :box_id => box.id, :display => 'home_page_only')
-    env.save!
+    box = Box.new(:owner_type => 'Environment', :owner_id => env.id)
+    box.blocks = [Block.new(:title => "Index Block", :box_id => box.id, :display => 'home_page_only'),
+                  Block.new(:title => "Index Block", :box_id => box.id, :display => 'except_home_page')]
+    box.save!
 
     get :index
-    assert block.visible?
+
+    assert_tag :tag => 'div', :attributes => {:id => "block-#{box.blocks[0].id.to_s}"}
+    assert_no_tag :tag => 'div', :attributes => {:id => "block-#{box.blocks[1].id.to_s}"}
   end
 
   should 'access terms of use of environment' do

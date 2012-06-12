@@ -70,12 +70,11 @@ class BlockTest < ActiveSupport::TestCase
   should 'be able to be displayed only in the homepage' do
     profile = Profile.new
     home_page = Article.new
-    profile.home_page = home_page
     block = Block.new(:display => 'home_page_only')
     block.stubs(:owner).returns(profile)
 
-    assert_equal true, block.visible?(:article => home_page)
-    assert_equal false, block.visible?(:article => Article.new)
+    assert_equal true, block.visible?(:request_path => '/')
+    assert_equal false, block.visible?
   end
 
   should 'be able to be displayed only in the homepage (index) of the environment' do
@@ -87,12 +86,10 @@ class BlockTest < ActiveSupport::TestCase
 
   should 'be able to be displayed everywhere except in the homepage' do
     profile = Profile.new
-    home_page = Article.new
-    profile.home_page = home_page
     block = Block.new(:display => 'except_home_page')
     block.stubs(:owner).returns(profile)
 
-    assert_equal false, block.visible?(:article => home_page)
+    assert_equal false, block.visible?(:request_path => '/')
     assert_equal true, block.visible?(:article => Article.new)
   end
 
@@ -101,8 +98,8 @@ class BlockTest < ActiveSupport::TestCase
     block = Block.new(:display => 'except_home_page')
     block.stubs(:owner).returns(profile)
 
-    assert_equal false, block.visible?(:article => nil, :request_path => '/testinguser')
-    assert_equal true, block.visible?(:article => nil)
+    assert_equal false, block.visible?(:profile => profile, :request_path => '/testinguser')
+    assert_equal true, block.visible?(:profile => profile)
   end
 
   should 'be able to save display setting' do

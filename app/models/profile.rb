@@ -292,12 +292,10 @@ class Profile < ActiveRecord::Base
   end
 
   def copy_blocks_from(profile)
-    self.boxes.destroy_all
-    profile.boxes.each do |box|
-      self.boxes << Box.new(:position => box.position)
-      box.blocks.each do |block|
-        self.boxes[-1].blocks << block.class.new(:title => block[:title], :settings => block.settings, :position => block.position)
-      end
+    self.boxes = profile.boxes.map do |box|
+      new_box = box.clone
+      new_box.blocks = box.blocks.map{ |block| block.clone }
+      new_box
     end
   end
 
@@ -544,6 +542,7 @@ private :generate_url, :url_options
     article.children.each do |a|
       copy_article_tree a, article_copy
     end
+    article_copy
   end
 
   # Adds a person as member of this Profile.
