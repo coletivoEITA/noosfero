@@ -258,7 +258,7 @@ class Environment < ActiveRecord::Base
   end
 
   def enable_plugin(plugin)
-    self.enabled_plugins += [plugin]
+    self.enabled_plugins += [plugin.to_s]
     self.enabled_plugins.uniq!
     self.save!
   end
@@ -269,7 +269,7 @@ class Environment < ActiveRecord::Base
   end
 
   def disable_plugin(plugin)
-    self.enabled_plugins.delete(plugin)
+    self.enabled_plugins.delete(plugin.to_s)
     self.save!
   end
 
@@ -279,6 +279,10 @@ class Environment < ActiveRecord::Base
   end
   def disabled?(feature)
     !enabled?(feature)
+  end
+
+  def plugin_enabled?(plugin)
+    enabled_plugins.include?(plugin.to_s)
   end
 
   # enables the features identified by <tt>features</tt>, which is expected to
