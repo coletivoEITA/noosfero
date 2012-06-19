@@ -261,7 +261,7 @@ Given /^I am logged in as "(.+)"$/ do |username|
   if selenium_driver?
     selenium.wait_for_page
   end
-  Then "I should be logged in as \"#{username}\""
+  Step "I should be logged in as \"#{username}\""
   @current_user = username
 end
 
