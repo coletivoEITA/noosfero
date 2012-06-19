@@ -324,7 +324,7 @@ class ProfileMembersControllerTest < ActionController::TestCase
 
     p_roles = p.find_roles(ent).map(&:role).uniq
 
-    assert p_roles, [r]
+    assert p_roles.empty?
   end
 
   should 'add locale on mailing' do

@@ -51,7 +51,6 @@ function checkIt(string) {
 
 /*-----------------------------------------------------------------------------------------------*/
 
-Event.observe(window, 'load', initialize, false);
 Event.observe(window, 'load', getBrowserInfo, false);
 
 var lightbox = Class.create();
@@ -66,8 +65,7 @@ lightbox.prototype = {
 		if (ctrl.id != '') {
 		    this.lightbox_className = ctrl.id;
 		}
-		Event.observe(ctrl, 'click', this.activate.bindAsEventListener(this), false);
-		ctrl.onclick = function(){return false;};
+        ctrl.lightbox = this;
 	},
 	
 	// Turn everything on - mainly the IE fixes
@@ -80,7 +78,6 @@ lightbox.prototype = {
 		}
 		this.hideObjectsAndEmbeds('hidden');
 		this.displayLightbox("block");
-		window.location.href= "#";
 	},
 	
 	// Ie requires height to 100% and overflow hidden or else you can scroll down past the lightbox
@@ -133,16 +130,21 @@ lightbox.prototype = {
 	displayLightbox: function(display){
 		$('overlay').style.display = display;
 		$('lightbox').style.display = display;
-		if(display != 'none') this.loadInfo();
+		if(display != 'none') {
+          this.loadInfo();
+          jQuery('#lightbox').css('top', jQuery(document).scrollTop()+parseInt(jQuery('#lightbox').css('top')));
+        } else {
+          jQuery('#lightbox').css('top', '');
+        }
 	},
 	
 	// Begin Ajax request based off of the href of the clicked linked
 	loadInfo: function() {
-		var myAjax = new Ajax.Request(
-	this.content,
-	{method: 'post', parameters: "", onComplete: this.processInfo.bindAsEventListener(this)}
-		);
-		
+        if (this.content)
+            var myAjax = new Ajax.Request(
+                this.content,
+                {method: 'post', parameters: "", onComplete: this.processInfo.bindAsEventListener(this)}
+            );
 	},
 	
 	// Display Ajax response
@@ -191,19 +193,32 @@ lightbox.prototype = {
 		}
 		this.hideObjectsAndEmbeds("visible");
 		this.displayLightbox("none");
+
+        this.lightbox = undefined;
 	}
 }
 
 /*-----------------------------------------------------------------------------------------------*/
 
-// Onload, make all links that need to trigger a lightbox active
-function initialize(){
-	addLightboxMarkup();
-	lbox = document.getElementsByClassName('lbOn');
-	for(i = 0; i < lbox.length; i++) {
-		valid = new lightbox(lbox[i]);
-	}
+function loadLightbox(context) {
+  if (jQuery('#lbLoadMessage').length == 0)
+    addLightboxMarkup();
+  if (context.lightbox == undefined)
+    valid = new lightbox(context);
+  else {
+    removeLightboxMarkup();
+    addLightboxMarkup();
+  }
+
+  context.lightbox.activate();
 }
+
+jQuery('.lbOn').live('click', function(event) {
+  loadLightbox(this);
+
+  event.preventDefault();
+  return false;
+});
 
 // Add in markup necessary to make this work. Basically two divs:
 // Overlay holds the shadow
@@ -220,4 +235,8 @@ function addLightboxMarkup() {
 						  '</div>';
 	bod.appendChild(overlay);
 	bod.appendChild(lb);
+}
+function removeLightboxMarkup() {
+    Element.remove($('overlay'));
+    Element.remove($('lightbox'));
 }

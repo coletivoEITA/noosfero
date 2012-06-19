@@ -7,7 +7,7 @@ class ProfileMembersController < MyProfileController
   end
 
   def update_roles
-    @roles = params[:roles] ? environment.roles.find(params[:roles].select{|r|!r.to_i.zero?}) : []
+    @roles = environment.roles.all(:conditions => {:id => params[:roles]})
     @roles = @roles.select{|r| r.has_kind?('Profile') }
     begin
       @person = profile.members.find(params[:person])
@@ -16,7 +16,7 @@ class ProfileMembersController < MyProfileController
     end
 
     if @person
-      if@person.is_last_admin_leaving?(profile, @roles)
+      if @person.is_last_admin_leaving?(profile, @roles)
         redirect_to :action => :last_admin
       elsif @person.define_roles(@roles, profile)
         session[:notice] = _('Roles successfuly updated')
