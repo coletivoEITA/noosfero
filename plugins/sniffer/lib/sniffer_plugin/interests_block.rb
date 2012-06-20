@@ -16,10 +16,10 @@ class SnifferPlugin::InterestsBlock < Block
     _("This block show interests of your profile")
   end
 
-  def content
+  def content(args = {})
     block = self
     lambda do
-      sniffer = SnifferPluginProfile.find_by_profile_id(block.owner)
+      sniffer = SnifferPluginProfile.find_or_create(block.owner)
       interests = sniffer.opportunities
       render :file => 'blocks/sniffer_plugin/interests_block',
         :locals => {:block => block, :interests => interests}
