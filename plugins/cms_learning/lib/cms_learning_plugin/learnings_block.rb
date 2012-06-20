@@ -16,7 +16,7 @@ class CmsLearningPlugin::LearningsBlock < Block
     _("This block show learnings of your profile")
   end
 
-  def content
+  def content(args = {})
     block = self
     lambda do
       learnings = CmsLearningPluginLearning.by_profile(block.owner)
