@@ -1,4 +1,4 @@
-require 'product'
+require_dependency '../../../../app/models/product'
 
 class Product
   KM_LAT = 111.2 # aproximate distance in km for 1 degree latitude
