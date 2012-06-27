@@ -9,14 +9,15 @@ class Enterprise < Organization
   N_('Enterprise')
 
   has_many :products, :dependent => :destroy, :order => 'name ASC'
+  has_many :product_categories, :through => :product
   has_many :inputs, :through => :products
   has_many :production_costs, :as => :owner
 
   has_and_belongs_to_many :fans, :class_name => 'Person', :join_table => 'favorite_enteprises_people'
 
   after_save_reindex [:products], :with => :delayed_job
-  extra_data_for_index :product_categories
-  def product_categories
+  extra_data_for_index :product_categories_names
+  def product_categories_names
     products.map{|p| p.category_full_name}.compact
   end
 

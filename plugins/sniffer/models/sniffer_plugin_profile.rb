@@ -42,21 +42,29 @@ class SnifferPluginProfile < ActiveRecord::Base
   end
 
   def suppliers_products
-    interests = Product.interests_suppliers_products(profile)
-    knowledges = Product.knowledge_suppliers_inputs(profile)
-    knowledges_interests = Product.knowledge_suppliers_interests(profile)
-    return interests if !profile.enterprise?
-    (Product.suppliers_products(profile) + interests + knowledges + knowledges_interests)#.uniq
+    products = []
 
+    products += Product.suppliers_products(profile) if profile.enterprise?
+    products += Product.interests_suppliers_products(profile)
+    if defined?(CmsLearningPlugin)
+      products += Product.knowledge_suppliers_inputs(profile)
+      products += Product.knowledge_suppliers_interests(profile)
+    end
+
+    products
   end
 
   def buyers_products
-    interests = Product.interests_buyers_products(profile)
-    knowledges = Product.knowledge_buyers_inputs(profile)
-    knowledges_interests = Product.knowledge_buyers_interests(profile)
+    products = []
 
-    return interests if !profile.enterprise?
-    (Product.buyers_products(profile) + interests + knowledges + knowledges_interests)#.uniq #-> ver cole de mema!
+    products += Product.buyers_products(profile) if profile.enterprise?
+    products += Product.interests_buyers_products(profile)
+    if defined?(CmsLearningPlugin)
+      products += Product.knowledge_buyers_inputs(profile)
+      products += Product.knowledge_buyers_interests(profile)
+    end
+
+    products
   end
 
 end

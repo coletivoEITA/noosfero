@@ -98,7 +98,6 @@ class Product
     }
   }
 
-
   #inputs x knowledge
   named_scope :knowledge_suppliers_inputs, lambda { |profile|
      {
@@ -139,9 +138,6 @@ class Product
     }
   }
 
-
-
-  #
   #interests x knowledge
   named_scope :knowledge_suppliers_interests, lambda { |profile|
     {
@@ -163,13 +159,9 @@ class Product
     }
   }
 
+  ########### from here on, methods that try to find individual matches ########################## 
 
-
-
-########### from here on, methods that try to find individual matches ########################## 
-
-#search for inputs of supplier that matches the products of producer
-
+  #search for inputs of supplier that matches the products of producer
   named_scope :products_inputs, lambda { |supplier, producer|
     {
       :select => "products.id, products.name, inputs.id AS input_id, inputs.product_category_id AS input_category_id,
@@ -182,8 +174,7 @@ class Product
     }
   }
 
-#search for interests of interested that matches the products of producer
-
+  #search for interests of interested that matches the products of producer
   named_scope :products_interests, lambda { |producer, interested|
     {
     :select => "products.id, products.name, 
@@ -200,8 +191,7 @@ class Product
   }
 
 
-#search for inputs of producer that matches the knowledges of wise
-
+  #search for inputs of producer that matches the knowledges of wise
   named_scope :knowledges_inputs, lambda { |wise, producer|
     {
       :select => "inputs.product_category_id AS input_cat, products.name AS product, products.product_category_id AS product_cat,
@@ -214,4 +204,5 @@ class Product
                     AND products.enterprise_id = #{producer.id}"
    }
   }
+
 end

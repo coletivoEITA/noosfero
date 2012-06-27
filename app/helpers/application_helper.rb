@@ -503,7 +503,7 @@ module ApplicationHelper
   def profile_cat_icons( profile )
     if profile.class == Enterprise
       icons =
-        profile.product_categories.map{ |c| c.size > 1 ? c[1] : nil }.
+        profile.product_categories_names.map{ |c| c.size > 1 ? c[1] : nil }.
           compact.uniq.map{ |c|
             cat_name = c.gsub( /[-_\s,.;'"]+/, '_' )
             cat_icon = "/images/icons-cat/#{cat_name}.png"

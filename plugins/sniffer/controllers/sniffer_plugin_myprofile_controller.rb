@@ -32,7 +32,6 @@ class SnifferPluginMyprofileController < MyProfileController
   def search
     self.class.no_design_blocks
 
-
     @suppliers_products = @sniffer_profile.suppliers_products
     @buyers_products = @sniffer_profile.buyers_products
     @no_results = @suppliers_products.count == 0 && @buyers_products.count == 0
