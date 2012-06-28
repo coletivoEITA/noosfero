@@ -2,7 +2,7 @@
 
 <div id="block-<%= block.id %>" class="block <%=box_presenter.block_css_classes(block) %>"
   help="<%= block.help if block.respond_to?(:help) %>"
-  title="<%= _("This block is invisible. Your visitors will not see it.") unless block.visible? %>">
+  title="<%= _("This block is invisible. Your visitors will not see it.") unless block.visible?(context) %>">
   <div class='block-inner-1'>
     <div class='block-inner-2'>
 

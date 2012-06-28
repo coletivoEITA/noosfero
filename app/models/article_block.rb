@@ -11,15 +11,12 @@ class ArticleBlock < Block
   def content(args={})
     block = self
     lambda do
+      return _('Article not selected yet.') unless block.article 
+          
       if block.box and block.box.main?
-        if block.article 
-          view_page block.article
-        else
-          _('Article not selected yet.')
-        end
+        view_page block.article, :toolbar => false
       else
-        block_title(block.title) +
-          (block.article ? article_to_html(block.article, :gallery_view => false) : _('Article not selected yet.'))
+        block_title(block.title) + article_to_html(block.article, :gallery_view => false)
       end
     end
   end
@@ -52,6 +49,10 @@ class ArticleBlock < Block
     @article = obj
   end
 
+  def default_title
+    self.article ? self.article.name : ''
+  end
+
   def available_articles
     return [] if self.box.nil? or self.box.owner.nil?
     self.box.owner.kind_of?(Environment) ? self.box.owner.portal_community.articles : self.box.owner.articles
@@ -59,7 +60,7 @@ class ArticleBlock < Block
 
   protected
 
-  after_create :own_article
+  before_create :own_article
   def own_article
     return if article.nil? or owner.nil? or article.profile == owner
     self.article = owner.copy_article_tree article

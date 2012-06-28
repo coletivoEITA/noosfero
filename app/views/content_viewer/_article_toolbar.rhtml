@@ -1,4 +1,4 @@
-<div class="<%= 'logged-in' if user %>">>
+<div class="<%= 'logged-in' if user %>">
   <div id="article-actions">
     <% if @page.allow_edit?(user) %>
       <%= link_to content_tag( 'span', label_for_edit_article(@page) ),
@@ -45,10 +45,5 @@
 
     <%= report_abuse(profile, :link, @page) %>
 
-  </div>
-  <div id="article-header">
-    <%= link_to(image_tag('icons-mime/rss-feed.png'), @page.feed.url, :class => 'blog-feed-link') if @page.has_posts? && @page.feed %>
-    <%= article_title(@page, :no_link => true) %>
-    <%= article_translations(@page) %>
   </div>
 </div>

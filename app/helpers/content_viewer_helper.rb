@@ -18,12 +18,14 @@ module ContentViewerHelper
     logged_in? && !environment.enabled?('captcha_for_logged_users')
   end
 
-  def view_page(article)
+  def view_page(article, options = {})
     @page = article
     @comments = @page.comments(true).as_thread
     @comments_count = @page.comments.count
 
-    render :file => 'content_viewer/view_page'
+    options[:toolbar] ||= true
+
+    render :file => 'content_viewer/view_page', :locals => options
   end
 
   def article_title(article, args = {})
