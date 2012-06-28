@@ -201,10 +201,9 @@ class Person < Profile
     memberships.communities
   end
 
-  validates_presence_of :user_id
-  validates_uniqueness_of :user_id
-
-  validates_associated :user
+  validates_associated :user, :if => proc{ |person| pp '============'; pp person.user.new_record?; ! person.user.new_record? }
+  validates_presence_of :user, :if => proc{ |person| ! person.user.new_record? }
+  validates_uniqueness_of :user_id, :if => proc{ |person| ! person.user.new_record? }
 
   def email
     self.user.nil? ? nil : self.user.email

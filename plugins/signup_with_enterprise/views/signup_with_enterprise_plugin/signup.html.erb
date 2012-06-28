@@ -1,0 +1,186 @@
+<% if @register_pending %>
+  <div id='thanks-for-signing'>
+    <h1><%= _("Welcome to %s!") % environment.name %></h1>
+    <h3><%= _("Thanks for signing up, we're thrilled to have you on our social network!") %></h3>
+    <p><%= _("Firstly, some tips for getting started:") %></p>
+    <h4><%= _("Confirm your account!") %></h4>
+    <p><%= _("You should receive a welcome email from us shortly. Please take a second to follow the link within to confirm your account.") %></p>
+    <p><%= _("You won't appear as %s until your account is confirmed.") % link_to(_('user'), {:controller => :search, :action => :people, :filter => 'more_recent'}, :target => '_blank') %></p>
+    <h4><%= _("What to do next?") %></h4>
+    <p><%= _("%s. Upload an avatar and let your friends find you easily :)") % link_to(_('Customize your profile'), {:controller => 'doc', :section => 'user', :topic => 'editing-person-info'}, :target => '_blank') %></p>
+    <p><%= _("Learn the guidelines. Read the %s for more details on how to use this social network!") % link_to(_('Documentation'), {:controller => 'doc'}, :target => '_blank') %></p>
+    <p><%= _("%s your Gmail, Yahoo and Hotmail contacts!") % link_to(_('Invite and find'), {:controller => 'doc', :section => 'user', :topic => 'invite-contacts'}, :target => '_blank') %></p>
+    <p><%= _("Start exploring and have fun!") %></p>
+  </div>
+<% else %>
+  <h1><%= _('Sign up for %s!') % environment.name %></h1>
+  <%= error_messages_for :user, :person %>
+  <% pp '============================' %>
+  <% pp @person.valid? %>
+  <% pp @person.errors %>
+
+  <% labelled_form_for :user, @user, :html => { :multipart => true, :id => 'signup-form' } do |f| %>
+
+    <%= hidden_field_tag :invitation_code, @invitation_code %>
+
+    <div id='signup-form-header'>
+
+      <span id="signup-domain"><%= environment.default_hostname %>/</span>
+      <div id='signup-login'>
+        <div id='signup-login-field'>
+          <%= required f.text_field(:login, :onchange => 'this.value = convToValidLogin(this.value);', :rel => s_('signup|Login')) %>
+          <div id='url-check'><p>&nbsp;</p></div>
+        </div>
+        <%= content_tag(:small, _('Choose your login name carefully! It will be your network access and you will not be able to change it later.'), :id => 'signup-balloon') %>
+        <br style="clear: both;" />
+      </div>
+      <%= observe_field 'user_login',
+        :url => { :controller => :account, :action => 'check_url' },
+        :with => 'identifier',
+        :update => 'url-check',
+        :loading => "jQuery('#user_login').removeClass('#{validation_classes}').addClass('checking');
+                     jQuery('#url-check').html('<p><span class=\"checking\">#{checking_message(:url)}</span></p>');",
+                     :complete => "jQuery('#user_login').removeClass('checking')"
+                   %>
+
+      <div id='signup-password'>
+        <%= required f.password_field(:password, :id => 'user_pw') %>
+        <%= f.text_field(:password_clear, :value => _('password')) %>
+        <%= content_tag(:small,_('Choose a password that you can remember easily. It must have at least 4 characters.'), :id => 'password-balloon') %>
+        <div id='fake-check'><p>&nbsp;</p></div>
+      </div>
+
+      <div id='signup-password-confirmation'>
+        <%= required f.password_field(:password_confirmation) %>
+        <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
+        <div id='password-check'><p>&nbsp;</p></div>
+      </div>
+
+      <div id='signup-email'>
+        <%= required f.text_field(:email, :rel => _('e-Mail')) %>
+        <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
+        <div id='email-check'><p>&nbsp;</p></div>
+      </div>
+      <%= observe_field "user_email",
+        :url      => { :controller => :account, :action => "check_email" },
+        :with     => "address",
+        :update   => "email-check",
+        :loading  => "jQuery('#user_email').removeClass('#{validation_classes}').addClass('checking');
+           jQuery('#email-check').html('<p><span class=\"checking\">#{checking_message(:email)}</span></p>');",
+           :complete => "jQuery('#user_email').removeClass('checking')",
+           :before   => "var field = jQuery('#user_email');
+           if (field.val()=='') {
+             field.removeClass('#{validation_classes}');
+             jQuery('#email-check').html('<p>&nbsp;</p>');
+             return false;
+           }
+           if (!( field.valid() )) {
+             field.removeClass('#{validation_classes}').addClass('invalid');
+             jQuery('#email-check').html('<p><span class=\"invalid\">#{_('This e-mail address is not valid')}</span></p>');
+             return false;
+           }"
+         %>
+
+      <%= label :profile_data, :name %>
+      <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
+
+    </div>
+
+    <div id="signup-form-profile">
+
+      <% labelled_fields_for :profile_data, @person do |f| %>
+        <%= render :partial => 'profile_editor/person_form', :locals => {:f => f} %>
+      <% end %>
+
+      <%= @plugins.dispatch(:signup_extra_contents).collect { |content| instance_eval(&content) }.join("") %>
+
+      <% unless @terms_of_use.blank? %>
+        <div id='terms-of-use-box' class='formfieldline'>
+          <%= labelled_check_box(_('I accept the %s') % link_to(_('terms of use'), {:controller => 'home', :action => 'terms'}, :target => '_blank'), 'user[terms_accepted]') %>
+        </div>
+      <% end %>
+
+      <% if params[:enterprise_code] %>
+        <%= hidden_field_tag :enterprise_code, params[:enterprise_code] %>
+        <%= hidden_field_tag :answer, params[:answer] %>
+        <%= hidden_field_tag :terms_accepted, params[:terms_accepted] %>
+        <%= hidden_field_tag :new_user, true %>
+      <% end %>
+    </div>
+
+    <p style="text-align: center">
+      <%= submit_button('save', _('Create my account')) %>
+    </p>
+
+  <% end -%>
+
+  <script type="text/javascript">
+    jQuery(function($) {
+      $('#signup-form input[type=text], #signup-form textarea').each(function() {
+        if ($(this).attr('rel')) var default_value = $(this).attr('rel').toLowerCase();
+        if ($(this).val() == '') $(this).val(default_value);
+        $(this).bind('focus', function() {
+          if ($(this).val() == default_value) $(this).val('');
+        });
+        $(this).bind('blur', function() {
+          if ($(this).val() == '') {
+            $(this).val(default_value);
+            $(this).removeClass('filled-in');
+          }
+          else $(this).addClass('filled-in');
+        });
+      });
+
+      $('#signup-form').bind('submit', function() {
+        $('#signup-form input[type=text], #signup-form textarea').each(function() {
+          if ($(this).attr('rel')) var default_value = $(this).attr('rel').toLowerCase();
+          if ($(this).val() == default_value) $(this).val('');
+        });
+        return true;
+      });
+
+      $('#user_password_clear, #user_password_confirmation_clear').show();
+      $('#user_password_clear, #user_password_confirmation_clear').unbind();
+      $('#user_pw, #user_password_confirmation').hide();
+      $('#user_password_clear').focus(function() {
+        $(this).hide();
+        $('#user_pw').show();
+        $('#user_pw').focus();
+      });
+      $('#user_pw').focus(function() {
+        $('#password-balloon').fadeIn('slow');
+      });
+      $('#user_pw').blur(function() {
+        if ($(this).val() == '') {
+          $('#user_password_clear').show();
+          $(this).hide();
+        }
+      });
+      $('#user_password_confirmation_clear').focus(function() {
+        $(this).hide();
+        $('#user_password_confirmation').show();
+        $('#user_password_confirmation').focus();
+      });
+      $('#user_password_confirmation, #user_pw').blur(function() {
+        if ($('#user_password_confirmation').val() == '') {
+          $('#user_password_confirmation_clear').show();
+          $('#user_password_confirmation').hide();
+        } else if ($('#user_password_confirmation').val() == $('#user_pw').val()) {
+          $('#user_password_confirmation').addClass('validated').removeClass('invalid');
+          $('#user_pw').removeClass('invalid_input').addClass('valid_input');
+          $('#password-check').html("<p>&nbsp;</p>");
+        } else if ($('#user_password_confirmation').val() != $('#user_pw').val()) {
+          $('#user_password_confirmation').removeClass('validated').addClass('invalid');
+          $('#user_pw').addClass('invalid_input').removeClass('valid_input');
+          $('#password-check').html("<p><span class='invalid'><%= _('Passwords don\'t match') %></span></p>");
+        }
+        $('#password-balloon').fadeOut('slow');
+      });
+      $('#user_login').focus(function() {
+        $('#signup-balloon').fadeIn('slow');
+      });
+    $('#user_login').blur(function() { $('#signup-balloon').fadeOut('slow'); });
+    $('#signup-form').validate({ rules: { 'user[email]': { email: true } }, messages: { 'user[email]' : '' } });
+    });
+  </script>
+<% end %>

@@ -58,26 +58,24 @@ class AccountController < ApplicationController
   def signup
     @invitation_code = params[:invitation_code]
     begin
-      if params[:user]
-        params[:user].delete(:password_confirmation_clear)
-        params[:user].delete(:password_clear)
-      end
-      @user = User.new(params[:user])
-      @user.terms_of_use = environment.terms_of_use
-      @user.environment = environment
-      @terms_of_use = environment.terms_of_use
-      @user.person_data = params[:profile_data]
-      @person = Person.new(params[:profile_data])
-      @person.environment = @user.environment
+      params[:user] ||= {}
+      params[:user].delete(:password_confirmation_clear)
+      params[:user].delete(:password_clear)
+
+      @user = User.build_with_person params[:profile_data],
+        params[:user].merge(:environment => environment)
+      @terms_of_use = @user.terms_of_use
+      @person = @user.person
+
       if request.post?
         @user.signup!
-        owner_role = Role.find_by_name('owner')
-        @user.person.affiliate(@user.person, [owner_role]) if owner_role
+
         invitation = Task.find_by_code(@invitation_code)
         if invitation
           invitation.update_attributes!({:friend => @user.person})
           invitation.finish
         end
+
         if @user.activated?
           self.current_user = @user
           redirect_to '/'
@@ -89,7 +87,6 @@ class AccountController < ApplicationController
       @person.valid?
       @person.errors.delete(:identifier)
       @person.errors.delete(:user_id)
-      render :action => 'signup'
     end
   end
 
