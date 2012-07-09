@@ -716,13 +716,13 @@ class Environment < ActiveRecord::Base
     inactive_enterprise_tmpl = Enterprise.create!(:name => 'Inactive Enterprise template', :identifier => pre + 'inactive_enterprise_template', :environment => self, :visible => false)
     com_id = Community.create!(:name => 'Community template', :identifier => pre + 'community_template', :environment => self, :visible => false).id
     pass = Digest::MD5.hexdigest rand.to_s
-    user = User.create!(:login => (pre + 'person_template'), :email => (pre + 'template@template.noo'), :password => pass, :password_confirmation => pass, :environment => self).person
-    user.update_attributes(:visible => false, :name => "Person template")
-    usr_id = user.id
+    person = User.create!(:login => (pre + 'person_template'), :email => (pre + 'template@template.noo'), :password => pass, :password_confirmation => pass, :environment => self).person
+    person.update_attributes(:visible => false, :name => "Person template")
+    psr_id = person.id
     self.settings[:enterprise_template_id] = ent_id
     self.inactive_enterprise_template = inactive_enterprise_tmpl
     self.settings[:community_template_id] = com_id
-    self.settings[:person_template_id] = usr_id
+    self.settings[:person_template_id] = psr_id
     self.save!
   end
 

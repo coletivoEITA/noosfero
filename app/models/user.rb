@@ -21,27 +21,31 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.build_with_person(person_data = {}, user_data = {})
-    user = new user_data
-    user.terms_of_use = user.environment.terms_of_use if user.environment
-    user.person = Person.new person_data.merge(:user => user, :identifier => user.login, :environment => user.environment)
-    user.person.name ||= user.login
-    user.person.visible = false unless user.activated?
-    user
-  end
-
   before_create :make_activation_code
-
-  before_create do |user|
-    user.environment ||= Environment.default
-  end
-
-  after_create do |user|
-    user.activate if user.environment && user.environment.enabled?('skip_new_user_email_confirmation')
-  end
-
   after_create :deliver_activation_code
   after_create :delay_activation_check
+  before_validation_on_create :assign_defaults
+  after_create :save_person
+
+  def assign_defaults
+    self.environment ||= Environment.default
+    self.terms_of_use ||= self.environment.terms_of_use
+  end
+
+  def set_person_defaults
+    self.person.environment = self.environment
+    self.person.identifier = self.login
+    self.person.user = self
+    self.person.visible = false unless self.activated?
+    self.person.name ||= self.login
+  end
+
+  def save_person
+    self.person ||= Person.new
+    set_person_defaults
+    self.person.save!
+    self.activate if self.environment && self.environment.enabled?('skip_new_user_email_confirmation')
+  end
 
   def email_domain
     self.person.preferred_domain && self.person.preferred_domain.name || self.environment.default_hostname(true)
@@ -72,13 +76,30 @@ class User < ActiveRecord::Base
     end
   end
 
+  def terms_of_use
+    self['terms_of_use'] || self.environment.terms_of_use
+  end
+
   def signup!
     self.save!
+
     owner_role = Role.find_by_name('owner')
     self.person.affiliate(self.person, [owner_role]) if owner_role
+
+    invitation = Task.find_by_code(@invitation_code)
+    if invitation
+      invitation.update_attributes!({:friend => @user.person})
+      invitation.finish
+    end
   end
   
   has_one :person, :dependent => :destroy
+
+  def person_with_defaults=(value)
+    self.person_without_defaults = value
+    set_person_defaults if value
+  end
+  alias_method_chain :person=, :defaults
 
   belongs_to :environment
 
@@ -86,8 +107,6 @@ class User < ActiveRecord::Base
 
   # Virtual attribute for the unencrypted password
   attr_accessor :password
-
-  validates_associated      :person, :if => proc{ |user| pp 'user ============'; pp user.person.new_record?; user.person.new_record? }
 
   validates_presence_of     :login, :email
   validates_format_of       :login, :with => Profile::IDENTIFIER_FORMAT, :if => (lambda {|user| !user.login.blank?})
@@ -101,7 +120,8 @@ class User < ActiveRecord::Base
   validates_length_of       :password, :within => 4..40, :if => :password_required?, :if => (lambda {|user| !user.password.blank?})
   validates_confirmation_of :password,                   :if => :password_required?
 
-  validates_inclusion_of    :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('%{fn} must be checked in order to signup.').fix_i18n
+  validates_inclusion_of    :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? },
+    :message => N_('%{fn} must be checked in order to signup.').fix_i18n
 
   before_save :encrypt_password
 

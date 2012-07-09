@@ -277,7 +277,7 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_includes p2.friends(true), p1
   end
 
-  should 'destroy use when person is destroyed' do
+  should 'destroy user when person is destroyed' do
     person = create_user('testuser').person
     assert_difference User, :count, -1 do
       person.destroy

@@ -111,8 +111,9 @@ class AccountControllerTest < ActionController::TestCase
 
   def test_shoud_not_save_without_acceptance_of_terms_of_use_on_signup
     assert_no_difference User, :count do
-      Environment.default.update_attributes(:terms_of_use => 'some terms ...')
+      Environment.default.update_attributes!(:terms_of_use => 'some terms ...')
       new_user
+      assert_equal Environment.default.terms_of_use, assigns(:terms_of_use)
       assert_response :success
       assert_nil assigns(:register_pending)
     end
@@ -583,6 +584,7 @@ class AccountControllerTest < ActionController::TestCase
 
     new_user
 
+    assert_equal env, assigns(:user).person.environment
     assert_equal 1, assigns(:user).person.boxes.size
     assert_equal 1, assigns(:user).person.boxes[0].blocks.size
   end
@@ -769,19 +771,16 @@ class AccountControllerTest < ActionController::TestCase
   end
 
   protected
-    def new_user(options = {}, extra_options ={})
+    def new_user(options = {}, extra_options = {})
       data = {:profile_data => person_data}
-      if extra_options[:profile_data]
-         data[:profile_data].merge! extra_options.delete(:profile_data)
-      end
+      data[:profile_data].merge! extra_options.delete(:profile_data) if extra_options[:profile_data]
       data.merge! extra_options
 
-       post :signup, { :user => { :login => 'quire',
-                                 :email => 'quire@example.com',
-                                 :password => 'quire',
-                                 :password_confirmation => 'quire'
-                              }.merge(options)
-                    }.merge(data)
+      post :signup, { :user => {
+            :login => 'quire', :email => 'quire@example.com',
+            :password => 'quire', :password_confirmation => 'quire'
+          }.merge(options)
+        }.merge(data)
     end
 
     def auth_token(token)
