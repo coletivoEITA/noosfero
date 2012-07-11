@@ -16,11 +16,11 @@
 <%= optional_field(@person, 'sex', f.radio_group(:profile_data, :sex, [ ['male',_('Male')], ['female',_('Female')] ])) %>
 <%= optional_field(@person, 'birth_date', labelled_form_field(_('Birth date'), '<div class="select-birth-date">' + pick_date(:profile_data, :birth_date, {:start_year => (Date.today.year - 100), :end_year => (Date.today.year - 5)}) + '</div>')) %>
 <%= optional_field(@person, 'nationality', f.text_field(:nationality, :rel => _('Nationality'))) %>
-<%= optional_field(@person, 'country', select_country(_('Country'), 'profile_data', 'country', {:class => 'type-select'})) %>
-<%= optional_field(@person, 'state', f.text_field(:state, :rel => _('State'))) %>
-<%= optional_field(@person, 'city', f.text_field(:city, :rel => _('City'))) %>
-<%= optional_field(@person, 'zip_code', labelled_form_field(_('ZIP code'), text_field(:profile_data, :zip_code, :rel => _('ZIP code')))) %>
 <%= optional_field(@person, 'address', labelled_form_field(_('Address (street and number)'), text_field(:profile_data, :address, :rel => _('Address')))) %>
+<%= optional_field(@person, 'zip_code', labelled_form_field(_('ZIP code'), text_field(:profile_data, :zip_code, :rel => _('ZIP code')))) %>
+<%= optional_field(@person, 'city', f.text_field(:city, :rel => _('City'))) %>
+<%= optional_field(@person, 'state', f.text_field(:state, :rel => _('State'))) %>
+<%= optional_field(@person, 'country', select_country(_('Country'), 'profile_data', 'country', {:class => 'type-select'})) %>
 
 <% optional_field(@person, 'schooling') do %>
   <div class="formfieldline">

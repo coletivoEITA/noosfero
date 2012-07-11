@@ -1,29 +1,29 @@
-<%= optional_field(profile, 'display_name', f.text_field(:display_name)) %>
+<%= optional_field(profile, 'display_name', f.text_field(:display_name, :rel => profile.class.human_attribute_name(:display_name))) %>
 <% if profile.enterprise? %>
-  <%= optional_field(profile, 'business_name', f.text_field(:business_name)) %>
+  <%= optional_field(profile, 'business_name', f.text_field(:business_name, :rel => profile.class.human_attribute_name(:business_name))) %>
 <% end %>
-<%= optional_field(profile, 'description', f.text_area(:description, :rows => 5)) %> <!-- , :maxlength => 10 -->
-<%= optional_field(profile, 'contact_person', f.text_field(:contact_person)) %>
-<%= optional_field(profile, 'contact_email', f.text_field(:contact_email)) %>
-<%= optional_field(profile, 'contact_phone', f.text_field(:contact_phone)) %>
-<%= optional_field(profile, 'legal_form', f.text_field(:legal_form)) %>
-<%= optional_field(profile, 'economic_activity', f.text_field(:economic_activity)) %>
-<%= optional_field(profile, 'management_information', f.text_area(:management_information, :rows => 5)) %>
-<%= optional_field(profile, 'address', labelled_form_field(_('Address (street and number)'), text_field(object_name, :address))) %>
-<%= optional_field(profile, 'zip_code', labelled_form_field(_('ZIP code'), text_field(object_name, :zip_code))) %>
-<%= optional_field(profile, 'city', f.text_field(:city)) %>
-<%= optional_field(profile, 'state', f.text_field(:state)) %>
-<%= optional_field(profile, 'country', select_country(_('Country'), object_name, 'country', {:class => 'type-select'})) %>
-<%= optional_field(profile, 'tag_list', f.text_field(:tag_list)) %>
+<%= optional_field(profile, 'description', f.text_area(:description, :rows => 5, :rel => profile.class.human_attribute_name(:description))) %> <!-- , :maxlength => 10 -->
+<%= optional_field(profile, 'contact_person', f.text_field(:contact_person, :rel => profile.class.human_attribute_name(:contact_person))) %>
+<%= optional_field(profile, 'contact_email', f.text_field(:contact_email, :rel => profile.class.human_attribute_name(:contact_email))) %>
+<%= optional_field(profile, 'contact_phone', f.text_field(:contact_phone, :rel => profile.class.human_attribute_name(:contact_phone))) %>
+<%= optional_field(profile, 'legal_form', f.text_field(:legal_form, :rel => profile.class.human_attribute_name(:legal_form))) %>
+<%= optional_field(profile, 'economic_activity', f.text_field(:economic_activity, :rel => profile.class.human_attribute_name(:economic_activity))) %>
+<%= optional_field(profile, 'management_information', f.text_area(:management_information, :rows => 5, :rel => profile.class.human_attribute_name(:management_information))) %>
+<%= optional_field(profile, 'address', labelled_form_field(_('Address (street and number)'), text_field(object_name, :address, :rel => profile.class.human_attribute_name(:address)))) %>
+<%= optional_field(profile, 'zip_code', labelled_form_field(_('ZIP code'), text_field(object_name, :zip_code, :rel => profile.class.human_attribute_name(:zip_code)))) %>
+<%= optional_field(profile, 'city', f.text_field(:city, :rel => profile.class.human_attribute_name(:city))) %>
+<%= optional_field(profile, 'state', f.text_field(:state, :rel => profile.class.human_attribute_name(:state))) %>
+<%= optional_field(profile, 'country', select_country(_('Country'), object_name, 'country', :class => 'type-select', :rel => profile.class.human_attribute_name(:country))) %>
+<%= optional_field(profile, 'tag_list', f.text_field(:tag_list, :rel => profile.class.human_attribute_name(:tag_list))) %>
 
 <% if profile.community? %>
-  <%= optional_field(profile, 'language', f.text_field(:language)) %>
+  <%= optional_field(profile, 'language', f.text_field(:language, :rel => profile.class.human_attribute_name(:language))) %>
 <% end %>
 
 <% if profile.enterprise? %>
-  <%= optional_field(profile, 'organization_website', f.text_field(:organization_website)) %>
-  <%= optional_field(profile, 'historic_and_current_context', f.text_area(:historic_and_current_context, :rows => 5)) %>
-  <%= optional_field(profile, 'activities_short_description', f.text_area(:activities_short_description, :rows => 5)) %>
-  <%= optional_field(profile, 'acronym', f.text_field(:acronym)) %>
-  <%= optional_field(profile, 'foundation_year', f.text_field(:foundation_year)) %>
+  <%= optional_field(profile, 'organization_website', f.text_field(:organization_website, :rel => profile.class.human_attribute_name(:organization_website))) %>
+  <%= optional_field(profile, 'historic_and_current_context', f.text_area(:historic_and_current_context, :rows => 5, :rel => profile.class.human_attribute_name(:historic_and_current_context))) %>
+  <%= optional_field(profile, 'activities_short_description', f.text_area(:activities_short_description, :rows => 5, :rel => profile.class.human_attribute_name(:activities_short_description))) %>
+  <%= optional_field(profile, 'acronym', f.text_field(:acronym, :rel => profile.class.human_attribute_name(:acronym))) %>
+  <%= optional_field(profile, 'foundation_year', f.text_field(:foundation_year, :rel => profile.class.human_attribute_name(:foundation_year))) %>
 <% end %>
