@@ -19,4 +19,8 @@ class SignupWithEnterprisePlugin < Noosfero::Plugin
     }]
   end
 
+  def stylesheet?
+    true
+  end
+
 end

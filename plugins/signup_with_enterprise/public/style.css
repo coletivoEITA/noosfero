@@ -1,0 +1,14 @@
+
+#signup-with-enterprise-plugin .signup-step.first-step {
+  background: url(/images/blocks/1.png) no-repeat;
+  background-position: 105px -8px;
+}
+
+#signup-with-enterprise-plugin .signup-step.second-step {
+  background: url(/images/blocks/2.png) no-repeat;
+  background-position: 105px -8px;
+}
+
+#signup-with-enterprise-plugin #signup-form-profile {
+  margin: 0;
+}

@@ -1,3 +1,5 @@
+<div id="signup-with-enterprise-plugin">
+
 <% if @register_pending %>
   <div id='thanks-for-signing'>
     <h1><%= _("Welcome to %s!") % environment.name %></h1>
@@ -15,57 +17,55 @@
 <% else %>
   <h1><%= _('Sign up for %s!') % environment.name %></h1>
   <%= error_messages_for :user, :person %>
-  <% pp '============================' %>
-  <% pp @person.valid? %>
-  <% pp @person.errors %>
 
   <% labelled_form_for :user, @user, :html => { :multipart => true, :id => 'signup-form' } do |f| %>
 
     <%= hidden_field_tag :invitation_code, @invitation_code %>
 
-    <div id='signup-form-header'>
+    <div class="signup-step first-step">
+      <div id='signup-form-header'>
 
-      <span id="signup-domain"><%= environment.default_hostname %>/</span>
-      <div id='signup-login'>
-        <div id='signup-login-field'>
-          <%= required f.text_field(:login, :onchange => 'this.value = convToValidLogin(this.value);', :rel => s_('signup|Login')) %>
-          <div id='url-check'><p>&nbsp;</p></div>
+        <span id="signup-domain"><%= environment.default_hostname %>/</span>
+        <div id='signup-login'>
+          <div id='signup-login-field'>
+            <%= required f.text_field(:login, :onchange => 'this.value = convToValidLogin(this.value);', :rel => s_('signup|Login')) %>
+            <div id='url-check'><p>&nbsp;</p></div>
+          </div>
+          <%= content_tag(:small, _('Choose your login name carefully! It will be your network access and you will not be able to change it later.'), :id => 'signup-balloon') %>
+          <br style="clear: both;" />
         </div>
-        <%= content_tag(:small, _('Choose your login name carefully! It will be your network access and you will not be able to change it later.'), :id => 'signup-balloon') %>
-        <br style="clear: both;" />
-      </div>
-      <%= observe_field 'user_login',
-        :url => { :controller => :account, :action => 'check_url' },
-        :with => 'identifier',
-        :update => 'url-check',
-        :loading => "jQuery('#user_login').removeClass('#{validation_classes}').addClass('checking');
+        <%= observe_field 'user_login',
+          :url => { :controller => :account, :action => 'check_url' },
+          :with => 'identifier',
+          :update => 'url-check',
+          :loading => "jQuery('#user_login').removeClass('#{validation_classes}').addClass('checking');
                      jQuery('#url-check').html('<p><span class=\"checking\">#{checking_message(:url)}</span></p>');",
                      :complete => "jQuery('#user_login').removeClass('checking')"
                    %>
 
-      <div id='signup-password'>
-        <%= required f.password_field(:password, :id => 'user_pw') %>
-        <%= f.text_field(:password_clear, :value => _('password')) %>
-        <%= content_tag(:small,_('Choose a password that you can remember easily. It must have at least 4 characters.'), :id => 'password-balloon') %>
-        <div id='fake-check'><p>&nbsp;</p></div>
-      </div>
+                 <div id='signup-password'>
+                   <%= required f.password_field(:password, :id => 'user_pw') %>
+                   <%= f.text_field(:password_clear, :value => _('password')) %>
+                   <%= content_tag(:small,_('Choose a password that you can remember easily. It must have at least 4 characters.'), :id => 'password-balloon') %>
+                   <div id='fake-check'><p>&nbsp;</p></div>
+                 </div>
 
-      <div id='signup-password-confirmation'>
-        <%= required f.password_field(:password_confirmation) %>
-        <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
-        <div id='password-check'><p>&nbsp;</p></div>
-      </div>
+                 <div id='signup-password-confirmation'>
+                   <%= required f.password_field(:password_confirmation) %>
+                   <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
+                   <div id='password-check'><p>&nbsp;</p></div>
+                 </div>
 
-      <div id='signup-email'>
-        <%= required f.text_field(:email, :rel => _('e-Mail')) %>
-        <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
-        <div id='email-check'><p>&nbsp;</p></div>
-      </div>
-      <%= observe_field "user_email",
-        :url      => { :controller => :account, :action => "check_email" },
-        :with     => "address",
-        :update   => "email-check",
-        :loading  => "jQuery('#user_email').removeClass('#{validation_classes}').addClass('checking');
+                 <div id='signup-email'>
+                   <%= required f.text_field(:email, :rel => _('e-Mail')) %>
+                   <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
+                   <div id='email-check'><p>&nbsp;</p></div>
+                 </div>
+                 <%= observe_field "user_email",
+                   :url      => { :controller => :account, :action => "check_email" },
+                   :with     => "address",
+                   :update   => "email-check",
+                   :loading  => "jQuery('#user_email').removeClass('#{validation_classes}').addClass('checking');
            jQuery('#email-check').html('<p><span class=\"checking\">#{checking_message(:email)}</span></p>');",
            :complete => "jQuery('#user_email').removeClass('checking')",
            :before   => "var field = jQuery('#user_email');
@@ -81,36 +81,45 @@
            }"
          %>
 
-      <%= label :profile_data, :name %>
-      <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
+       <%= label :profile_data, :name %>
+       <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
 
-    </div>
+       <div id="signup-form-profile">
 
-    <div id="signup-form-profile">
+         <% labelled_fields_for :profile_data, @person do |f| %>
+           <%= render :partial => 'profile_editor/person_form', :locals => {:f => f} %>
+         <% end %>
 
-      <% labelled_fields_for :profile_data, @person do |f| %>
-        <%= render :partial => 'profile_editor/person_form', :locals => {:f => f} %>
-      <% end %>
+         <%= @plugins.dispatch(:signup_extra_contents).collect { |content| instance_eval(&content) }.join("") %>
 
-      <%= @plugins.dispatch(:signup_extra_contents).collect { |content| instance_eval(&content) }.join("") %>
+         <% unless @terms_of_use.blank? %>
+           <div id='terms-of-use-box' class='formfieldline'>
+             <%= labelled_check_box(_('I accept the %s') % link_to(_('terms of use'), {:controller => 'home', :action => 'terms'}, :target => '_blank'), 'user[terms_accepted]') %>
+           </div>
+         <% end %>
 
-      <% unless @terms_of_use.blank? %>
-        <div id='terms-of-use-box' class='formfieldline'>
-          <%= labelled_check_box(_('I accept the %s') % link_to(_('terms of use'), {:controller => 'home', :action => 'terms'}, :target => '_blank'), 'user[terms_accepted]') %>
-        </div>
-      <% end %>
+         <% if params[:enterprise_code] %>
+           <%= hidden_field_tag :enterprise_code, params[:enterprise_code] %>
+           <%= hidden_field_tag :answer, params[:answer] %>
+           <%= hidden_field_tag :terms_accepted, params[:terms_accepted] %>
+           <%= hidden_field_tag :new_user, true %>
+         <% end %>
+       </div>
+     </div>
+   </div>
 
-      <% if params[:enterprise_code] %>
-        <%= hidden_field_tag :enterprise_code, params[:enterprise_code] %>
-        <%= hidden_field_tag :answer, params[:answer] %>
-        <%= hidden_field_tag :terms_accepted, params[:terms_accepted] %>
-        <%= hidden_field_tag :new_user, true %>
-      <% end %>
-    </div>
+   <div class="signup-step second-step">
+     <div id='signup-form-header'>
+       <% labelled_fields_for(:enterprise_data, @enterprise) do |f| %>
+         <%= required f.text_field(:name, :rel => _('Enterprise name')) %>
+         <%= render :partial => 'shared/organization_custom_fields', :locals => { :f => f, :object_name => :enterprise_data, :profile => @enterprise } %>
+       <% end %>
+     </div>
+   </div>
 
-    <p style="text-align: center">
-      <%= submit_button('save', _('Create my account')) %>
-    </p>
+   <p style="text-align: center">
+     <%= submit_button('save', _('Create my account')) %>
+   </p>
 
   <% end -%>
 
@@ -184,3 +193,5 @@
     });
   </script>
 <% end %>
+
+</div>

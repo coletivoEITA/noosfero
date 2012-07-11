@@ -7,14 +7,23 @@ class SignupWithEnterprisePluginController < ApplicationController
     params[:user] ||= {}
     params[:user].delete(:password_confirmation_clear)
     params[:user].delete(:password_clear)
+    params[:profile_data] ||= {}
+    params[:enterprise_data] ||= {}
 
-    begin
+    #begin
       @user = User.new params[:user].merge(:environment => environment)
       @terms_of_use = @user.terms_of_use
       @person = @user.person = Person.new(params[:profile_data])
+      @enterprise = Enterprise.new params[:enterprise_data].merge(:environment => environment)
 
       if request.post?
-        @user.signup!
+        User.transaction do
+          Enterprise.transaction do
+            @user.signup!
+            @enterprise.save!
+            @enterprise.add_admin @person
+          end
+        end
 
         if @user.activated?
           self.current_user = @user
@@ -23,10 +32,10 @@ class SignupWithEnterprisePluginController < ApplicationController
           @register_pending = true
         end
       end
-    rescue ActiveRecord::RecordInvalid
-      @person.valid?
-      @person.errors.delete(:identifier)
-      @person.errors.delete(:user_id)
-    end
+    #rescue ActiveRecord::RecordInvalid
+      #@person.valid?
+      #@person.errors.delete(:identifier)
+      #@person.errors.delete(:user_id)
+    #end
   end
 end
