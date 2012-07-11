@@ -33,6 +33,7 @@ function convToValidLogin( str ) {
 }
 
 /* * * Convert a string to a valid login name * * */
+/* see also convert_to_identifier at lib/noosfero.rb */
 function convToValidIdentifier( str, sep ) {
   return str.toLowerCase()
             .replace( /@.*$/,     ""  )
