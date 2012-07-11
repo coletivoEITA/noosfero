@@ -45,6 +45,8 @@ class ProfileDesignController < BoxOrganizerController
       blocks << RawHTMLBlock
     end
 
+    blocks += @plugins.dispatch(:profile_blocks, profile) if @plugins
+
     blocks
   end
 

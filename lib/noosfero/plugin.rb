@@ -186,6 +186,12 @@ class Noosfero::Plugin
   def admin_panel_links
     nil
   end
+  
+  # -> Adds new block types in profile
+  # returs = class implements Block
+  def profile_blocks(profile)
+    nil
+  end
 
   # -> Adds buttons to manage members page
   # returns = { :title => title, :icon => icon, :url => url }
