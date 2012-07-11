@@ -104,7 +104,7 @@
   <% end %>
 
   <% button_bar do %>
-    <%= f.submit "Conclude Exchange Proposal" %>
+    <%= f.submit _('Conclude Exchange Proposal') %>
     <%= button_to_function :back, _('Back to %{origin} offers') % {:origin => @origin_enterprise.name}, "history.back()"%>
   <% end %>
 <% end %>

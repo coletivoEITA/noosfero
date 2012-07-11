@@ -250,13 +250,14 @@ class ExchangePluginMyprofileController < MyProfileController
 
   def update_quantity
     @element = ExchangePlugin::ExchangeElement.find params[:element_id]
+    old_quantity = @element.quantity
     @element.quantity = params[:quantity]
     @element.save
     @exchange = ExchangePlugin::Exchange.find @element.exchange_id   
 
     #message
-    body = _('%{enterprise} changed the quantity of element %{element} to %{quantity}') % 
-      {:enterprise => profile.name, :element => (@element.element_type.constantize.find @element.element_id).name, :quantity => @element.quantity} 
+    body = _('%{enterprise} changed the quantity of element %{element} from %{old_quantity} to %{quantity}') % 
+      {:enterprise => profile.name, :element => (@element.element_type.constantize.find @element.element_id).name, :old_quantity => old_quantity, :quantity => @element.quantity} 
     m = ExchangePlugin::Message.new_exchange_message(@exchange, nil, nil, nil , body)
    
     render :nothing => true

@@ -165,10 +165,10 @@
         </table>
       <% end %>
     <% end %>
-
+    <% message = _('Choose at least one element!')%>
     <% button_bar do %>
-       <%= f.submit "Continue >>"%>
-       <%= button_to_function :back, _('Back to %{target} offers') % {:target => @target_enterprise_name}, "history.back()"%>
+      <%= f.submit _('Continue >>'), :onclick => "choose_origin_offers(this,'%{msg}', event);" % {:msg => message} %>
+      <%= button_to_function :back, _('Back to %{target} offers') % {:target => @target_enterprise_name}, "history.back()"%>
     <% end %>
   <% end #formfor%>
 <% end #if products or articles%> 
