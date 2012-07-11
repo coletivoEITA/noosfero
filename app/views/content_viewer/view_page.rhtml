@@ -6,7 +6,7 @@
 
 <div id="article" class="<%= @page.css_class_name %>">
 
-  <% if !defined?(toolbar) or toolbar == true %>
+  <% if (!defined?(display_toolbar) or display_toolbar == true) %>
     <div id="article-toolbar"></div>
 
     <script type="text/javascript">
@@ -17,7 +17,7 @@
 
   <div id="article-header">
     <%= link_to(image_tag('icons-mime/rss-feed.png'), @page.feed.url, :class => 'blog-feed-link') if @page.has_posts? && @page.feed %>
-    <%= article_title(@page, :no_link => true) %>
+    <%= article_title(@page, :no_link => true) if (!defined?(display_title) or display_title == true) %>
     <%= article_translations(@page) %>
   </div>
 
@@ -28,7 +28,7 @@
     </div>
   <% end %>
 
-  <% if @page.display_hits? %>
+  <% if (!defined?(display_hits) or display_hits == true) and @page.display_hits? %>
     <div id="article-hits">
       <%= n_('Viewed one time', 'Viewed %{num} times', @page.hits) % { :num => @page.hits } %>
     </div>

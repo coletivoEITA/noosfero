@@ -13,11 +13,13 @@ class ArticleBlock < Block
     lambda do
       return _('Article not selected yet.') unless block.article 
           
-      if block.box and block.box.main?
-        view_page block.article, :toolbar => false
+      ret = if block.box and block.box.main?
+        view_page block.article, :display_toolbar => false, :display_title => false, :display_hits => false
       else
-        block_title(block.title) + article_to_html(block.article, :gallery_view => false)
+        article_to_html block.article, :gallery_view => false
       end
+
+      block_title(block.title) + ret
     end
   end
 

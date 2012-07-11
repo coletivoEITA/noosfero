@@ -23,7 +23,9 @@ module ContentViewerHelper
     @comments = @page.comments(true).as_thread
     @comments_count = @page.comments.count
 
-    options[:toolbar] ||= true
+    options[:display_toolbar] = true if options[:display_toolbar].nil?
+    options[:display_title] = true if options[:display_title].nil?
+    options[:display_hits] = true if options[:display_hits].nil?
 
     render :file => 'content_viewer/view_page', :locals => options
   end
