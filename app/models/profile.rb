@@ -266,6 +266,11 @@ class Profile < ActiveRecord::Base
     true
   end
 
+  before_validation_on_create :assign_defaults
+  def assign_defaults
+    self.identifier ||= Noosfero.convert_to_identifier self.name, '-'
+  end
+
   # registar callback for creating boxes after the object is created. 
   after_create :create_default_set_of_boxes
 

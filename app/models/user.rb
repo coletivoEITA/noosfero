@@ -30,6 +30,7 @@ class User < ActiveRecord::Base
   def assign_defaults
     self.environment ||= Environment.default
     self.terms_of_use ||= self.environment.terms_of_use
+    self.login ||= Noosfero.convert_to_identifier self.person.name, '-' if self.person
   end
 
   def set_person_defaults
