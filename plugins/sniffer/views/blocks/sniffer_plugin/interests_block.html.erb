@@ -2,6 +2,12 @@
 
 <ul>
   <% interests.each do |interest| %>
-    <li><%= interest.opportunity.name %></li>
+    <li class="sniffer-plugin-declared-interest"><%= interest.opportunity.name %></li>
+  <% end %>
+
+  <% if inputs %>
+    <% inputs.each do |input| %>
+      <li class="sniffer-plugin-input-interest"><%= input.product_category.name %></li>
+    <% end %>
   <% end %>
 </ul>
