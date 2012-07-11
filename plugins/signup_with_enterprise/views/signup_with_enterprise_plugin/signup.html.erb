@@ -22,8 +22,23 @@
 
     <%= hidden_field_tag :invitation_code, @invitation_code %>
 
+    <%# FIXME: put text in environment setting %>
+    <div>
+      <h2>Bem-vindo ao ESCAMBO!</h2>
+      O ESCAMBO é uma rede para trocas entre pontos de cultura. O ponto de cultura
+      pode ser um artesão, um coletivo cultura, uma banda, um grupo de teatro, entre
+      outras formas de manifestações culturais. No Escambo você cadastra o que pode
+      oferecer, o que te interessa e começa a trocar. Simples assim! Escolha as opções
+      abaixo e comece já.
+    </div>
+
     <div class="signup-step first-step">
       <div id='signup-form-header'>
+
+        <%# FIXME: put text in environment setting %>
+        <div>
+          Quero trocar no ESCAMBO!
+        </div>
 
         <span id="signup-domain"><%= environment.default_hostname %>/</span>
         <div id='signup-login'>
@@ -110,6 +125,16 @@
 
    <div class="signup-step second-step">
      <div id='signup-form-header'>
+
+       <%# FIXME: put text in environment setting %>
+       <div>
+         Agora vamos cadastrar o espaço em que você vai mostrar suas ofertas
+         para troca. Digite o nome do Ponto de Cultura, que pode ser o nome do
+         seu coletivo, ou seu nome caso queira trocar individualmente. Complete
+         os dados relativos ao Ponto de Cultura, caso sejam diferentes dos seus
+         dados pessoais.
+       </div>
+
        <% labelled_fields_for(:enterprise_data, @enterprise) do |f| %>
          <%= required f.text_field(:name, :rel => _('Enterprise name')) %>
          <%= render :partial => 'shared/organization_custom_fields', :locals => { :f => f, :object_name => :enterprise_data, :profile => @enterprise } %>
