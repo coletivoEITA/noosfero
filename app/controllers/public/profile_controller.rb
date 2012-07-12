@@ -9,7 +9,7 @@ class ProfileController < PublicController
   helper TagsHelper
 
   def index
-    self.load_profile_badge
+    # moved to ProfileBlock
   end
 
   def tags

@@ -13,7 +13,7 @@ class ProfileBlock < Block
     lambda do
       if block.box.main?
         load_profile_badge
-        render :partial => 'profile/index'
+        render :file => 'profile/badge'
       else
         ''
       end
