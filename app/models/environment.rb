@@ -248,6 +248,10 @@ class Environment < ActiveRecord::Base
 
   settings_items :enabled_plugins, :type => Array, :default => []
 
+  settings_items :search_hints, :type => Hash, :default => {}
+
+  settings_items :top_level_category_as_facet_ids, :type => Array, :default => []
+
   def news_amount_by_folder=(amount)
     settings[:news_amount_by_folder] = amount.to_i
   end
@@ -278,7 +282,7 @@ class Environment < ActiveRecord::Base
     self.settings["#{feature}_enabled".to_sym] == true
   end
   def disabled?(feature)
-    !enabled?(feature)
+    !self.enabled?(feature)
   end
 
   def plugin_enabled?(plugin)
@@ -361,11 +365,11 @@ class Environment < ActiveRecord::Base
   end
 
   def terminology
-    if self.settings[:terminology]
-      self.settings[:terminology].constantize.instance
-    else
+    #if self.settings[:terminology]
+      #self.settings[:terminology].constantize.instance
+    #else
       Noosfero.terminology
-    end
+    #end
   end
 
   def terminology=(value)

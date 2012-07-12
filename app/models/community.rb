@@ -1,9 +1,17 @@
 class Community < Organization
+
+  def self.type_name
+    _('Community')
+  end
+
   N_('Community')
   N_('Language')
 
   settings_items :language
   settings_items :zip_code, :city, :state, :country
+
+  extend SetProfileRegionFromCityState::ClassMethods
+  set_profile_region_from_city_state
 
   before_create do |community|
     community.moderated_articles = true if community.environment.enabled?('organizations_are_moderated_by_default')
@@ -77,6 +85,10 @@ class Community < Organization
 
   def control_panel_settings_button
     {:title => __('Community Info and settings'), :icon => 'edit-profile-group'}
+  end
+
+  def activities
+    Scrap.find_by_sql("SELECT id, updated_at, 'Scrap' AS klass FROM scraps WHERE scraps.receiver_id = #{self.id} AND scraps.scrap_id IS NULL UNION SELECT id, updated_at, 'ActionTracker::Record' AS klass FROM action_tracker WHERE action_tracker.target_id = #{self.id} UNION SELECT action_tracker.id, action_tracker.updated_at, 'ActionTracker::Record' AS klass FROM action_tracker INNER JOIN articles ON action_tracker.target_id = articles.id WHERE articles.profile_id = #{self.id} AND action_tracker.target_type = 'Article' ORDER BY action_tracker.updated_at DESC")
   end
 
 end

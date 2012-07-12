@@ -22,9 +22,7 @@ module LightboxHelper
   def lightbox_options(options, lightbox_type = 'lbOn')
     the_class = lightbox_type
     the_class << " #{options[:class]}" if options.has_key?(:class)
-    options.merge(
-      :class => the_class
-    )
+    options.merge(:class => the_class)
   end
 
   def lightbox?
