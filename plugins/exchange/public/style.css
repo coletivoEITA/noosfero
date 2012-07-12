@@ -123,3 +123,12 @@ td {
 .comment-wrapper-8-inverted {
   background: url(imgs/comment-bg-NO-inverted.png)   0%   0% no-repeat;
 }
+
+.controller-profile_editor a.control-panel-exchange{
+  background-image: url(imgs/exchange-64x64.png);
+}
+.icon-exchange,
+.icon-newexchange {
+  background-image: url(imgs/exchange-16x16.png);
+}
+
