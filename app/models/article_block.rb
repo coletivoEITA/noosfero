@@ -11,15 +11,7 @@ class ArticleBlock < Block
   def content(args={})
     block = self
     lambda do
-      return _('Article not selected yet.') unless block.article 
-          
-      ret = if block.box and block.box.main?
-        view_page block.article, :display_toolbar => false, :display_title => false, :display_hits => false
-      else
-        article_to_html block.article, :gallery_view => false
-      end
-
-      block_title(block.title) + ret
+      render :file => 'blocks/article', :locals => {:block => block}
     end
   end
 
