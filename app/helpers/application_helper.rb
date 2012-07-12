@@ -41,8 +41,9 @@ module ApplicationHelper
     @boxes_controller ||= (self.respond_to?(:profile) and profile) ? :profile_design : :environment_design
   end
 
-  def on_homepage?
-    context[:request_path] == '/' || (context[:profile] && context[:profile].on_homepage?(context[:request_path]))
+  def on_homepage?(request_path = nil)
+    request_path ||= context[:request_path]
+    request_path == '/' || (context[:profile] && context[:profile].on_homepage?(request_path))
   end
 
   def locale
