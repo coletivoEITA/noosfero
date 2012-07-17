@@ -109,7 +109,7 @@ class Environment < ActiveRecord::Base
       'user_themes' => _('Allow users to create their own themes'),
       'search_in_home' => _("Display search form in home page"),
 
-      'cant_change_homepage' => _("Don't allow users to change which article to use as homepage"),
+      'cant_change_homepage' => _("Disable users' homepage edition"),
       'display_header_footer_explanation' => _("Display explanation about header and footer"),
       'articles_dont_accept_comments_by_default' => _("Articles don't accept comments by default"),
       'organizations_are_moderated_by_default' => _("Organizations have moderated publication by default"),
