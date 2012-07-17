@@ -10,7 +10,7 @@ class SignupWithEnterprisePluginController < ApplicationController
     params[:profile_data] ||= {}
     params[:enterprise_data] ||= {}
 
-    #begin
+    begin
       @user = User.new params[:user].merge(:environment => environment)
       @terms_of_use = @user.terms_of_use
       @person = @user.person = Person.new(params[:profile_data])
@@ -27,15 +27,15 @@ class SignupWithEnterprisePluginController < ApplicationController
 
         if @user.activated?
           self.current_user = @user
-          redirect_to '/'
+          redirect_to :controller => :profile_editor, :profile => @enterprise.identifier
         else
           @register_pending = true
         end
       end
-    #rescue ActiveRecord::RecordInvalid
-      #@person.valid?
-      #@person.errors.delete(:identifier)
-      #@person.errors.delete(:user_id)
-    #end
+    rescue ActiveRecord::RecordInvalid
+      @person.valid?
+      @person.errors.delete(:identifier)
+      @person.errors.delete(:user_id)
+    end
   end
 end

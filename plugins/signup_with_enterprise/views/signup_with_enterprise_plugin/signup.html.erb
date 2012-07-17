@@ -23,7 +23,7 @@
     <%= hidden_field_tag :invitation_code, @invitation_code %>
 
     <%# FIXME: put text in environment setting %>
-    <div>
+    <div class='help-text'>
       <h2>Bem-vindo ao ESCAMBO!</h2>
       O ESCAMBO é uma rede para trocas entre pontos de cultura. O ponto de cultura
       pode ser um artesão, um coletivo cultura, uma banda, um grupo de teatro, entre
@@ -36,51 +36,36 @@
       <div id='signup-form-header'>
 
         <%# FIXME: put text in environment setting %>
-        <div>
+        <div class='help-text'>
           Quero trocar no ESCAMBO!
         </div>
 
-        <span id="signup-domain"><%= environment.default_hostname %>/</span>
-        <div id='signup-login'>
-          <div id='signup-login-field'>
-            <%= required f.text_field(:login, :onchange => 'this.value = convToValidLogin(this.value);', :rel => s_('signup|Login')) %>
-            <div id='url-check'><p>&nbsp;</p></div>
-          </div>
-          <%= content_tag(:small, _('Choose your login name carefully! It will be your network access and you will not be able to change it later.'), :id => 'signup-balloon') %>
-          <br style="clear: both;" />
+       <%= label :profile_data, :name %>
+       <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
+
+        <div id='signup-password'>
+          <%= required f.password_field(:password, :id => 'user_pw') %>
+          <%= f.text_field(:password_clear, :value => _('password')) %>
+          <%= content_tag(:small,_('Choose a password that you can remember easily. It must have at least 4 characters.'), :id => 'password-balloon') %>
+          <div id='fake-check'><p>&nbsp;</p></div>
         </div>
-        <%= observe_field 'user_login',
-          :url => { :controller => :account, :action => 'check_url' },
-          :with => 'identifier',
-          :update => 'url-check',
-          :loading => "jQuery('#user_login').removeClass('#{validation_classes}').addClass('checking');
-                     jQuery('#url-check').html('<p><span class=\"checking\">#{checking_message(:url)}</span></p>');",
-                     :complete => "jQuery('#user_login').removeClass('checking')"
-                   %>
 
-                 <div id='signup-password'>
-                   <%= required f.password_field(:password, :id => 'user_pw') %>
-                   <%= f.text_field(:password_clear, :value => _('password')) %>
-                   <%= content_tag(:small,_('Choose a password that you can remember easily. It must have at least 4 characters.'), :id => 'password-balloon') %>
-                   <div id='fake-check'><p>&nbsp;</p></div>
-                 </div>
+        <div id='signup-password-confirmation'>
+          <%= required f.password_field(:password_confirmation) %>
+          <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
+          <div id='password-check'><p>&nbsp;</p></div>
+        </div>
 
-                 <div id='signup-password-confirmation'>
-                   <%= required f.password_field(:password_confirmation) %>
-                   <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
-                   <div id='password-check'><p>&nbsp;</p></div>
-                 </div>
-
-                 <div id='signup-email'>
-                   <%= required f.text_field(:email, :rel => _('e-Mail')) %>
-                   <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
-                   <div id='email-check'><p>&nbsp;</p></div>
-                 </div>
-                 <%= observe_field "user_email",
-                   :url      => { :controller => :account, :action => "check_email" },
-                   :with     => "address",
-                   :update   => "email-check",
-                   :loading  => "jQuery('#user_email').removeClass('#{validation_classes}').addClass('checking');
+        <div id='signup-email'>
+          <%= required f.text_field(:email, :rel => _('e-Mail')) %>
+          <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
+          <div id='email-check'><p>&nbsp;</p></div>
+        </div>
+        <%= observe_field "user_email",
+          :url      => { :controller => :account, :action => "check_email" },
+          :with     => "address",
+          :update   => "email-check",
+          :loading  => "jQuery('#user_email').removeClass('#{validation_classes}').addClass('checking');
            jQuery('#email-check').html('<p><span class=\"checking\">#{checking_message(:email)}</span></p>');",
            :complete => "jQuery('#user_email').removeClass('checking')",
            :before   => "var field = jQuery('#user_email');
@@ -95,9 +80,6 @@
              return false;
            }"
          %>
-
-       <%= label :profile_data, :name %>
-       <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
 
        <div id="signup-form-profile">
 
@@ -127,7 +109,7 @@
      <div id='signup-form-header'>
 
        <%# FIXME: put text in environment setting %>
-       <div>
+       <div class='help-text'>
          Agora vamos cadastrar o espaço em que você vai mostrar suas ofertas
          para troca. Digite o nome do Ponto de Cultura, que pode ser o nome do
          seu coletivo, ou seu nome caso queira trocar individualmente. Complete
