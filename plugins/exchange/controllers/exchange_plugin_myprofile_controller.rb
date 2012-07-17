@@ -53,7 +53,7 @@ class ExchangePluginMyprofileController < MyProfileController
    
     #allowing edition
     @edit_allowed = true
-    edit_not_allowed = ["concluded", "conclusion_proposed_by_origin", "conclusion_proposed_by_target",
+    edit_not_allowed = ["proposed", "concluded", "conclusion_proposed_by_origin", "conclusion_proposed_by_target",
         "evaluated_by_target", "evaluated_by_origin", "evaluated"]
 
     if (edit_not_allowed.index(@exchange.state))

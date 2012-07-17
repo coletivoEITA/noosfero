@@ -27,11 +27,13 @@
 
 <div id="evaluation">
   <% form_for :evaluation, :url => {:controller => 'exchange_plugin_myprofile', :action => 'evaluate', :exchange_id => @exchange.id} do |f| %>
-    <h2><%= _('Give a score to the behaviour of %s during the exchange process:') % @enterprise_other.name %></h2>
+    <h2><%= _('Please evaluate the behaviour of %s during the exchange process:') % @enterprise_other.name %></h2>
     <table style="width:auto">
-    <% 5.times do |i|%>
-      <tr><td><%= i+1 %></td><td><%= radio_button_tag "score", i+1 %></td></tr>
-    <% end %>
+      <tr><td><%= _("1 (Very bad)") %></td><td><%= radio_button_tag "score", 1 %></td></tr>
+      <tr><td><%= _("2 (Less than expected)") %></td><td><%= radio_button_tag "score", 1 %></td></tr>
+      <tr><td><%= _("3 (Regular)") %></td><td><%= radio_button_tag "score", 1 %></td></tr>
+      <tr><td><%= _("4 (Better than expected)") %></td><td><%= radio_button_tag "score", 1 %></td></tr>
+      <tr><td><%= _("5 (Excellent)") %></td><td><%= radio_button_tag "score", 1 %></td></tr>
     </table>
       <div id='leave_scrap' style="float:none; height:70px;">
         <%= text_area_tag 'text',nil, :rows => 2, :cols => 30, :placeholder => _('Write your evaluation message here...') %>
