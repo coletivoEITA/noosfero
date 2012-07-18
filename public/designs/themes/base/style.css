@@ -292,11 +292,6 @@ body, th, td, input {
   border-bottom: 2px solid #2e3436;
 }
 
-.block {
-  position: relative;
-  padding: 10px 0;
-  float: none;
-}
 .box-1 .block {
   float: left;
 }
@@ -374,10 +369,11 @@ div#notice {
 }
 
 .block {
-  padding: 0px;
-  margin: 0px 0px 20px 0px;
   position: relative;
+  padding: 0;
+  margin: 0px 0px 20px 0px;
   min-height: 30px;
+  float: none;
 }
 
 
