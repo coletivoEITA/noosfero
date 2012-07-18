@@ -31,5 +31,9 @@ class SnifferPlugin < Noosfero::Plugin
     SnifferPlugin::InterestsBlock
   end
 
+  def environment_blocks(environment)
+    SnifferPlugin::InterestsBlock
+  end
+
 end
 

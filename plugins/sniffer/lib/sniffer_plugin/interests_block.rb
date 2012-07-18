@@ -1,11 +1,11 @@
 class SnifferPlugin::InterestsBlock < Block
 
   def self.description
-    _("Profile's interests")
+    _("Lists declared and inputs interests")
   end
 
   def self.short_description
-    _("Profile's interests")
+    _("Lists interests")
   end
 
   def default_title
@@ -13,17 +13,24 @@ class SnifferPlugin::InterestsBlock < Block
   end
 
   def help
-    _("This block show interests of your profile")
+    _("This block show interests of your profile or environment")
   end
 
   def content(args = {})
     block = self
     lambda do
-      sniffer = SnifferPluginProfile.find_or_create(block.owner)
-      interests = sniffer.opportunities
-      inputs = sniffer.profile.enterprise? ? sniffer.profile.inputs : nil
+      if block.owner.is_a?(Profile)
+        sniffer = SnifferPluginProfile.find_or_create(block.owner)
+        interests = sniffer.opportunities
+        interests |= sniffer.profile.inputs if sniffer.profile.enterprise?
+      else # Environment
+        interests = SnifferPluginOpportunity.product_categories :limit => 5, :order => 'created_at DESC'
+        interests += Input.all :limit => 5, :order => 'created_at DESC'
+        interests.sort{ |a, b| -1 * a.created_at.to_i <=> b.created_at.to_i }
+      end
+
       render :file => 'blocks/sniffer_plugin/interests_block',
-        :locals => {:block => block, :interests => interests, :inputs => inputs}
+        :locals => {:block => block, :interests => interests}
     end
   end
 
