@@ -10,7 +10,7 @@ class SnifferPluginMyprofileController < MyProfileController
     if request.post?
       begin
         @sniffer_profile.update_attributes(params[:sniffer])
-        @sniffer_profile.enabled = params[:sniffer][:enabled]
+        @sniffer_profile.enabled = true
         @sniffer_profile.save!
         session[:notice] = @sniffer_profile.enabled ?
           _('Buyer interests published') : _('Buyer interests disabled')

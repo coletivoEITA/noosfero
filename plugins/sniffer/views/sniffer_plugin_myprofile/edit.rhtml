@@ -1,9 +1,6 @@
 <h1> <%= _('Buyer interests') %> </h1>
   
 <% form_for(:sniffer, @sniffer_profile, :url => {:action => 'edit'}, :html => {:method => 'post'}) do |f| %>
-  <%= f.check_box :enabled, :onchange => "sniffer_plugin_interest_enable(jQuery(this).attr('checked'))" %>
-  <%= f.label :enabled, _('Enable network buyer profile'), :class => 'sniffer-edit-enable-label' %>
-  <div class="sniffer-edit-enable-help"><%= _('By enabling the network buyer profile, enterprises and other network entities will be able to know your buying interests e get in contact for business') %></div>
   
   <div id='sniffer-plugin-product-select'>
     <div><%= _('Products and Services of Interest') %></div>
@@ -23,5 +20,4 @@
 
 <div id="sniffer-plugin-disable-pane">
 </div>
-<%= javascript_tag "jQuery(window).load(function () { sniffer_plugin_interest_enable(jQuery('#sniffer_enabled').attr('checked')); });" %>
 
