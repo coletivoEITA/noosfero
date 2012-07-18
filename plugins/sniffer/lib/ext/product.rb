@@ -50,8 +50,8 @@ class Product
       categories.id as product_category_id, categories.name as product_category_name,
       'interest_supplier_product' as view,
       SQRT( POW((#{KM_LAT} * (#{profile.lat} - profiles.lat)), 2) + POW((#{KM_LNG} * (#{profile.lng} - profiles.lng)), 2)) AS profile_distance",
-    :joins => "INNER JOIN sniffer_plugin_opportunities as op ON ( sniffer.id = op.profile_id AND op.opportunity_type = 'ProductCategory' )
-      INNER JOIN categories categories ON ( op.opportunity_id = categories.id )
+    :joins => "INNER JOIN sniffer_plugin_opportunities AS op ON ( sniffer.id = op.profile_id AND op.opportunity_type = 'ProductCategory' )
+      INNER JOIN categories ON ( op.opportunity_id = categories.id )
       INNER JOIN products ON ( products.product_category_id = categories.id )
       INNER JOIN profiles ON ( products.enterprise_id = profiles.id )",
     :conditions => "sniffer.enabled = true AND sniffer.profile_id = #{profile.id} AND products.enterprise_id <> #{profile.id}
