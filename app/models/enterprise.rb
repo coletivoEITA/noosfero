@@ -163,9 +163,9 @@ class Enterprise < Organization
     end
   end
 
-  def control_panel_settings_button                                                                                                                                                             
-    {:title => __('Enterprise Info and settings'), :icon => 'edit-profile-enterprise'}                                                                                                          
-  end 
+  def control_panel_settings_button
+    {:title => __('Enterprise Info and settings'), :icon => 'edit-profile-enterprise'}
+  end
 
   settings_items :enable_contact_us, :type => :boolean, :default => true
 

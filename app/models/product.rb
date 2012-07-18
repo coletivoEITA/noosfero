@@ -138,7 +138,7 @@ class Product < ActiveRecord::Base
   def qualifiers_list=(qualifiers)
     self.product_qualifiers.destroy_all
     qualifiers.each do |qualifier_id, certifier_id|
-      self.product_qualifiers.create(:qualifier_id => qualifier_id, :certifier_id => certifier_id)
+      self.product_qualifiers.create(:qualifier_id => qualifier_id, :certifier_id => certifier_id) if qualifier_id != 'nil'
     end
   end
 
@@ -219,7 +219,7 @@ class Product < ActiveRecord::Base
   def self.f_region_proc(id)
     c = Region.find(id)
     s = c.parent
-    if c and c.kind_of?(City) and s and s.kind_of?(State) and s.acronym 
+    if c and c.kind_of?(City) and s and s.kind_of?(State) and s.acronym
       [c.name, ', ' + s.acronym]
     else
       c.name

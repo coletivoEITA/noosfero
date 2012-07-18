@@ -1,6 +1,7 @@
 <li class="search-profile-item">
 <% if @empty_query or @results.size > 1 or !profile.enterprise?  %>
-  <%= profile_image_link profile, :portrait, 'div' %>
+  <%= profile_image_link profile, :portrait, 'div',
+    @filter == 'more_recent' ? profile.send(@filter + '_label') + show_date(profile.created_at) : profile.send(@filter + '_label') %>
 <% else %>
   <div class="search-enterprise-item">
     <div class="search-enterprise-item-column-left">
@@ -25,14 +26,12 @@
 
       <div class="search-enterprise-categorization">
         <% profile.top_level_categorization.each do |parent, children| %>
-          <% if parent.name != "Territórios" %>
-            <div class="search-enterprise-category-<%=parent.id%> search-enterprise-category">
-              <span class="search-enterprise-categorization-parent"><%= parent.name %></span>
-              <span class="search-enterprise-categorization-children">
-                <%= children.collect(&:name).join(', ')  %>
-              </span>
-            </div>
-          <% end %>
+          <div class="search-enterprise-category-<%=parent.id%> search-enterprise-category">
+            <span class="search-enterprise-categorization-parent"><%= parent.name %></span>
+            <span class="search-enterprise-categorization-children">
+              <%= children.collect(&:name).join(', ')  %>
+            </span>
+          </div>
         <% end %>
       </div>
     </div>

@@ -187,6 +187,12 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Adds new block types in environment
+  # returs = class that implements Block
+  def environment_blocks(environment)
+    nil
+  end
+
   # -> Adds buttons to manage members page
   # returns = { :title => title, :icon => icon, :url => url }
   #   title = name that will be displayed.
