@@ -3,6 +3,10 @@
 <% if block.article %>
   <% if block.box and block.box.main? %>
     <%= view_page block.article, :display_toolbar => false, :display_title => false, :display_hits => false %>
+
+    <% if logged_in? and block.article.allow_edit?(user) %>
+      <%= link_to _('Edit'), :controller => :cms, :action => :edit, :id => block.article.id %>
+    <% end %>
   <% else %>
     <%= article_to_html block.article, :gallery_view => false %>
   <% end %>
