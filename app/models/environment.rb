@@ -711,6 +711,11 @@ class Environment < ActiveRecord::Base
     "home-page-news/#{cache_key}-#{language}"
   end
 
+  def on_homepage?(url)
+    url = url.sub(/(\/)+$/, '') # remove trailing slashes
+    url == ""
+  end
+
   def notification_emails
     [contact_email.blank? ? nil : contact_email].compact + admins.map(&:email)
   end

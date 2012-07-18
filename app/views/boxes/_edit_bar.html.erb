@@ -1,17 +1,11 @@
 <div id="boxes-edit-bar">
   <% for_profile = self.respond_to?(:profile) && self.profile %>
   <% editing = false unless defined? editing %>
-
-  <% if for_profile %>
-    <% on_homepage = profile.on_homepage?(request.path) %>
-    <% edit_main_box = on_homepage %>
-  <% else %>
-    <% edit_main_box = false %>
-  <% end %>
+  <% on_homepage = for_profile ? profile.on_homepage?(request.path) : environment.on_homepage?(request.path) %>
 
   <% javascript_tag do %>
     jQuery(document).ready(function() {
-      block_dragndrop_init('<%= url_for :profile => (profile.identifier rescue nil), :controller => boxes_controller, :action => :move_block%>', <%= edit_main_box %>);
+      block_dragndrop_init('<%= url_for :profile => (profile.identifier rescue nil), :controller => boxes_controller, :action => :move_block%>', <%= on_homepage %>);
       <% if editing %>
         jQuery('#box-edit-button')[0].onclick();
       <% end %>

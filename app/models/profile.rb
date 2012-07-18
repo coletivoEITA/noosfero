@@ -201,7 +201,7 @@ class Profile < ActiveRecord::Base
   end
 
   belongs_to :region
-  
+
   def location(separator = ' - ')
     myregion = self.region
     if myregion
@@ -282,12 +282,12 @@ class Profile < ActiveRecord::Base
     true
   end
 
-  # registar callback for creating boxes after the object is created. 
+  # registar callback for creating boxes after the object is created.
   after_create :create_default_set_of_boxes
 
   # creates the initial set of boxes when the profile is created. Can be
   # overriden for each subclass to create a custom set of boxes for its
-  # instances.    
+  # instances.
   def create_default_set_of_boxes
     if template
       apply_template(template, :copy_articles => false)
@@ -400,7 +400,7 @@ class Profile < ActiveRecord::Base
 
   # returns +false+
   def person?
-    self.kind_of?(Person) 
+    self.kind_of?(Person)
   end
 
   def enterprise?
@@ -508,7 +508,7 @@ private :generate_url, :url_options
 
   after_create :insert_default_article_set
   def insert_default_article_set
-    if template 
+    if template
       copy_articles_from template
     else
       default_set_of_articles.each do |article|
@@ -576,7 +576,7 @@ private :generate_url, :url_options
       raise _("%s can't have members") % self.class.name
     end
   end
-  
+
   def remove_member(person)
     self.disaffiliate(person, Profile::Roles.all_roles(environment.id))
   end
@@ -635,7 +635,7 @@ private :generate_url, :url_options
   end
 
   def edit_home_boxes
-    
+
     lambda do
       render :file => 'cms/feedback_plugin_page'
     end
@@ -820,6 +820,7 @@ private :generate_url, :url_options
   end
 
   def on_homepage?(url)
+    url = url.sub(/(\/)+$/, '') # remove trailing slashes
     url == "/#{self.identifier}" || url == "/profile/#{self.identifier}"
   end
 
@@ -867,7 +868,7 @@ private :generate_url, :url_options
   def self.f_region_proc(id)
     c = Region.find(id)
     s = c.parent
-    if c and c.kind_of?(City) and s and s.kind_of?(State) and s.acronym 
+    if c and c.kind_of?(City) and s and s.kind_of?(State) and s.acronym
       [c.name, ', ' + s.acronym]
     else
       c.name
@@ -875,7 +876,7 @@ private :generate_url, :url_options
   end
 
   def self.f_enabled_proc(enabled)
-    enabled = enabled == "true" ? true : false 
+    enabled = enabled == "true" ? true : false
     enabled ? _('Enabled') : _('Not enabled')
   end
   def f_enabled
@@ -923,9 +924,9 @@ private :generate_url, :url_options
   after_save_reindex [:articles], :with => :delayed_job
   handle_asynchronously :solr_save
 
-  def control_panel_settings_button                                                                                                                                                             
-    {:title => _('Profile Info and settings'), :icon => 'edit-profile'}                                                                                                                         
-  end 
+  def control_panel_settings_button
+    {:title => _('Profile Info and settings'), :icon => 'edit-profile'}
+  end
 
   def followed_by?(person)
     person.is_member_of?(self)
