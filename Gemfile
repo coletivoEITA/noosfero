@@ -33,6 +33,7 @@ group :production do
   gem 'thin', '1.2.4'
   gem 'exception_notification', '1.0.20090728'
   gem 'capistrano'
+  gem 'rvm-capistrano'
   gem 'capistrano_colors'
 end
 

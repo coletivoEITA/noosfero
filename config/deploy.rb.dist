@@ -40,7 +40,6 @@ set :rails_env, "production"
 default_run_options[:pty] = true # for sudo and environments without tty
 
 # RVM (comment if not using), see http://beginrescueend.com/integration/capistrano
-$:.unshift File.expand_path('./lib', ENV['rvm_path'])
 require "rvm/capistrano"
 set :rvm_gemset, 'noosfero036'
 set :rvm_ruby_string, "1.8.7@#{fetch :rvm_gemset}"
