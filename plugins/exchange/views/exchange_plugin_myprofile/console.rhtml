@@ -1,7 +1,15 @@
 
-<div id="exchange_console_top">
+
+<% button_bar(:style => 'margin-bottom: 1em;') do %>
+  <%= button(:back, _('Back to My Exchanges'), :action => "index") %>
+<% end %>
+
+  <div id="exchange_console_top">
+
   <div id="exchange_summary">
   <h2><%= _('Exchange Summary')%></h2>
+
+
   <table>
     <!--<tr><td class="exchange_label"><%= _("Slug: ") %></td><td><%= @exchange.slug %></td></tr>-->
     <tr><td class="exchange_label"><%= _("Exchange with: ") %></td><td><%= @exchange.the_other(profile).name %></td></tr>

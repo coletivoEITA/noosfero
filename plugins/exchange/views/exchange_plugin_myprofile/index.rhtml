@@ -6,9 +6,9 @@
 <% else %>
   <table>
     <tr>
-      <th><%= sortable "slug",_('Slug') %></th>
+      <!--<th><%= sortable "slug",_('Slug') %></th>-->
       <th><%= sortable "state", _('State') %></th>
-      <th><%= sortable "description",_('Description') %></th>
+      <!--<th><%= sortable "description",_('Description') %></th>-->
       <th><%= _('Proposer') %></th>
       <th><%= _('Proposed') %></th>
       <th><%= sortable "created_at" ,_('Date Created') %></th>
@@ -20,9 +20,9 @@
 
     <% @exchanges.each do |exchange|   %>
       <tr>
-        <td><%= exchange.slug %></td>
+        <!--<td><%= exchange.slug %></td>-->
         <td><%= ExchangePlugin::Exchange.state[exchange.state] %></td>
-        <td><%= exchange.description %></td>
+        <!--<td><%= exchange.description %></td>-->
         <% if (ev = (exchange.evaluations.find_by_evaluator_id exchange.enterprise_origin_id)) %>
           <td title="<%= ev.text %>"><%= exchange.enterprise_origin.name %> | <%= ev.score %></td>
         <% else %>
