@@ -137,7 +137,7 @@ namespace :configs do
     ), 'local.rb' => (<<-EOF
       Noosfero.default_locale = '#{fetch :default_locale}'
 
-      # Replace with own server, see http://noosfero.org/Development/SMTPMailSending
+      # Replace with own server, see http://noosfero.org/Development/MailSending
       ActionMailer::Base.delivery_method = :test
     EOF
     ), 'thin.yml' => (<<-EOF
