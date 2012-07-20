@@ -3,7 +3,7 @@
 <ul>
   <% learnings.each do |learning| %>
     <li>
-      <%= learning.name %>
+      <%= link_to_article(learning) %>
     </li>
   <% end %>
 </ul>
