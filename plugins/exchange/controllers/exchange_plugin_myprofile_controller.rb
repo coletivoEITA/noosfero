@@ -67,7 +67,9 @@ class ExchangePluginMyprofileController < MyProfileController
       "conclusion_proposed_by_origin" => [ [_('Exchange Concluded'), "conclude"], [_('Exchange not Concluded'), "happening"] ],
       "happening" => [ [_('Propose Conclusion'), "propose_conclusion"], [_('Cancel Exchange'), "cancel"] ],
       "concluded" => [ [_('Back to happening - this should not appear'), "happening"], [_('Cancel'), "cancel"] ],
-      "cancelled" => [ [_('Back to happening - this should not appear'), "happening"], [_('Cancel'), "cancel"] ]
+      "cancelled" => [ [_('Back to happening - this should not appear'), "happening"], [_('Cancel'), "cancel"] ],
+      "cancelled_by_target" => [ [_('Back to happening - this should not appear'), "happening"], [_('Cancel'), "cancel"] ],
+      "cancelled_by_origin" => [ [_('Back to happening - this should not appear'), "happening"], [_('Cancel'), "cancel"] ]
     }
     @button = state_buttons[@exchange.state] 
 
@@ -189,6 +191,7 @@ class ExchangePluginMyprofileController < MyProfileController
   def conclude 
     e = ExchangePlugin::Exchange.find params[:id]
     e.state = "concluded"
+    e.simplified_state = "concluded"
     e.save
    
     #message
@@ -201,10 +204,15 @@ class ExchangePluginMyprofileController < MyProfileController
   def cancel
     e = ExchangePlugin::Exchange.find params[:id]
     e.state = "cancelled"
+    if profile.id = e.enterprise_target_id
+      e.simplified_state = "cancelled_by_target"
+    else
+      e.simplified_state = "cancelled_by_origin"
+    end
     e.save
    
     #message
-    body = _('Exchange Cancelled') 
+    body = _('Exchange Cancelled by %{enterprise}') % {:enterprise => profile.name}
     m = ExchangePlugin::Message.new_exchange_message(e, nil, nil, nil , body)
    
     redirect_to :action => 'evaluate', :id => params[:id]

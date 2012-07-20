@@ -93,6 +93,7 @@ class ExchangePluginProfileController < ProfileController
     @exchange.enterprise_origin = Enterprise.find params[:origin_enterprise_id]
     @exchange.enterprise_target = profile
     @exchange.state = "proposed"
+    @exchange.simplified_state = "happening"
     @exchange.save!
     
     #message
