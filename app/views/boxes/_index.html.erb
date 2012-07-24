@@ -1,5 +1,5 @@
-<% profile_admin = logged_in? and profile and (profile == current_user.person or profile.admins.include?(current_user.person)) %>
-<% env_admin = current_user.person.is_admin?(environment) %>
+<% profile_admin = logged_in? && profile && (profile == current_user.person || profile.admins.include?(current_user.person)) %>
+<% env_admin = logged_in? && current_user.person.is_admin?(environment) %>
 
 <% if env_admin or (profile_admin and environment.disabled?('cant_change_homepage')) %>
   <% self.box_presenter = BlockEditorPresenter %>
