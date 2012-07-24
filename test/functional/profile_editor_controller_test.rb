@@ -601,15 +601,6 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :attributes => { :href => '/myprofile/default_user/cms' }
   end
 
-  should 'not display link to CMS if disabled' do
-    env = Environment.default
-    env.enable('disable_cms')
-    env.save!
-    get :index, :profile => profile.identifier
-
-    assert_no_tag :tag => 'a', :attributes => { :href => '/myprofile/default_user/cms' }
-  end
-
   should 'offer to create blog in control panel' do
     get :index, :profile => profile.identifier
     assert_tag :tag => 'a', :attributes => { :href => "/myprofile/default_user/cms/new?type=Blog" }
@@ -751,7 +742,6 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert_nothing_raised do
       post :edit, :profile => c.identifier, :profile_data => c.attributes.merge('identifier' => '')
     end
-    assert_response :success
   end
 
   should 'show active fields when edit community' do
@@ -914,6 +904,49 @@ class ProfileEditorControllerTest < ActionController::TestCase
     get :edit, :profile => profile.identifier
     assert_tag :tag => 'input', :attributes => { :name => 'profile_data[image_builder][uploaded_data]' }
     assert_tag :tag => 'div', :attributes => { :id => 'profile_change_picture' }
+  end
+
+  should 'add extra content on person info from plugins' do
+    class Plugin1 < Noosfero::Plugin
+      def profile_info_extra_contents
+        lambda {"<strong>Plugin1 text</strong>"}
+      end
+    end
+    class Plugin2 < Noosfero::Plugin
+      def profile_info_extra_contents
+        lambda {"<strong>Plugin2 text</strong>"}
+      end
+    end
+
+    Environment.default.enable_plugin(Plugin1)
+    Environment.default.enable_plugin(Plugin2)
+
+    get :edit, :profile => profile.identifier
+
+    assert_tag :tag => 'strong', :content => 'Plugin1 text'
+    assert_tag :tag => 'strong', :content => 'Plugin2 text'
+  end
+
+  should 'add extra content on organization info from plugins' do
+    class Plugin1 < Noosfero::Plugin
+      def profile_info_extra_contents
+        lambda {"<strong>Plugin1 text</strong>"}
+      end
+    end
+    class Plugin2 < Noosfero::Plugin
+      def profile_info_extra_contents
+        lambda {"<strong>Plugin2 text</strong>"}
+      end
+    end
+
+    Environment.default.enable_plugin(Plugin1)
+    Environment.default.enable_plugin(Plugin2)
+    organization = fast_create(Community)
+
+    get :edit, :profile => organization.identifier
+
+    assert_tag :tag => 'strong', :content => 'Plugin1 text'
+    assert_tag :tag => 'strong', :content => 'Plugin2 text'
   end
 
 end

@@ -94,7 +94,6 @@ class Environment < ActiveRecord::Base
       'disable_asset_events' => _('Disable search for events'),
       'disable_products_for_enterprises' => __('Disable products for enterprises'),
       'disable_categories' => _('Disable categories'),
-      'disable_cms' => _('Disable CMS'),
       'disable_header_and_footer' => _('Disable header/footer editing by users'),
       'disable_gender_icon' => _('Disable gender icon'),
       'disable_categories_menu' => _('Disable the categories menu'),
@@ -122,6 +121,7 @@ class Environment < ActiveRecord::Base
       'xmpp_chat' => _('XMPP/Jabber based chat'),
       'show_zoom_button_on_article_images' => _('Show a zoom link on all article images'),
       'captcha_for_logged_users' => _('Ask captcha when a logged user comments too'),
+      'skip_new_user_email_confirmation' => _('Skip e-mail confirmation for new users')
     }
   end
 
@@ -248,6 +248,10 @@ class Environment < ActiveRecord::Base
 
   settings_items :enabled_plugins, :type => Array, :default => []
 
+  settings_items :search_hints, :type => Hash, :default => {}
+
+  settings_items :top_level_category_as_facet_ids, :type => Array, :default => []
+
   def news_amount_by_folder=(amount)
     settings[:news_amount_by_folder] = amount.to_i
   end
@@ -258,7 +262,7 @@ class Environment < ActiveRecord::Base
   end
 
   def enable_plugin(plugin)
-    self.enabled_plugins += [plugin]
+    self.enabled_plugins += [plugin.to_s]
     self.enabled_plugins.uniq!
     self.save!
   end
@@ -269,13 +273,20 @@ class Environment < ActiveRecord::Base
   end
 
   def disable_plugin(plugin)
-    self.enabled_plugins.delete(plugin)
+    self.enabled_plugins.delete(plugin.to_s)
     self.save!
   end
 
   # Tells if a feature, identified by its name, is enabled
   def enabled?(feature)
     self.settings["#{feature}_enabled".to_sym] == true
+  end
+  def disabled?(feature)
+    !self.enabled?(feature)
+  end
+
+  def plugin_enabled?(plugin)
+    enabled_plugins.include?(plugin.to_s)
   end
 
   # enables the features identified by <tt>features</tt>, which is expected to
@@ -696,8 +707,8 @@ class Environment < ActiveRecord::Base
     settings[:portal_folders] = folders ? folders.map(&:id) : nil
   end
 
-  def portal_news_cache_key
-    "home-page-news/#{cache_key}"
+  def portal_news_cache_key(language='en')
+    "home-page-news/#{cache_key}-#{language}"
   end
 
   def notification_emails

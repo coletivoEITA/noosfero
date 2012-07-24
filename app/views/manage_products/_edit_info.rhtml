@@ -21,6 +21,10 @@
       <td class='formlabel'><%= _('Available') %></td>
       <td class='formfield'><%= labelled_radio_button( _('Yes'), 'product[available]', true, @product.available, :id => 'product_available') + labelled_radio_button( _('No'), 'product[available]', false, !@product.available) %></td>
     </tr>
+    <tr>
+      <td><%= f.label :highlighted, _('Highlight this product?'), :class => 'formlabel' %></td>
+      <td class='formfield'><%= f.check_box(:highlighted) %></td>
+    </tr>
   </table>
 
   <% if !environment.qualifiers.empty? %>
@@ -35,8 +39,7 @@
           <%= select_qualifiers(@product, qualifier.id) %>
         </td>
         <td id='certifier-area-<%= index %>'>
-          <%= select_certifiers(qualifier, @product) %>
-          <%= button_to_function(:delete, content_tag('span', 'Delete qualifier'), "jQuery(this).parents('tr').remove()") %>
+          <%= select_certifiers(qualifier, @product) + remove_qualifier_button %>
         </td>
       </tr>
       <% end %>
@@ -44,9 +47,9 @@
     <%= button_to_function(
       :add,
       _('Add new qualifier'),
-      "new_qualifier_row('#product-qualifiers-list', '#{escape_javascript(select_qualifiers(@product))}')"
+      "new_qualifier_row('#product-qualifiers-list', '#{escape_javascript(select_qualifiers(@product))}', '#{escape_javascript(remove_qualifier_button)}')"
     ) %>
-    <%= hidden_field_tag "product[qualifiers_list]" %>
+    <%= hidden_field_tag "product[qualifiers_list][nil]" %>
   <% end %>
 
   <%= hidden_field_tag 'info-bar-update-url', @product.price_composition_bar_display_url, :class => 'bar-update-url' %>

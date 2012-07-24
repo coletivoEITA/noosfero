@@ -55,6 +55,9 @@ Raphael Rousseau <raph@r4f.org>
 Théo Bondolfi <move@cooperation.net>
 Vicente Aguiar <vicenteaguiar@colivre.coop.br>
 
+Arts
+===================================
+Nara Oliveira <narananet@gmail.com>
 EOF
 
   desc 'updates the AUTHORS file'
@@ -81,9 +84,14 @@ EOF
   desc 'Build Debian packages'
   task :debian_packages => :package do
     target = "pkg/noosfero-#{Noosfero::VERSION}"
+
+    # base pre-config
     mkdir "#{target}/tmp"
     ln_s '../../../vendor/rails', "#{target}/vendor/rails"
     cp "#{target}/config/database.yml.sqlite3", "#{target}/config/database.yml"
+    # solr inclusion
+    Dir.chdir(target) { sh "rake solr:download" }
+
     sh "cd #{target} && dpkg-buildpackage -us -uc -b"
   end
 

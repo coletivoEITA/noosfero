@@ -622,14 +622,14 @@ class AccountControllerTest < ActionController::TestCase
     @controller.expects(:environment).returns(env).at_least_once
     profile = create_user('mylogin').person
     get :check_url, :identifier => 'mylogin'
-    assert_equal 'available', assigns(:status_class)
+    assert_equal 'validated', assigns(:status_class)
   end
 
   should 'check if url is not available on environment' do
     @controller.expects(:environment).returns(Environment.default).at_least_once
     profile = create_user('mylogin').person
     get :check_url, :identifier => 'mylogin'
-    assert_equal 'unavailable', assigns(:status_class)
+    assert_equal 'invalid', assigns(:status_class)
   end
 
   should 'check if e-mail is available on environment' do
@@ -637,7 +637,7 @@ class AccountControllerTest < ActionController::TestCase
     @controller.expects(:environment).returns(env).at_least_once
     profile = create_user('mylogin', :email => 'mylogin@noosfero.org', :environment_id => fast_create(Environment).id)
     get :check_email, :address => 'mylogin@noosfero.org'
-    assert_equal 'available', assigns(:status_class)
+    assert_equal 'validated', assigns(:status_class)
   end
 
   should 'check if e-mail is not available on environment' do
@@ -645,7 +645,7 @@ class AccountControllerTest < ActionController::TestCase
     @controller.expects(:environment).returns(env).at_least_once
     profile = create_user('mylogin', :email => 'mylogin@noosfero.org', :environment_id => env)
     get :check_email, :address => 'mylogin@noosfero.org'
-    assert_equal 'unavailable', assigns(:status_class)
+    assert_equal 'invalid', assigns(:status_class)
   end
 
   should 'merge user data with extra stuff from plugins' do
@@ -735,6 +735,37 @@ class AccountControllerTest < ActionController::TestCase
     assert_nothing_raised do
       new_user :password_clear => 'nothing', :password_confirmation_clear => 'nothing'
     end
+  end
+
+  should 'login after signup when no e-mail confirmation is required' do
+    e = Environment.default
+    e.enable('skip_new_user_email_confirmation')
+    e.save!
+
+    new_user
+    assert_response :redirect
+    assert_not_nil assigns(:current_user)
+  end
+
+  should 'add extra content on signup forms from plugins' do
+    class Plugin1 < Noosfero::Plugin
+      def signup_extra_contents
+        lambda {"<strong>Plugin1 text</strong>"}
+      end
+    end
+    class Plugin2 < Noosfero::Plugin
+      def signup_extra_contents
+        lambda {"<strong>Plugin2 text</strong>"}
+      end
+    end
+
+    Environment.default.enable_plugin(Plugin1.name)
+    Environment.default.enable_plugin(Plugin2.name)
+
+    get :signup
+
+    assert_tag :tag => 'strong', :content => 'Plugin1 text'
+    assert_tag :tag => 'strong', :content => 'Plugin2 text'
   end
 
   protected

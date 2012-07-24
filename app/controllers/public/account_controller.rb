@@ -78,7 +78,12 @@ class AccountController < ApplicationController
           invitation.update_attributes!({:friend => @user.person})
           invitation.finish
         end
-        @register_pending = true
+        if @user.activated?
+          self.current_user = @user
+          redirect_to '/'
+        else
+          @register_pending = true
+        end
       end
     rescue ActiveRecord::RecordInvalid
       @person.valid?
@@ -211,10 +216,10 @@ class AccountController < ApplicationController
     valid = Person.is_available?(@identifier, environment)
     if valid
       @status = _('This login name is available')
-      @status_class = 'available'
+      @status_class = 'validated'
     else
       @status = _('This login name is unavailable')
-      @status_class = 'unavailable'
+      @status_class = 'invalid'
     end
     render :partial => 'identifier_status'
   end
@@ -222,10 +227,10 @@ class AccountController < ApplicationController
   def check_email
     if User.find_by_email_and_environment_id(params[:address], environment.id).nil?
       @status = _('This e-mail address is available')
-      @status_class = 'available'
+      @status_class = 'validated'
     else
       @status = _('This e-mail address is taken')
-      @status_class = 'unavailable'
+      @status_class = 'invalid'
     end
     render :partial => 'email_status'
   end
