@@ -1,36 +1,36 @@
-# Inspired by http://railscasts.com/episodes/133-capistrano-tasks
-# See also
+# See online documentation on
 #   http://noosfero.org/Development/InstallSteps
-#   http://articles.slicehost.com/2008/1/18/capistrano-series-configuring-capistrano-1
+#   http://noosfero.org/Development/Capistrano
 
 require 'capistrano_colors'
 
 # Noosfero's environment settings
-set :name, "My environment"
-set :domain, "localhost"
+set :name, "ESCAMBO"
+set :domain, "escambo.org.br"
 set :default_locale, "pt"
-set :enabled_plugins, []
+set :enabled_plugins, ['cms_learning', 'evaluation', 'exchange', 'signup_with_enterprise', 'sniffer']
 
 # Server access
-set :application, "localhost"
+set :application, "bhakta.casadomato.org"
 set :user, "noosfero"
-#set :password, ""
+set :password, "n0osfero22"
 set :port, 22
 
 # Deploy destination
 set :deploy_to, "/home/#{fetch :user}/rails_app/#{fetch :domain}"
 set :deploy_via, :remote_cache
 set :use_sudo, false
-set :keep_releases, 10
+set :keep_releases, 5
 
 # Repository
 set :scm, "git"
-set :repository, "git://gitorious.org/noosfero/noosfero.git"
+set :repository, "git://github.com/ESCAMBO/noosfero-ecosol.git"
 set :branch, "master"
+set :git_enable_submodules, 1
 
 # Configuration variables
 set :database_name_prefix, "#{fetch :user}_#{fetch :domain}"
-set :app_port, 9040
+set :app_port, 9070
 set :app_servers, 4
 set :smtp_tls_support, true
 set :exception_notification, true
@@ -65,7 +65,6 @@ namespace :deploy do
   task :restart do
     deploy.migrate
     run "cd #{current_path}; script/production stop"
-    run "rm -f tmp/pids/mongrel*pid"
     run "cd #{current_path}; script/production start"
   end
 
@@ -89,12 +88,14 @@ after "deploy:create_symlink", "plugins:enable"
 after "deploy:create_symlink", "translations:compile"
 after "deploy:create_symlink", "uploads:symlink"
 after "deploy:create_symlink", "smtp:install_tls_support"
+after "deploy:create_symlink", "solr:download"
+after "deploy:update_code", "configs:copy"
 after "deploy:update_code", "configs:release_symlink"
 after "deploy:update_code", "dirs:release_create"
 after "deploy:restart", "cache:clear"
 
 namespace :plugins do
-  
+
   desc "Enable configured plugin list (and disable others)."
   task :enable do
     run "cd #{current_path}; script/noosfero-plugins disableall"
@@ -124,21 +125,29 @@ namespace :configs do
         encoding: unicode
         username: #{fetch :user}
         password:
-      development:
-        database: #{fetch :database_name_prefix, 'noosfero'}_development
-        <<: *base
-      test:
-        database: #{fetch :database_name_prefix, 'noosfero'}_test
-        <<: *base
       production:
         database: #{fetch :database_name_prefix, 'noosfero'}_production
         <<: *base
+    EOF
+    ), 'solr.yml' => (<<-EOF
+      production:
+        url: http://127.0.0.1:8983/solr
+        jvm_options: -server -Xmx192M -Xms64M
+        timeout: 0
     EOF
     ), 'local.rb' => (<<-EOF
       Noosfero.default_locale = '#{fetch :default_locale}'
 
       # Replace with own server, see http://noosfero.org/Development/MailSending
-      ActionMailer::Base.delivery_method = :test
+      ActionMailer::Base.smtp_settings = {
+        :tls => true,
+        :address => "mail.escambo.org.br",
+        :port => "587",
+        :domain => "escambo.org.br",
+        :authentication => :plain,
+        :user_name => "noreply@escambo.org.br",
+        :password => "GJDg^2qk"
+      }
     EOF
     ), 'thin.yml' => (<<-EOF
       ---
@@ -149,16 +158,6 @@ namespace :configs do
       environment: #{fetch :rails_env}
       pid: #{shared_path}/tmp/pid/thin.pid
       log: #{shared_path}/log/thin.log
-    EOF
-    ), 'ferret_server.yml' => (<<-EOF
-      production:
-        host: localhost
-        port: 9011
-        pid_file: tmp/pids/ferret.production.pid
-      development:
-        host: localhost
-        port: 9010
-        pid_file: tmp/pids/ferret.development.pid
     EOF
     ), 'noosfero.yml' => (<<-EOF
       development:
@@ -171,15 +170,14 @@ namespace :configs do
         gravatar: wavatar
         googlemaps_initial_zoom: 4
         exception_recipients: [admin@example.com]
-      
-      test:
-      
+
       production:
+        exception_recipients: [alantygel@gmail.com, brauliobo@gmail.com]
     EOF
     ),
   }
 
-  desc "Copy configuration files for each release."
+  desc "Copy configuration files to shared folder."
   task :copy do
     run "mkdir -p #{shared_path}/config"
     configs.each do |file, template|
@@ -205,6 +203,14 @@ namespace :configs do
 
 end
 
+namespace :solr do
+
+  desc "Download solr for current reload."
+  task :download do
+    run "cd #{current_path}; #{rake} solr:download"
+  end
+
+end
 
 namespace :translations do
 
@@ -278,7 +284,7 @@ namespace :db do
     task :list do
       run "ls -l #{shared_path}/backups"
     end
-    
+
   end
 
   namespace :data do
@@ -306,7 +312,7 @@ end
 # http://www.simonecarletti.com/blog/2009/02/capistrano-uploads-folder/
 namespace :uploads do
 
-  desc "Symlink uploaded files on current release."
+  desc "Symlink uploaded files for current release."
   task :symlink do
     %w{image_uploads}.each do |share|
       run "rm -rf #{current_path}/public/#{share}"
@@ -320,7 +326,7 @@ end
 
 # See http://noosfero.org/Development/SMTPMailSending for configuration details
 namespace :smtp do
-  desc "Install TLS support for SMTP."
+  desc "Install TLS support for SMTP for current release."
   task :install_tls_support do
     run "cd #{current_path}; script/plugin install git://github.com/collectiveidea/action_mailer_optional_tls.git"
   end
@@ -406,7 +412,7 @@ end
 
 namespace :bundle do
 
-  desc "Run bundle install."
+  desc "Run bundle install on current release."
   task :install do
     run "cd #{current_path}; bundle install"
   end
