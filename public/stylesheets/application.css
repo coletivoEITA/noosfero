@@ -6688,12 +6688,16 @@ h1#agenda-title {
   float: left;
 }
 
+#signup-form #signup-name,
+#signup-form #signup-email,
 #signup-form #signup-password,
 #signup-form #signup-password-confirmation,
 #signup-form #signup-login {
   position: relative;
 }
 
+#signup-form small#name-balloon,
+#signup-form small.signup-balloon,
 #signup-form small#signup-balloon,
 #signup-form small#password-balloon {
   display: none;
