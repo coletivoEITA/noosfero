@@ -40,9 +40,11 @@
           Quero trocar no ESCAMBO!
         </div>
 
-       <%= label :profile_data, :name %>
-       <%= required text_field(:profile_data, :name, :rel => _('Full name')) %>
-
+        <div id='signup-name' class='signup-field-container'>
+          <%= label :profile_data, :name %>
+          <%= required text_field(:profile_data, :name, :rel => _('Full name'), :class => 'signup-field') %>
+          <%= content_tag(:small,_('Type your name, please.'), :class => 'signup-balloon') %>
+        </div>
         <div id='signup-password'>
           <%= required f.password_field(:password, :id => 'user_pw') %>
           <%= f.text_field(:password_clear, :value => _('password')) %>
@@ -50,15 +52,16 @@
           <div id='fake-check'><p>&nbsp;</p></div>
         </div>
 
-        <div id='signup-password-confirmation'>
+        <div id='signup-password-confirmation' class='signup-field-container'>
           <%= required f.password_field(:password_confirmation) %>
-          <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation')) %>
+          <%= f.text_field(:password_confirmation_clear, :value => _('password confirmation'), :class => 'signup-field') %>
+          <%= content_tag(:small,_('Please, type your password again. This is necessary to confirm you typed it correctly.'), :class => 'signup-balloon') %>
           <div id='password-check'><p>&nbsp;</p></div>
         </div>
 
-        <div id='signup-email'>
-          <%= required f.text_field(:email, :rel => _('e-Mail')) %>
-          <%= content_tag(:small,_('This e-mail address will be used to contact you.')) %>
+        <div id='signup-email' class='signup-field-container'>
+          <%= required f.text_field(:email, :rel => _('e-Mail'), :class => 'signup-field') %>
+          <%= content_tag(:small,_('This e-mail address will be used to contact you.'), :class => 'signup-balloon') %>
           <div id='email-check'><p>&nbsp;</p></div>
         </div>
         <%= observe_field "user_email",
@@ -104,6 +107,19 @@
        </div>
      </div>
    </div>
+
+   
+  <div id="signup-form-header">
+    <div id='register-enterprise-box' class='signup-field-container'>
+      <div class='help-text'>
+      <h3><%= required check_box("register_enterprise", "box", {:checked => "checked", :class => "register-enterprise-box", 
+                          :onClick => "if (jQuery('.register-enterprise-box').is(':checked') == true){jQuery('.second-step').show();} else {jQuery('.second-step').hide();}"}) %>
+                        <%= _('I want to register a new Enterprise!') %></h3>
+      <%= _('If you want to register a new enterprise now, click on this box. If you enterprise is 
+            already registered, uncheck the box and ask the user that registered it to add you to the enterprise.')%>
+      </div>
+    </div>
+  </div>
 
    <div class="signup-step second-step">
      <div id='signup-form-header'>
@@ -191,11 +207,17 @@
           $('#password-check').html("<p><span class='invalid'><%= _('Passwords don\'t match') %></span></p>");
         }
         $('#password-balloon').fadeOut('slow');
+        $('.signup-balloon').fadeOut('slow');
       });
-      $('#user_login').focus(function() {
-        $('#signup-balloon').fadeIn('slow');
+    
+      
+      $('.signup-field').focus(function() {
+        $(this).parents('.signup-field-container').find('.signup-balloon').fadeIn('slow');
       });
-    $('#user_login').blur(function() { $('#signup-balloon').fadeOut('slow'); });
+      $('.signup-field').blur(function() {
+        $(this).parents('.signup-field-container').find('.signup-balloon').fadeOut('slow');
+      });
+
     $('#signup-form').validate({ rules: { 'user[email]': { email: true } }, messages: { 'user[email]' : '' } });
     });
   </script>

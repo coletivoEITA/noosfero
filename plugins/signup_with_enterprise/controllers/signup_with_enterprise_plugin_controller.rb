@@ -15,11 +15,15 @@ class SignupWithEnterprisePluginController < ApplicationController
       @terms_of_use = @user.terms_of_use
       @person = @user.person = Person.new(params[:profile_data])
       @enterprise = Enterprise.new params[:enterprise_data].merge(:environment => environment)
-
+      
       if request.post?
+        
         User.transaction do
+          @user.signup!
+        end
+       
+        if params[:register_enterprise][:box] == "1"
           Enterprise.transaction do
-            @user.signup!
             @enterprise.save!
             @enterprise.add_admin @person
           end
