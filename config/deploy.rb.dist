@@ -93,6 +93,8 @@ after "deploy:update_code", "configs:copy"
 after "deploy:update_code", "configs:release_symlink"
 after "deploy:update_code", "dirs:release_create"
 after "deploy:restart", "cache:clear"
+after "deploy", "deploy:cleanup"
+before "deploy:migrate", "db:backup:do"
 
 namespace :plugins do
 
