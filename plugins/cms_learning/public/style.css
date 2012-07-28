@@ -41,10 +41,10 @@
 }
 
 .icon-content-cms-learning {
-  background-image: url(images/cms-learning-64x64.png);
+  background-image: url(/plugins/cms_learning/images/cms-learning-64x64.png);
 }
 .icon-cms-learning,
 .icon-newcms-learning {
-  background-image: url(images/cms-learning-16x16.png);
+  background-image: url(/plugins/cms_learning/images/cms-learning-16x16.png);
 }
 
