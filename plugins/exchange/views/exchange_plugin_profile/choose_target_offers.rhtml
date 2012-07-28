@@ -1,7 +1,7 @@
 <script type="text/javascript">
   function choose_origin_form(button,message) {
-    if (jQuery.inArray(true, jQuery('#target_product_id\\[\\]').map(function(index, element){return element.checked})) == -1) 
-      if (jQuery.inArray(true, jQuery('#target_knowledge_id\\[\\]').map(function(index, element){return element.checked})) == -1) 
+    if (jQuery.inArray(true, jQuery('.target_product').map(function(index, element){return element.checked})) == -1)
+      if (jQuery.inArray(true, jQuery('.target_knowledge').map(function(index, element){return element.checked})) == -1)
         { alert(message); return}
     jQuery('#choose_origin-container').show();
     jQuery.colorbox({ inline : true, href : '#choose_origin-container', maxWidth : '600px', maxHeight : '300px' });
@@ -18,7 +18,7 @@
 
 <% message = _('Choose at least one element!')%>
 
-<h1> <%= _("%s's Offers") % profile.name %>  </h1>
+<h1> <%= _("%s's Offers") % profile.name %> xx </h1>
 
 <% if @target_products.blank? && @target_knowledges.blank? %>
   <%= _("%s has no offers registered.") % profile.name %>
@@ -36,7 +36,7 @@
 
       <% @target_products.each do |p|   %>
         <tr style="background:#00FFB7">
-          <td><%= check_box_tag "target_product_id[]", p.id %></td>
+          <td><%= check_box_tag "target_product_id[]", p.id, false, :class => "target_product" %></td>
           <td><%= p.name %></td>
           <td><%= text_field_tag "target_quantity[#{p.id}]", nil, :class => "numbers-only" %></td>
           <td><%= p.description %></td>
@@ -44,7 +44,7 @@
      <% end %>
         <% @target_knowledges.each do |k|   %>
         <tr style="background:#FFF690">
-          <td><%= check_box_tag "target_knowledge_id[]", k.id %></td>
+          <td><%= check_box_tag "target_knowledge_id[]", k.id, false, :class => "target_knowledge" %></td>
           <td><%= k.name %></td>
           <td><%= text_field_tag "target_knowledge_quantity[#{k.id}]", nil, :class => "numbers-only" %></td>
           <td><%= k.summary %></td>
@@ -82,25 +82,25 @@
                 <% matching_products_inputs.each do |p| %>
                   <% input_name = (Input.find p.input_id).name  %>
                   <% product_supplier_name = (p.products_supplier_name ? p.products_supplier_name : (Product.find p.products_supplier_id).product_category.name) %>
-                  <li>  <%= _("%{e_name} offers %{products_supplier_name} and %{profile_name} needs %{input_name} to make %{p_name} <br />") % 
+                  <li>  <%= _("%{e_name} offers %{products_supplier_name} and %{profile_name} needs %{input_name} to make %{p_name} <br />") %
                   {:products_supplier_name => product_supplier_name, :profile_name => profile.name, :input_name => input_name, :e_name => e.name, :p_name => p.name} %></li>
                 <% end %>
                 <% matching_products_interests.each do |p| %>
                   <% interest_name = (Category.find p.product_category_id).name %>
-                  <li>  <%= _("%{e_name} offers %{product_name} and %{profile_name} is interested in %{interest_name} <br />") % 
+                  <li>  <%= _("%{e_name} offers %{product_name} and %{profile_name} is interested in %{interest_name} <br />") %
                   {:product_name => p.name, :profile_name => profile.name, :interest_name => interest_name, :e_name => e.name} %></li>
                 <% end %>
                 <% matching_knowledges_inputs.each do |k| %>
                   <% input_name = (Category.find k.input_cat).name %>
                   <% product_name = (k.product ? k.product : (Category.find k.product_cat).name) %>
-                  <li>  <%= _("%{e_name} knows %{knowledge_name} and %{profile_name} uses %{input_name} to make %{product_name}<br />") % 
-                  {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :input_name => input_name, 
+                  <li>  <%= _("%{e_name} knows %{knowledge_name} and %{profile_name} uses %{input_name} to make %{product_name}<br />") %
+                  {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :input_name => input_name,
                     :e_name => e.name, :product_name => product_name} %></li>
                   <% end %>
                   <% matching_knowledges_interests.each do |k| %>
                     <% interest_name = (Category.find k.interest_cat).name %>
-                    <li><%= _("%{e_name} knows %{knowledge_name} and %{profile_name} is interested in %{interest_name}<br />") % 
-                    {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :interest_name => interest_name, 
+                    <li><%= _("%{e_name} knows %{knowledge_name} and %{profile_name} is interested in %{interest_name}<br />") %
+                    {:knowledge_name => k.knowledge_name, :profile_name => profile.name, :interest_name => interest_name,
                       :e_name => e.name} %>
                       </li>
                     <% end %>
@@ -119,7 +119,7 @@
           });
     </script>
 
-    <%= submit_button('add', _('Propose exchange with selected objects!'), :onclick => "choose_origin_form(this,'%{msg}'); return false" % {:msg => message} ) %>
+    <%= submit_button('add', _('Propose exchange with selected objects!'), :style => "float:right; margin-right:59px; margin-top:15px;", :onclick => "choose_origin_form(this,'%{msg}'); return false" % {:msg => message} ) %>
   <% end %>
 <% end %>
 
