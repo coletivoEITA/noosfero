@@ -84,11 +84,12 @@ td {
   padding: 10px;
   padding-top: 30px;
   float:right;  
+  width: 400px;
 }
 #exchange_summary{
   padding: 10px;
   float:left;
-  max-width: 400px;
+  width: 400px;
 }
 
 #exchange_summary td{

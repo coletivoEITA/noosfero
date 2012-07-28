@@ -31,7 +31,7 @@
     </tr>
     <tr>
       <td class="exchange_label"><%= _('Exchange State:') %></td>
-      <td> <!--<%= ExchangePlugin::Exchange.state[@exchange.state] %> --><%= @exchange.simplified_state %><%= @no_button_message %></td>
+      <td><%= ExchangePlugin::Exchange.state[@exchange.state] %> - <%= @no_button_message %></td>
     </tr>
     <% if @origin_evaluation_score %>
       <tr>
