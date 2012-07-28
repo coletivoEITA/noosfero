@@ -1,9 +1,5 @@
 class ProductsBlock < Block
 
-  include ActionView::Helpers::TagHelper
-  include ActionView::Helpers::UrlHelper
-  include ActionController::UrlWriter
-
   def self.description
     _('Products')
   end
@@ -17,23 +13,17 @@ class ProductsBlock < Block
   end
 
   def content(args={})
-    block_title(title) +
-    content_tag(
-      'ul',
-      products.map {|product|
-        content_tag('li',
-          link_to( product.name,
-                   product.url,
-                   :style => 'background-image:url(%s)' % product.default_image('minor')
-                 ),
-          :class => 'product'
-        )
-      }
-    )
+    block = self
+    lambda do
+      render :file => 'blocks/products', :locals => {:block => block}
+    end
   end
 
   def footer
-    link_to(_('View all products'), owner.public_profile_url.merge(:controller => 'catalog', :action => 'index'))
+    block = self
+    lambda do
+      link_to(_('View all products'), block.owner.public_profile_url.merge(:controller => 'catalog', :action => 'index'))
+    end
   end
 
   settings_items :product_ids, Array

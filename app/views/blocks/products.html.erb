@@ -1,0 +1,13 @@
+<%= block_title block.title %>
+
+<ul class='product'>
+  <% block.products.each do |product| %>
+    <li>
+      <%= link_to product.name, product.url, :style => 'background-image:url(%s)' % product.default_image('minor') %>
+    </li>
+  <% end %>
+</ul>
+
+<% if logged_in? and (current_user.person.is_admin?(environment) or profile.admins.include?(current_user.person)) %>
+  <%= link_to _('New product'), {:controller => :manage_products, :action => :new} %>
+<% end %>
