@@ -1,4 +1,4 @@
-@import url(token-input-sniffer.css);
+@import url(/plugins/sniffer/token-input-sniffer.css);
 
 .sniffer-edit-enable-label {
   font-weight: bold;
@@ -25,16 +25,16 @@
 }
 
 .controller-profile_editor a.control-panel-buyer-interests {
-  background-image: url(images/buyer-interests.png)
+  background-image: url(/plugins/sniffer/images/buyer-interests.png)
 }
 .controller-profile_editor .msie6 a.control-panel-buyer-interests {
-  background-image: url(images/buyer-interests.gif)
+  background-image: url(/plugins/sniffer/images/buyer-interests.gif)
 }
 .controller-profile_editor a.control-panel-sniff-opportunities {
-  background-image: url(images/sniff-opportunities.png)
+  background-image: url(/plugins/sniffer/images/sniff-opportunities.png)
 }
 .controller-profile_editor .msie6 a.control-panel-sniff-opportunities {
-  background-image: url(images/sniff-opportunities.gif)
+  background-image: url(/plugins/sniffer/images/sniff-opportunities.gif)
 }
 
 #sniffer-plugin-disable-pane {
