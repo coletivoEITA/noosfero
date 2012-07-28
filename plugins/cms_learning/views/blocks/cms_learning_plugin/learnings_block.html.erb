@@ -7,3 +7,7 @@
     </li>
   <% end %>
 </ul>
+
+<% if logged_in? and (current_user.person.is_admin?(environment) or profile.admins.include?(current_user.person)) %>
+  <%= link_to _('New knowledge'), {:controller => :cms, :action => :new, :type => 'CmsLearningPluginLearning'} %>
+<% end %>
