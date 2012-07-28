@@ -22,7 +22,7 @@
         <% profile = interest.is_a?(SnifferPluginOpportunity) ? interest.profile : interest.product.enterprise %>
         <%= _('%{interest} from %{profile}') % {
           :interest => interest.product_category.name,
-          :profile => link_to_profile(profile.name, profile),
+          :profile => link_to_profile(profile.name, profile.identifier),
         } %>
       </li>
     <% end %>
