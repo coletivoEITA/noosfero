@@ -1,11 +1,17 @@
-@import url(/plugins/sniffer/token-input-sniffer.css);
-
 .sniffer-edit-enable-label {
   font-weight: bold;
 }
 .sniffer-edit-enable-help {
   margin: 5px 0 20px 25px;
   width: 300px;
+}
+
+.sniffer-plugin-sidebar ul.token-input-list,
+.sniffer-plugin-sidebar div.token-input-dropdown {
+  width: 255px;
+}
+.sniffer-plugin-sidebar ul.token-input-list li input {
+  width: 205px;
 }
 
 .sniffer-plugin-sidebar {

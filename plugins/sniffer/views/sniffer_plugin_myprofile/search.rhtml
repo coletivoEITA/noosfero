@@ -7,7 +7,7 @@
      <%= text_field_tag 'suppliers_products' %>
      <% javascript_tag do %>
        jQuery.TokenList(jQuery("#suppliers_products"), <%=@suppliers_products.collect(&:product_category).map { |p| {:id => p.id, :name => p.name} }.to_json%>,
-         {searchDelay: 0, showAllResults: true, theme: "sniffer", preventDuplicates: true, <%=jquery_token_input_messages_json(_('Type in a category'))%>,
+         {searchDelay: 0, showAllResults: true, preventDuplicates: true, <%=jquery_token_input_messages_json(_('Type in a category'))%>,
          onAdd: function (item) { applyCategoryFilter(item.id); }, onDelete: function (item) { unapplyCategoryFilter(item.id); } });
      <% end %>
   </div>
@@ -17,7 +17,7 @@
      <%= text_field_tag 'buyers_products' %>
      <% javascript_tag do %>
        jQuery.TokenList(jQuery("#buyers_products"), <%=@buyers_products.collect(&:product_category).map { |p| {:id => p.id, :name => p.name} }.to_json%>,
-         {searchDelay: 0, showAllResults: true, theme: "sniffer", preventDuplicates: true, <%=jquery_token_input_messages_json(_('Type in a category'))%>,
+         {searchDelay: 0, showAllResults: true, preventDuplicates: true, <%=jquery_token_input_messages_json(_('Type in a category'))%>,
          onAdd: function (item) { applyCategoryFilter(item.id); }, onDelete: function (item) { unapplyCategoryFilter(item.id); } });
      <% end %>
   </div>
@@ -154,7 +154,7 @@
       icon = yellowIcon;
     else if (<%= sp.length %> > 0)
       icon = greenIcon;
-    else 
+    else
       icon = ltblueIcon;
 
     marker = mapPutMarker(<%= profile.lat.to_json %>, <%= profile.lng.to_json %>, <%= profile.name.to_json %>, icon, fillBalloon);
