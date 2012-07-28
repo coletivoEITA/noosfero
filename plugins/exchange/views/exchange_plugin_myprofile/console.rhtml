@@ -23,7 +23,7 @@
     </tr>
     <tr>
       <td class="exchange_label"><%= _("%{other} offers me:") % {:other => @exchange.the_other(profile).name} %></td>
-      <td>  
+      <td>
         <% @exchange.other_elements(profile).each do |x| %>
           <%= "#{x.element.name} (#{x.quantity}) "%>
         <% end %>
@@ -31,7 +31,7 @@
     </tr>
     <tr>
       <td class="exchange_label"><%= _('Exchange State:') %></td>
-      <td> <%= ExchangePlugin::Exchange.state[@exchange.state] %> - <%= @exchange.simplified_state %><%= @no_button_message %></td>
+      <td> <!--<%= ExchangePlugin::Exchange.state[@exchange.state] %> --><%= @exchange.simplified_state %><%= @no_button_message %></td>
     </tr>
     <% if @origin_evaluation_score %>
       <tr>
@@ -57,12 +57,12 @@
       </td>
     </tr>
   </table>
-  </div><!--exchange_summary--> 
+  </div><!--exchange_summary-->
   <div id="exchange_system_messages">
   <table>
     <tr><th><%= _('Last Updates') %>
-    <% i = 0%>  
-  <% @system_messages.each do |m| %> 
+    <% i = 0%>
+  <% @system_messages.each do |m| %>
     <tr><td><%= m.created_at.strftime("%d de %B de %Y, às %H:%M") + "<br />" + m.body %></td></tr>
     <% i = i + 1 %>
     <% i == 5 ? break : true %>
@@ -84,7 +84,7 @@
 </div>
 <div id="messages">
   <table>
-  <% @messages.each do |m| %> 
+  <% @messages.each do |m| %>
     <tr>
       <td><% if m.enterprise_sender.id == profile.id%><%= link_to profile_image(profile, :thumb) +"\n", profile.url %><% end %></td>
       <td>
