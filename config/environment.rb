@@ -98,7 +98,7 @@ Rails::Initializer.run do |config|
   end
 
   # FIXME: should work on prolifing.rb environment
-  config.gem 'fiveruns_tuneup' if Rails.env == 'profiling'
+  # config.gem 'fiveruns_tuneup' if Rails.env == 'profiling'
 
 end
 extra_controller_dirs.each do |item|
