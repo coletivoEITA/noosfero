@@ -1,17 +1,38 @@
+Introduction
+============
 Noosfero supports newrelic_rpm, fiveruns_tuneup and rails performance testing for profiling
 
-To use newrelic_rpm and fiveruns_tuneup run the webserver using the 'profiling' environment:
-$ script/server thin -e profiling
+Configuration
+=============
+Edit config/database.yml and config/solr.yml to create the `profiling` environment.
+Replace the development definition to:
+    development: &DEVELOPMENT
 
+And add the profiling environment:
+    profiling:
+      <<: *DEVELOPMENT
+
+Setup
+=====
+Install profile tools:
+    gem install fiveruns_tuneup
+    gem install newrelic_rpm
+
+To use newrelic_rpm and fiveruns_tuneup run the webserver using the 'profiling' environment:
+    script/server thin -e profiling
+
+NOTE: newrelic_rpm is incompatible with fiveruns_tuneup enabled. Disable the latter to use the former.
+(See config/environment.rb and config/environments/profiling.rb)
+
+Use
+===
 fiveruns_tuneup will show up in the top of every page.
 newrelic_rpm reports are accessible at '/newrelic'
 
-NOTE: newrelic_rpm is imcompatible with fiveruns_tuneup. Disable the latter to use the former.
-(See config/environment.rb and config/environments/profiling.rb)
-
 To run a performance test use:
-$ script/performance/profiler test/performance/script.rb
+     RAILS_ENV=profiling script/performance/profiler test/performance/script.rb
 
-References:
+References
+==========
 - http://railscasts.com/episodes/98-request-profiling/
 - http://railscasts.com/episodes/161-three-profiling-tools/
