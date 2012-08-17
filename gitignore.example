@@ -23,6 +23,9 @@ public/designs/icons/default
 public/javascripts/cache*.js
 public/stylesheets/cache*.css
 public/plugins
+public/images/tuneup/
+public/javascripts/tuneup/
+public/stylesheets/tuneup/
 db/development.db
 db/production.db
 db/test.db
