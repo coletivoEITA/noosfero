@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120411132751) do
+ActiveRecord::Schema.define(:version => 20120820142056) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -179,6 +179,7 @@ ActiveRecord::Schema.define(:version => 20120411132751) do
     t.integer "image_id"
     t.string  "acronym"
     t.string  "abbreviation"
+    t.text    "ancestry"
   end
 
   create_table "categories_profiles", :id => false, :force => true do |t|
