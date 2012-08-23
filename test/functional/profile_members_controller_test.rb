@@ -116,6 +116,7 @@ class ProfileMembersControllerTest < ActionController::TestCase
     admin = create_user_with_permission('admin_user', 'manage_memberships', com)
     member = create_user('test_member').person
     com.add_member(member)
+    com.reload
     assert_includes com.members, member
 
     login_as :admin_user
@@ -134,6 +135,7 @@ class ProfileMembersControllerTest < ActionController::TestCase
 
     com = Community.create!(:name => 'test community')
     p = create_user_with_permission('test_user', 'manage_memberships', com)
+    com.reload
     assert_includes com.members.map(&:name), p.name
 
     login_as :test_user

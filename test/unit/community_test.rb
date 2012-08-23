@@ -197,6 +197,7 @@ class CommunityTest < ActiveSupport::TestCase
     assert_no_difference AddMember, :count do
       community.add_member(person)
     end
+    community.reload
     assert person.is_member_of?(community)
   end
 
@@ -216,10 +217,12 @@ class CommunityTest < ActiveSupport::TestCase
 
     community.add_member(fast_create(Person))
 
+    community.reload
     assert_difference AddMember, :count do
       community.add_member(person)
     end
 
+    community.reload
     assert_no_difference AddMember, :count do
       community.add_member(person)
     end

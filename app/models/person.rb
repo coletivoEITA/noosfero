@@ -22,12 +22,6 @@ class Person < Profile
     super
   end
 
-  named_scope :members_of, lambda { |resources|
-    resources = [resources] if !resources.kind_of?(Array)
-    conditions = resources.map {|resource| "role_assignments.resource_type = '#{resource.class.base_class.name}' AND role_assignments.resource_id = #{resource.id || -1}"}.join(' OR ')
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => [conditions] }
-  }
-
   def has_permission_with_plugins?(permission, profile)
     permissions = [has_permission_without_plugins?(permission, profile)]
     permissions += plugins.map do |plugin|
@@ -36,10 +30,6 @@ class Person < Profile
     permissions.include?(true)
   end
   alias_method_chain :has_permission?, :plugins
-
-  def memberships
-    Profile.memberships_of(self)
-  end
 
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships
@@ -394,10 +384,6 @@ class Person < Profile
 
   def self.notify_activity(tracked_action)
     Delayed::Job.enqueue NotifyActivityToProfilesJob.new(tracked_action.id)
-  end
-
-  def is_member_of?(profile)
-    profile.members.include?(self)
   end
 
   def follows?(profile)
