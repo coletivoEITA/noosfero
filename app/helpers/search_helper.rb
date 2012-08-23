@@ -147,8 +147,8 @@ module SearchHelper
 
   def facet_selecteds_html_for(environment, klass, params)
     def name_with_extra(klass, facet, value)
-      name = klass.facet_result_name(facet, value)
-      name = name[0] + name[1] if name.kind_of?(Array)
+      name = klass.facet_result_name(facet, [[value, 0]])[0][0]
+      name = name[0] + name[1] if name.is_a?(Array)
       name
     end
 

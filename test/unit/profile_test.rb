@@ -1770,7 +1770,6 @@ class ProfileTest < ActiveSupport::TestCase
     assert profile.is_on_homepage?("/#{profile.identifier}/#{homepage.slug}", homepage)
   end
 
-  
   should 'find profiles with image' do
     env = fast_create(Environment)
     2.times do |n|
@@ -1881,7 +1880,8 @@ class ProfileTest < ActiveSupport::TestCase
     cat = fast_create(Category)
     prof = fast_create(Person, :region_id => city.id)
     prof.add_category(cat, true)
-    assert_equal ['Tabajara', ', XZ'], Profile.facet_by_id(:f_region)[:proc].call(prof.send(:f_region))
+    facet = Profile.facet_by_id(:f_region)
+    assert_equal [[prof.region.id.to_s, 'Tabajara, XZ', 1]], facet[:proc].call(facet, [[prof.send(:f_region), 1]])
     assert_equal "category_filter:#{cat.id}", Person.facet_category_query.call(cat)
   end
 
