@@ -22,12 +22,6 @@ class Person < Profile
     super
   end
 
-  named_scope :members_of, lambda { |resource| { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.resource_type = ? AND role_assignments.resource_id = ?', resource.class.base_class.name, resource.id ] } }
-
-  def memberships
-    Profile.memberships_of(self)
-  end
-
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships
 
@@ -381,10 +375,6 @@ class Person < Profile
 
   def self.notify_activity(tracked_action)
     Delayed::Job.enqueue NotifyActivityToProfilesJob.new(tracked_action.id)
-  end
-
-  def is_member_of?(profile)
-    profile.members.include?(self)
   end
 
   def follows?(profile)

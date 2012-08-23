@@ -61,18 +61,32 @@ class Profile < ActiveRecord::Base
 
   acts_as_accessible
 
-  named_scope :memberships_of, lambda { |person| { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.accessor_type = ? AND role_assignments.accessor_id = ?', person.class.base_class.name, person.id ] } }
+  named_scope :memberships_of, lambda { |person| {
+    :select => 'DISTINCT profiles.*', :joins => :role_assignments,
+    :conditions => ['role_assignments.accessor_type = ? AND role_assignments.accessor_id = ?',
+                    person.class.base_class.name, person.id ]
+  }}
+  named_scope :members_of, lambda { |resource| {
+    :select => 'DISTINCT profiles.*', :joins => :role_assignments,
+    :conditions => ['role_assignments.resource_type = ? AND role_assignments.resource_id = ?',
+                    resource.class.base_class.name, resource.id ]
+  }}
+
+  # non-polymorphic version of role_assignments for use with has_many :through
+  has_many :resources, :class_name => 'RoleAssignment', :foreign_key => :accessor_id
+  has_many :accessors, :class_name => 'RoleAssignment', :foreign_key => :resource_id
+
+  RoleAssignment.belongs_to :profile_accessor, :foreign_key => :accessor_id, :class_name => 'Profile'
+  RoleAssignment.belongs_to :profile_resource, :foreign_key => :resource_id, :class_name => 'Profile'
+
+  has_many :memberships, :through => :resources, :source => :profile_resource, :uniq => true,
+    :conditions => ["role_assignments.accessor_type = 'Profile'"]
+  has_many :members, :through => :accessors, :source => :profile_accessor, :uniq => true,
+    :conditions => ["role_assignments.resource_type = 'Profile'"]
+
   #FIXME: these will work only if the subclass is already loaded
   named_scope :enterprises, lambda { {:conditions => (Enterprise.send(:subclasses).map(&:name) << 'Enterprise').map { |klass| "profiles.type = '#{klass}'"}.join(" OR ")} }
   named_scope :communities, lambda { {:conditions => (Community.send(:subclasses).map(&:name) << 'Community').map { |klass| "profiles.type = '#{klass}'"}.join(" OR ")} }
-
-  def members
-    Person.members_of(self)
-  end
-
-  def members_count
-    members.count('DISTINCT(profiles.id)')
-  end
 
   def members_by_role(role)
     Person.members_of(self).all(:conditions => ['role_assignments.role_id = ?', role.id])
@@ -568,6 +582,13 @@ private :generate_url, :url_options
     article.children.each do |a|
       copy_article_tree a, article_copy
     end
+  end
+
+  def members_count
+    members.size
+  end
+  def is_member_of?(profile)
+    profile.members.include?(self)
   end
 
   # Adds a person as member of this Profile.

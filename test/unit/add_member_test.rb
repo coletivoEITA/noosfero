@@ -19,6 +19,7 @@ class AddMemberTest < ActiveSupport::TestCase
     task = fast_create(AddMember, :requestor_id => person.id, :target_id => community.id, :target_type => 'Community')
     task.finish
 
+    community.reload
     assert_equal [person], community.members
   end
 
