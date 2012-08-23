@@ -266,7 +266,7 @@ class EnterpriseTest < ActiveSupport::TestCase
     ent = fast_create(Enterprise, :name => 'test ent', :identifier => 'test_ent')
     p = ent.products.create!(:name => 'test prod', :product_category => subcategory)
 
-    assert_equal [p.category_full_name], ent.product_categories
+    assert_equal [p.category_full_name], ent.product_categories_names
   end
 
   should 'not create a products block for enterprise if environment do not let' do
@@ -463,10 +463,10 @@ class EnterpriseTest < ActiveSupport::TestCase
 
   should 'reindex products with full category name after save' do
     product = mock
-    product.expects(:category_full_name)
     Enterprise.any_instance.stubs(:products).returns([product])
     Enterprise.expects(:solr_batch_add).with(includes(product))
     ent = fast_create(Enterprise)
+    ent.expects(:product_categories_names)
     ent.save!
   end
 

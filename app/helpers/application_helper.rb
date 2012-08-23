@@ -502,22 +502,19 @@ module ApplicationHelper
     sex
   end
 
-  def profile_cat_icons( profile )
-    if profile.class == Enterprise
-      icons =
-        profile.product_categories.map{ |c| c.size > 1 ? c[1] : nil }.
-          compact.uniq.map{ |c|
-            cat_name = c.gsub( /[-_\s,.;'"]+/, '_' )
-            cat_icon = "/images/icons-cat/#{cat_name}.png"
-            if ! File.exists? RAILS_ROOT.to_s() + '/public/' + cat_icon
-              cat_icon = '/images/icons-cat/undefined.png'
-            end
-            content_tag 'span',
-                        content_tag( 'span', c ),
-                        :title => c,
-                        :class => 'product-cat-icon cat_icon_' + cat_name,
-                        :style => "background-image:url(#{cat_icon})"
-          }.join "\n"
+  def profile_cat_icons(profile)
+    if profile.is_a?(Enterprise)
+      icons = profile.product_categories_names.map{ |c| c.size > 1 ? c[1] : nil }.compact.map do |c|
+        cat_name = c.gsub( /[-_\s,.;'"]+/, '_' )
+        cat_icon = "/images/icons-cat/#{cat_name}.png"
+        if !File.exists? "#{RAILS_ROOT}/public/#{cat_icon}"
+          cat_icon = '/images/icons-cat/undefined.png'
+        end
+        content_tag 'span', content_tag( 'span', c ), :title => c,
+          :class => 'product-cat-icon cat_icon_' + cat_name,
+          :style => "background-image:url(#{cat_icon})"
+      end.join "\n"
+
       content_tag 'div',
                   content_tag( 'span', _('Principal Product Categories'), :class => 'header' ) +"\n"+ icons,
                   :class => 'product-category-icons'
