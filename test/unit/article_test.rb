@@ -1572,8 +1572,10 @@ class ArticleTest < ActiveSupport::TestCase
     a = Article.create!(:name => 'black flag review', :profile_id => person.id)
     a.add_category(cat, true)
     a.save!
-    assert_equal Article.type_name, Article.facet_by_id(:f_type)[:proc].call(a.send(:f_type))
-    assert_equal Person.type_name, Article.facet_by_id(:f_profile_type)[:proc].call(a.send(:f_profile_type))
+    facet = Article.facet_by_id(:f_type)
+    assert_equal [[a.send(:f_type), Article.type_name, 1]], facet[:proc].call(facet, [[a.send(:f_type), 1]])
+    facet = Article.facet_by_id(:f_profile_type)
+    assert_equal [[a.send(:f_profile_type), Person.type_name, 1]], facet[:proc].call(facet, [[a.send(:f_profile_type), 1]])
     assert_equal a.published_at, a.send(:f_published_at)
     assert_equal ['hardcore'], a.send(:f_category)
     assert_equal "category_filter:\"#{cat.id}\"", Article.facet_category_query.call(cat)

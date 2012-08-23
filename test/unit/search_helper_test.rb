@@ -6,7 +6,7 @@ class SearchHelperTest < ActiveSupport::TestCase
 
   should 'display search page title' do
     title = 'page_title'
-    assert_equal search_page_title(title), '<h1>page_title</h1>' 
+    assert_equal search_page_title(title), '<h1>page_title</h1>'
   end
 
   should 'display search page title with category name' do
@@ -119,7 +119,7 @@ class SearchHelperTest < ActiveSupport::TestCase
     expects(:javascript_tag).with(regexp_matches(/id.*[\'array_item\'].*json_message/m)).returns(
       '<javascript_tag_return>')
     stubs(:jquery_token_input_messages_json).returns('json_message')
-    assert_equal '<text_field_tag_return><javascript_tag_return>', 
+    assert_equal '<text_field_tag_return><javascript_tag_return>',
       facet_javascript('id', '', ['array_item'])
   end
 
@@ -128,13 +128,13 @@ class SearchHelperTest < ActiveSupport::TestCase
     expects(:javascript_tag).with(regexp_matches(/id.*\[\].*json_message/m)).returns(
       '<javascript_tag_return>')
     stubs(:jquery_token_input_messages_json).returns('json_message')
-    assert_equal '<text_field_tag_return><javascript_tag_return>', 
+    assert_equal '<text_field_tag_return><javascript_tag_return>',
       facet_javascript('id', '', [])
   end
 
   should 'return html code for facet link' do
     facet = {
-      :solr_field => 'facet_solr_field', 
+      :solr_field => 'facet_solr_field',
       :label_id => 'facet_label_id'
     }
     params = {}
@@ -149,13 +149,13 @@ class SearchHelperTest < ActiveSupport::TestCase
     stubs(:content_tag).with(anything, ' (1)', anything).returns('<content_tag_count>')
     stubs(:content_tag).with(anything, '<link_to_result><content_tag_extra><content_tag_count>', anything).returns('<content_tag_final_result>')
 
-    assert_equal '<content_tag_final_result>', 
+    assert_equal '<content_tag_final_result>',
       facet_link_html(facet, params, value, label, count)
   end
 
   should 'return html code for facet link with extra label' do
     facet = {
-      :solr_field => 'facet_solr_field', 
+      :solr_field => 'facet_solr_field',
       :label_id => 'facet_label_id'
     }
     params = {}
@@ -170,13 +170,13 @@ class SearchHelperTest < ActiveSupport::TestCase
     stubs(:content_tag).with(anything, ' (1)', anything).returns('<content_tag_count>')
     stubs(:content_tag).with(anything, '<link_to_result><content_tag_extra><content_tag_count>', anything).returns('<content_tag_final_result>')
 
-    assert_equal '<content_tag_final_result>', 
+    assert_equal '<content_tag_final_result>',
       facet_link_html(facet, params, value, label, count)
   end
 
   should 'return html code for selected facet link' do
     facet = {
-      :solr_field => 'facet_solr_field' 
+      :solr_field => 'facet_solr_field'
     }
     params = {:facet => {'facet_solr_field' => 'facet_value'}}
     value = 'facet_value'
@@ -190,7 +190,7 @@ class SearchHelperTest < ActiveSupport::TestCase
     stubs(:content_tag).with(anything, ' (1)', anything).returns('<content_tag_count>')
     stubs(:content_tag).with(anything, '<link_to_result><content_tag_extra><content_tag_count>', {:class => 'facet-menu-item facet-result-link-selected'}).returns('<content_tag_final_result>')
 
-    assert_equal '<content_tag_final_result>', 
+    assert_equal '<content_tag_final_result>',
       facet_link_html(facet, params, value, label, count)
   end
 
@@ -198,9 +198,9 @@ class SearchHelperTest < ActiveSupport::TestCase
     klass = mock
     klass.stubs(:facet_by_id).with(:facet_id).returns('klass_facet_by_id')
     klass.stubs(:facet_label).with('klass_facet_by_id').returns('klass_facet_label')
-    klass.stubs(:facet_result_name).with('klass_facet_by_id', 'facet_value').returns('klass_facet_result_name')
+    klass.stubs(:facet_result_name).with('klass_facet_by_id', [['facet_value', 0]]).returns([['klass_facet_result_name']])
     params = {:facet => {:facet_id => 'facet_value'}}
-    
+
     expects(:content_tag).with(anything, 'klass_facet_label', anything).returns('<content_tag_label>')
     expects(:content_tag).with(anything, 'klass_facet_result_name', anything).returns('<content_tag_name>')
     expects(:link_to).with(anything, {:facet => {}}, anything).returns('<link_to_url>')
@@ -208,7 +208,7 @@ class SearchHelperTest < ActiveSupport::TestCase
 
     environment = mock
     assert_match '<final_content>', facet_selecteds_html_for(environment, klass, params)
-  end 
+  end
 
   should 'show select tag for order_by' do
     [:products, :events, :articles, :enterprises, :people, :communities].each do |asset|
@@ -230,7 +230,6 @@ class SearchHelperTest < ActiveSupport::TestCase
       assert_equal '<final_content>', label_total_found(asset, 10)
     end
   end
-    
 
   should 'return asset class from string' do
     asset_names = ['products', 'events', 'articles', 'enterprises', 'people', 'communities']

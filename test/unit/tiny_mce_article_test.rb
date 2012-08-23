@@ -233,7 +233,8 @@ end
 
   should 'define type facet' do
 	  a = TinyMceArticle.new
-		assert_equal TextArticle.type_name, TinyMceArticle.send(:f_type_proc, a.send(:f_type))
+    assert_equal [[a.send(:f_type), TextArticle.type_name, 1]],
+      TinyMceArticle.send(:f_type_proc, TinyMceArticle.facet_by_id(:f_type), [[a.send(:f_type), 1]])
   end
 
 end

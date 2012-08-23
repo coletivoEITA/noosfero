@@ -131,7 +131,7 @@ class Article < ActiveRecord::Base
     pending_categorizations.clear
   end
 
-  acts_as_taggable  
+  acts_as_taggable
   N_('Tag list')
 
   acts_as_filesystem
@@ -222,7 +222,7 @@ class Article < ActiveRecord::Base
   end
 
   # returns the data of the article. Must be overriden in each subclass to
-  # provide the correct content for the article. 
+  # provide the correct content for the article.
   def data
     body
   end
@@ -627,12 +627,16 @@ class Article < ActiveRecord::Base
   Forum
   Event
 
-  def self.f_type_proc(klass)
-    klass.constantize.type_name
+  def self.f_type_proc(facet, id_count_arr)
+    id_count_arr.map do |type, count|
+      [type, type.constantize.type_name, count]
+    end
   end
 
-  def self.f_profile_type_proc(klass)
-    klass.constantize.type_name
+  def self.f_profile_type_proc(facet, id_count_arr)
+    id_count_arr.map do |type, count|
+      [type, type.constantize.type_name, count]
+    end
   end
 
   def f_type
@@ -673,11 +677,11 @@ class Article < ActiveRecord::Base
   public
 
   acts_as_faceted :fields => {
-      :f_type => {:label => _('Type'), :proc => proc{|klass| f_type_proc(klass)}},
+      :f_type => {:label => _('Type'), :proc => method(:f_type_proc).to_proc},
       :f_published_at => {:type => :date, :label => _('Published date'), :queries => {'[* TO NOW-1YEARS/DAY]' => _("Older than one year"),
         '[NOW-1YEARS TO NOW/DAY]' => _("In the last year"), '[NOW-1MONTHS TO NOW/DAY]' => _("In the last month"), '[NOW-7DAYS TO NOW/DAY]' => _("In the last week"), '[NOW-1DAYS TO NOW/DAY]' => _("In the last day")},
         :queries_order => ['[NOW-1DAYS TO NOW/DAY]', '[NOW-7DAYS TO NOW/DAY]', '[NOW-1MONTHS TO NOW/DAY]', '[NOW-1YEARS TO NOW/DAY]', '[* TO NOW-1YEARS/DAY]']},
-      :f_profile_type => {:label => _('Profile'), :proc => proc{|klass| f_profile_type_proc(klass)}},
+      :f_profile_type => {:label => _('Profile'), :proc => method(:f_profile_type_proc).to_proc},
       :f_category => {:label => _('Categories')},
     }, :category_query => proc { |c| "category_filter:\"#{c.id}\"" },
     :order => [:f_type, :f_published_at, :f_profile_type, :f_category]

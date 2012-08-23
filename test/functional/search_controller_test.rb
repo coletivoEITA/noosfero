@@ -198,7 +198,7 @@ class SearchControllerTest < ActionController::TestCase
     prod = Product.create!(:name => 'Sound System', :enterprise_id => ent.id, :product_category_id => @product_category.id)
 		qualifier1 = fast_create(Qualifier)
 		qualifier2 = fast_create(Qualifier)
-		prod.qualifiers_list = [[qualifier1.id, 0], [qualifier2.id, 0]]
+    prod.qualifiers_list = [[qualifier1.id, nil], [qualifier2.id, nil]]
 		prod.qualifiers.reload
 		prod.save!
 
@@ -206,8 +206,8 @@ class SearchControllerTest < ActionController::TestCase
 		assert !assigns(:results)[:products].facets.blank?
 		assert assigns(:results)[:products].facets['facet_fields']['f_category_facet'][0][0] == @product_category.name
 		assert assigns(:results)[:products].facets['facet_fields']['f_region_facet'][0][0] == city.id.to_s
-		assert assigns(:results)[:products].facets['facet_fields']['f_qualifier_facet'][0][0] == "#{qualifier1.id} 0"
-		assert assigns(:results)[:products].facets['facet_fields']['f_qualifier_facet'][1][0] == "#{qualifier2.id} 0"
+    assert assigns(:results)[:products].facets['facet_fields']['f_qualifier_facet'][0][0] == "#{qualifier1.id} "
+    assert assigns(:results)[:products].facets['facet_fields']['f_qualifier_facet'][1][0] == "#{qualifier2.id} "
   end
 
   # 'assets' menu outside any category

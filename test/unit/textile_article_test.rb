@@ -174,17 +174,18 @@ class TextileArticleTest < ActiveSupport::TestCase
     assert_equal "<p>one\nparagraph</p>", build_article("one\nparagraph").to_html
   end
 
+  should 'define type facet' do
+    a = TextileArticle.new
+    assert_equal [[a.send(:f_type), TextArticle.type_name, 1]],
+      TextileArticle.send(:f_type_proc, TextileArticle.facet_by_id(:f_type), [[a.send(:f_type), 1]])
+  end
+
   protected
 
   def build_article(input = nil, options = {})
     article = TextileArticle.new({:body => input}.merge(options))
     article.valid? # trigger the xss terminate thingy
     article
-  end
-
-  should 'define type facet' do
-	  a = TextileArticle.new
-		assert_equal TextArticle.type_name, TextileArticle.send(:f_type_proc, a.send(:f_type))
   end
 
 end

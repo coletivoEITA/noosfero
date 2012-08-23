@@ -8,7 +8,7 @@ module ActsAsFaceted
     #
     #acts_as_faceted :fields => {
     #  :f_type => {:label => _('Type'), :proc => proc{|klass| f_type_proc(klass)}},
-    #  :f_published_at => {:type => :date, :label => _('Published date'), :queries => {'[* TO NOW-1YEARS/DAY]' => _("Older than one year"), 
+    #  :f_published_at => {:type => :date, :label => _('Published date'), :queries => {'[* TO NOW-1YEARS/DAY]' => _("Older than one year"),
     #    '[NOW-1YEARS TO NOW/DAY]' => _("Last year"), '[NOW-1MONTHS TO NOW/DAY]' => _("Last month"), '[NOW-7DAYS TO NOW/DAY]' => _("Last week"), '[NOW-1DAYS TO NOW/DAY]' => _("Last day")}},
     #  :f_profile_type => {:label => _('Author'), :proc => proc{|klass| f_profile_type_proc(klass)}},
     #  :f_category => {:label => _('Categories')}},
@@ -36,7 +36,7 @@ module ActsAsFaceted
       self.facets_order = options[:order] || self.facets.keys
       self.facets_results_containers = {:fields => 'facet_fields', :queries => 'facet_queries', :ranges => 'facet_ranges'}
       self.facets_option_for_solr = Hash[facets.select{ |id,data| ! data.has_key?(:queries) }].keys
-      self.facets_fields_for_solr = facets.map{ |id,data| {id => data[:type] || :facet} } 
+      self.facets_fields_for_solr = facets.map{ |id,data| {id => data[:type] || :facet} }
       self.solr_fields_names = facets.map{ |id,data| id.to_s + '_' + get_solr_field_type(data[:type] || :facet) }
       self.facet_category_query = options[:category_query]
 
@@ -67,6 +67,7 @@ module ActsAsFaceted
         raise 'Use map_facets_for before this method' if facet[:solr_field].nil?
         facets_data = {} if facets_data.blank? # could be empty array
         solr_facet = to_solr_fields_names[facet[:solr_field]]
+        unfiltered_facets_data ||= {}
 
         if facet[:queries]
           container = facets_data[facets_results_containers[:queries]]
@@ -98,27 +99,23 @@ module ActsAsFaceted
 
         if facet[:queries]
           result = facet_data.map do |id, count|
-            q = id[id.index(':')+1,id.length]
-            label = facet_result_name(facet, q)
+            q = id[id.index(':')+1, id.length]
+            label = gettext(facet[:queries][q])
             [q, label, count] if count > 0
           end.compact
           result = facet[:queries_order].map{ |id| result.detect{ |rid, label, count| rid == id } }.compact if facet[:queries_order]
         elsif facet[:proc]
           if facet[:label_id]
-            result = facet_data.map do |id, count|
-              name = facet_result_name(facet, id)
-              [id, name, count] if name
-            end.compact
-            # FIXME limit is NOT improving performance in this case :(
+            result = facet_result_proc(facet, facet_data)
             facet_count = result.length
             result = result.first(options[:limit]) if options[:limit]
           else
             facet_data = facet_data.first(options[:limit]) if options[:limit]
-            result = facet_data.map { |id, count| [id, facet_result_name(facet, id), count] }
+            result = facet_result_proc(facet, facet_data)
           end
         else
           facet_data = facet_data.first(options[:limit]) if options[:limit]
-          result = facet_data.map { |id, count| [id, facet_result_name(facet, id), count] }
+          result = facet_data.map{ |id, count| [id, id, count] }
         end
 
         sorted = facet_result_sort(facet, result, options[:sort])
@@ -142,16 +139,20 @@ module ActsAsFaceted
         end
       end
 
+      def facet_result_proc(facet, data)
+        if facet[:multi]
+          facet[:label_id] ||= 0
+          facet[:proc].call(facet, data)
+        else
+          gettext(facet[:proc].call(facet, data))
+        end
+      end
+
       def facet_result_name(facet, data)
         if facet[:queries]
-          gettext(facet[:queries][data])
+          gettext(facet[:queries][q])
         elsif facet[:proc]
-          if facet[:multi]
-            facet[:label_id] ||= 0
-            facet[:proc].call(facet, data)
-          else
-            gettext(facet[:proc].call(data))
-          end
+          facet_result_proc(facet, data).first[1]
         else
           data
         end

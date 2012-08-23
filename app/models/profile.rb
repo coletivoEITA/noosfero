@@ -871,37 +871,46 @@ private :generate_url, :url_options
   private
   def self.f_categories_label_proc(environment)
     ids = environment.top_level_category_as_facet_ids
-    r = Category.find(ids)
-    map = {}
+    map, r = {}, Category.find(ids)
     ids.map{ |id| map[id.to_s] = r.detect{|c| c.id == id}.name }
     map
   end
-  def self.f_categories_proc(facet, id)
-    id = id.to_i
-    return if id.zero?
-    c = Category.find(id)
-    c.name if c.top_ancestor.id == facet[:label_id].to_i or facet[:label_id] == 0
+  def self.f_categories_proc(facet, id_count_arr)
+    ids = id_count_arr.map{ |id, count| id }
+    cats, r = [], Category.find(ids)
+    ids.each{ |id| cats << r.detect{ |c| c.id == id.to_i} }
+    cats.reject!{ |c| !(c.top_ancestor.id == facet[:label_id].to_i || facet[:label_id] == 0) }
+
+    count_hash = Hash[id_count_arr]
+    cats.map do |cat|
+      [cat.id.to_s, cat.name, count_hash[cat.id.to_s]]
+    end
   end
   def f_categories
     category_ids - [region_id]
   end
 
   def f_region
-    self.region_id
+    self.region_id.to_s
   end
-  def self.f_region_proc(id)
-    c = Region.find(id)
-    s = c.parent
-    if c and c.kind_of?(City) and s and s.kind_of?(State) and s.acronym
-      [c.name, ', ' + s.acronym]
-    else
-      c.name
+  def self.f_region_proc(facet, id_count_arr)
+    ids = id_count_arr.map{ |id, count| id }
+    regs, r = [], Region.find(ids, :include => :parent)
+    ids.each{ |id| regs << r.detect{ |c| c.id == id.to_i} }
+
+    count_hash = Hash[id_count_arr]
+    extend SearchHelper
+    regs.map do |c|
+      [c.id.to_s, city_with_state(c), count_hash[c.id.to_s]]
     end
   end
 
-  def self.f_enabled_proc(enabled)
-    enabled = enabled == "true" ? true : false
-    enabled ? _('facets|Enabled') : _('facets|Not enabled')
+  def self.f_enabled_proc(facet, id_count_arr)
+    id_count_arr.map do |enabled, count|
+      text = enabled == "true" ? true : false
+      text = enabled ? _('facets|Enabled') : _('facets|Not enabled')
+      [enabled, text, count]
+    end
   end
   def f_enabled
     self.enabled
@@ -920,9 +929,9 @@ private :generate_url, :url_options
 
   acts_as_faceted :fields => {
       :f_enabled => {:label => _('Situation'), :type_if => proc { |klass| klass.kind_of?(Enterprise) },
-        :proc => proc { |id| f_enabled_proc(id) }},
-      :f_region => {:label => _('City'), :proc => proc { |id| f_region_proc(id) }},
-      :f_categories => {:multi => true, :proc => proc {|facet, id| f_categories_proc(facet, id)},
+        :proc => method(:f_enabled_proc).to_proc},
+      :f_region => {:label => _('City'), :proc => method(:f_region_proc).to_proc},
+      :f_categories => {:multi => true, :proc => method(:f_categories_proc).to_proc,
         :label => proc { |env| f_categories_label_proc(env) }, :label_abbrev => proc{ |env| f_categories_label_abbrev_proc(env) }},
     }, :category_query => proc { |c| "category_filter:#{c.id}" },
     :order => [:f_region, :f_categories, :f_enabled]
