@@ -908,7 +908,7 @@ private :generate_url, :url_options
   def self.f_enabled_proc(facet, id_count_arr)
     id_count_arr.map do |enabled, count|
       text = enabled == "true" ? true : false
-      text = enabled ? _('facets|Enabled') : _('facets|Not enabled')
+      text = enabled ? s_('facets|Enabled') : s_('facets|Not enabled')
       [enabled, text, count]
     end
   end
