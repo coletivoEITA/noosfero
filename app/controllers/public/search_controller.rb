@@ -25,7 +25,9 @@ class SearchController < PublicController
 
   def articles
     if !@empty_query
-      full_text_search ['public:true']
+      full_text_search ['public:true'], :sql_options => {:include => [
+          :last_changed_by, :parent, :tags, :categories, {:profile => [:domains]}
+        ]}
     else
       @results[@asset] = @environment.articles.public.send(@filter).paginate(paginate_options)
     end
@@ -35,18 +37,14 @@ class SearchController < PublicController
     redirect_to params.merge(:action => :articles)
   end
 
-  def people
-    if !@empty_query
-      full_text_search ['public:true']
-    else
-      @results[@asset] = @environment.people.visible.send(@filter).paginate(paginate_options)
-    end
-  end
-
   def products
     public_filters = ['public:true', 'enabled:true']
     if !@empty_query
-      full_text_search public_filters
+      full_text_search public_filters, :sql_options => {:include => [
+          :product_category, :unit, :region, :image, {:inputs => [:product_category]},
+          {:product_qualifiers => [:qualifier, :certifier]},
+          {:price_details => [:production_cost]}, {:enterprise => [:domains]}
+        ]}
     else
       @one_page = true
       @geosearch = logged_in? && current_user.person.lat && current_user.person.lng
@@ -64,9 +62,19 @@ class SearchController < PublicController
     end
   end
 
+  def people
+    if !@empty_query
+      full_text_search ['public:true'], :sql_options => {:include => [:domains, :image]}
+    else
+      @results[@asset] = @environment.people.visible.send(@filter).paginate(paginate_options)
+    end
+  end
+
   def enterprises
     if !@empty_query
-      full_text_search ['public:true']
+      full_text_search ['public:true'], :sql_options => {:include => [
+          :domains, :image, :categories, :product_categories, :home_page, {:region => [:parent]}
+        ]}
     else
       @filter_title = _('Enterprises from network')
       @results[@asset] = @environment.enterprises.visible.paginate(paginate_options)
@@ -75,7 +83,7 @@ class SearchController < PublicController
 
   def communities
     if !@empty_query
-      full_text_search ['public:true']
+      full_text_search ['public:true'], :sql_options => {:include => [:domains, :image]}
     else
       @results[@asset] = @environment.communities.visible.send(@filter).paginate(paginate_options)
     end
@@ -98,7 +106,9 @@ class SearchController < PublicController
     end
 
     if !@empty_query
-      full_text_search
+      full_text_search [], :sql_options => {:include => [
+          {:profile => :domains}
+        ]}
     else
       @results[@asset] = date_range ? environment.events.by_range(date_range) : environment.events
     end
@@ -271,19 +281,19 @@ class SearchController < PublicController
   end
 
   def full_text_search(filters = [], options = {})
-    paginate_options = paginate_options(params[:page])
     asset_class = asset_class(@asset)
 
     solr_options = options
     if !@results_only and asset_class.respond_to? :facets
       solr_options.merge! asset_class.facets_find_options(params[:facet])
       solr_options[:all_facets] = true
-      solr_options[:limit] = 0 if @facets_only
     end
     solr_options[:filter_queries] ||= []
     solr_options[:filter_queries] += filters
     solr_options[:filter_queries] << "environment_id:#{environment.id}"
     solr_options[:filter_queries] << asset_class.facet_category_query.call(@category) if @category
+
+    pg_options = paginate_options(params[:page])
 
     solr_options[:boost_functions] ||= []
     params[:order_by] = nil if params[:order_by] == 'none'
@@ -295,7 +305,7 @@ class SearchController < PublicController
       end
     end
 
-    ret = asset_class.find_by_contents(@query, paginate_options, solr_options)
+    ret = asset_class.find_by_contents(@query, pg_options, solr_options)
     @results[@asset] = ret[:results]
     @facets = ret[:facets]
     @all_facets = ret[:all_facets]
