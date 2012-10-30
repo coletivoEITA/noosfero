@@ -490,10 +490,9 @@ class CategoryTest < ActiveSupport::TestCase
   should 'paginate upcoming events' do
     category = Category.create!(:name => 'category1', :environment_id => Environment.default.id)
     profile = fast_create(Profile)
-    event1 = category.events.build(:name => 'event1', :start_date => Time.now, :profile => profile)	
-    event2 = category.events.build(:name => 'event2', :start_date => Time.now + 1.hour, :profile => profile)	
-    event3 = category.events.build(:name => 'event3', :start_date => Time.now + 1.day, :profile => profile)
-    category.save!
+    event1 = category.events.create!(:name => 'event1', :start_date => Time.now, :profile => profile)
+    event2 = category.events.create!(:name => 'event2', :start_date => Time.now + 1.hour, :profile => profile)
+    event3 = category.events.create!(:name => 'event3', :start_date => Time.now + 1.day, :profile => profile)
     assert_equal [event1, event2], category.upcoming_events(2)
   end
 
