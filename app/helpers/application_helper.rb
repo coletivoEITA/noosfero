@@ -131,7 +131,9 @@ module ApplicationHelper
   end
 
   def link_to_homepage(text, profile = nil, options = {})
-    p = if profile
+    p = if profile.is_a?(Profile)
+          profile
+        elsif profile.is_a?(String)
           Profile[profile]
         else
           user
