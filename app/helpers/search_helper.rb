@@ -4,8 +4,16 @@ module SearchHelper
   LIST_SEARCH_LIMIT = 20
   BLOCKS_SEARCH_LIMIT = 18
   MULTIPLE_SEARCH_LIMIT = 8
+
   DistFilt = 200
   DistBoost = 50
+
+  FILTERS = %w(
+    more_recent
+    more_active
+    more_popular
+    more_comments
+  )
 
   Searches = ActiveSupport::OrderedHash[
     :articles, _('Contents'),

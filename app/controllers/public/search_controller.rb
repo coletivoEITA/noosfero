@@ -214,12 +214,6 @@ class SearchController < PublicController
     end
   end
 
-  FILTERS = %w(
-    more_recent
-    more_active
-    more_popular
-    more_comments
-  )
   def filter
     if FILTERS.include?(params[:filter])
       params[:filter]
