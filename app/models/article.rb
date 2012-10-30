@@ -390,6 +390,8 @@ class Article < ActiveRecord::Base
   named_scope :galleries, :conditions => { :type => 'Gallery' }
   named_scope :images, :conditions => { :is_image => true }
   named_scope :text_articles, :conditions => [ 'articles.type IN (?)', text_article_types ]
+  named_scope :no_feeds, :conditions => ["type != 'RssFeed'"]
+  named_scope :lastest, :order => "updated_at DESC"
 
   named_scope :more_comments, :order => "comments_count DESC"
   named_scope :more_views, :order => "hits DESC"

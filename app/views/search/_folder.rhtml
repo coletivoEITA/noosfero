@@ -7,7 +7,7 @@
     <tr class="search-folder-items">
       <td class="search-field-label"><%= _("Last items") %></td>
 
-      <% r = folder.children.last(3) %>
+      <% r = folder.children.lastest.no_feeds.all(:limit => 3) %>
       <td class="<%= "search-field-none" if r.empty? %>">
         <% r.each do |a| %>
           <%= link_to a.title, a.view_url, :class => 'search-folder-sample-item '+icon_for_article(a) %>
