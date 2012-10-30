@@ -8,7 +8,7 @@
       <%= profile_image_link profile, :portrait, 'div' %>
     </div>
     <div class="search-enterprise-item-column-right">
-      <%= link_to_homepage(profile.name, profile.identifier, :class => "search-result-title") %>
+      <%= link_to_homepage(profile.name, profile, :class => "search-result-title") %>
       <div class="search-enterprise-description">
         <% if profile.description %>
           <% body_stripped = strip_tags(profile.description) %>
