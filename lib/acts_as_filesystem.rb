@@ -91,6 +91,13 @@ module ActsAsFileSystem
       end
     end
 
+    def descendents_options
+      ["#{self.ancestry_column} LIKE ?", "%#{self.formatted_ancestry_id}%"]
+    end
+    def descendents
+      self.class.scoped :conditions => descendents_options
+    end
+
     def update_children_path
       if self.recalculate_path
         self.children.each do |child|
