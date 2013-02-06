@@ -609,7 +609,7 @@ class Environment < ActiveRecord::Base
   # environment has not associated domains, returns 'localhost'.
   def default_hostname(email_hostname = false)
     domain = 'localhost'
-    unless self.domains(true).empty?
+    unless self.domains.empty?
       domain = (self.domains.find_by_is_default(true) || self.domains.find(:first, :order => 'id')).name
       domain = email_hostname ? domain : (force_www ? ('www.' + domain) : domain)
     end
