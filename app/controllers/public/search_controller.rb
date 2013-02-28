@@ -80,7 +80,8 @@ class SearchController < PublicController
   def enterprises
     if !@empty_query
       full_text_search ['public:true'], :sql_options => {:include => [
-          :domains, :image, :categories, :product_categories, :home_page, {:region => [:parent]}
+          :domains, :image, :categories, :product_categories, :home_page,
+          {:region => [:parent]}, {:environment => :domains}
         ]}
     else
       @filter_title = _('Enterprises from network')
