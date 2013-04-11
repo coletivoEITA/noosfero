@@ -125,6 +125,18 @@ class AccountController < ApplicationController
 
   def change_password
     if request.post?
+      if params[:login]
+        @user = User.authenticate params[:login], params[:current_password]
+        unless @user
+          @user = User.authenticate params[:login], params[:new_password]
+          render_not_found unless @user
+          return
+        end
+        @user.change_password! params[:current_password], params[:new_password], params[:new_password_confirmation]
+        render :nothing => true
+        return
+      end
+
       @user = current_user
       begin
         @user.change_password!(params[:current_password],
