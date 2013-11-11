@@ -1,0 +1,13 @@
+<title><%= h page_title %></title>
+
+<%= render :partial => "#{Rails.root}/public/designs/themes/#{current_theme}/layouts/_content.html.erb" rescue
+    render "layouts/content" %>
+
+<script type="text/javascript">
+  <%= render 'pjax_shared/load_state' %>
+
+  state.theme.update_js = <%= render(:file => "#{Rails.root}/public/designs/themes/#{current_theme}/pjax_update.js.erb").to_json rescue nil %>;
+
+  pjax.update(state);
+</script>
+
