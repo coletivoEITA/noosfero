@@ -231,3 +231,26 @@
 
       full_messages:
         format: "%{attribute} %{message}"
+
+  messaging_plugin:
+    lib:
+    models:
+      message:
+        to: "para"
+
+  email_plugin:
+    lib:
+    models:
+      account:
+        host: 'Servidor'
+        port: 'Porta'
+        username: 'Nome do usuário'
+        password: 'Senha'
+    views:
+      home:
+        index:
+      account:
+        no_account: "Ainda não tem uma conta de email? Cadastre agora:"
+        edit:
+          save: "Salvar"
+

@@ -1,0 +1,34 @@
+<script id="conversations-template" type="text/html">
+  {{ _.each(conversations, function(conversation) { }}
+      <div id="conversation-{{=conversation.id}}" class="conversation {{= conversation.read ? 'read' : 'unread' }}" onclick="email.conversations.open.click({{=conversation.id}})">
+      <span class="from">
+        {{= conversation.from }}
+      </span>
+      <span class="subject">
+        {{= conversation.subject }}
+      </span>
+      <span class="date">
+        {{= conversation.date }}
+      </span>
+      <span class="clean"/>
+    </div>
+  {{ }); }}
+</script>
+
+<%= render 'open_conversation' %>
+
+<div id="conversations" class="loading">
+</div>
+<div id="open-conversation">
+</div>
+
+<% javascript_tag do %>
+  email.conversations.url = "<%= url_for :controller => :email_plugin_conversations %>/%{action}/%{id}";
+  email.conversations.template = _.template(jQuery("#conversations-template").html());
+  email.conversations.view = jQuery('#conversations');
+  email.conversations.index();
+
+  email.conversations.open.template = _.template(jQuery("#open-conversation-template").html());
+  email.conversations.open.view = jQuery('#open-conversation');
+<% end %>
+

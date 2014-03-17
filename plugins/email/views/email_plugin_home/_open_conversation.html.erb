@@ -1,0 +1,31 @@
+<script id="open-conversation-template" type="text/html">
+  <h2> {{= conversation.subject }} </h2>
+  {{ _.each(conversation.messages, function(message) { }}
+      <div id="message-{{=message.id}}" class="message">
+      <div class="image-column">
+      </div>
+      <div class="main-column">
+        <div class="header">
+          <div class="left">
+            <div class="from">
+              {{= message.from }}
+            </div>
+            <div class="to">
+              <%= t('messaging_plugin.models.message.to') %> {{= message.to }}
+            </div>
+          </div>
+          <div class="right">
+            <div class="date">
+              {{= message.date }}
+            </div>
+            <div class="actions">
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          {{= message.body }}
+        </div>
+      </div>
+    </div>
+  {{ }); }}
+</script>

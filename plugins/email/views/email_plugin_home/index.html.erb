@@ -1,0 +1,11 @@
+<div id="email-home">
+
+  <%= render 'labels' %>
+
+  <% if profile.email_accounts.empty? %>
+    <%= render 'email_plugin_accounts/no_account' %>
+  <% else %>
+    <%= render 'conversations' %>
+  <% end %>
+
+</div>

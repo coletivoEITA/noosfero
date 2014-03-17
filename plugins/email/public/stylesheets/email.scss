@@ -1,0 +1,58 @@
+@import 'base';
+
+#email-home {
+
+  #labels {
+    width: $module03;
+
+  }
+
+  #conversations {
+    width: $module09 + 2*$intercolumn;
+    background: #EEF0F3;
+
+    .conversation {
+      border-bottom: #E5E5E5 solid 1px;
+      height: 3*$height;
+      margin: 0;
+      cursor: pointer;
+
+      &.unread {
+        font-weight: bold;
+      }
+      &.read {
+        background: #C7D5E4;
+      }
+
+      .from, .subject, .date {
+        overflow: hidden;
+        float: left;
+        padding: $half-padding $padding;
+        white-space: nowrap;
+      }
+      .from {
+        width: $module02 - $padding;
+      }
+      .subject {
+        width: $module06 - $padding;
+        margin-left: $margin;
+      }
+      .date {
+        width: $module01 - $padding;
+        margin-left: $margin;
+      }
+    }
+
+  }
+
+  #open-conversation {
+    display: none;
+
+    .message {
+
+
+    }
+  }
+
+
+}

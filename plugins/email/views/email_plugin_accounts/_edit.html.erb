@@ -1,0 +1,11 @@
+<% form_for :account, account, :url => {:controller => :email_plugin_accounts, :action => :edit} do |f| %>
+
+  <%= f.hidden_field :id, :value => (if account.new_record? then 'new' else account.id end) %>
+
+  <%= f.text_field :host, :placeholder => t('email_plugin.models.account.host') %>
+  <%= f.text_field :port, :placeholder => t('email_plugin.models.account.port') %>
+  <%= f.text_field :username, :placeholder => t('email_plugin.models.account.username') %>
+  <%= f.password_field :password, :placeholder => t('email_plugin.models.account.password') %>
+
+  <%= f.submit t('email_plugin.views.account.edit.save') %>
+<% end %>
