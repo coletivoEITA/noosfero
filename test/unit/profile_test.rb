@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProfileTest < ActiveSupport::TestCase
@@ -6,31 +7,31 @@ class ProfileTest < ActiveSupport::TestCase
   def test_identifier_validation
     p = Profile.new
     p.valid?
-    assert p.errors.invalid?(:identifier)
+    assert p.errors[:identifier.to_s].present?
 
     p.identifier = 'with space'
     p.valid?
-    assert p.errors.invalid?(:identifier)
+    assert p.errors[:identifier.to_s].present?
 
     p.identifier = 'áéíóú'
     p.valid?
-    assert p.errors.invalid?(:identifier)
+    assert p.errors[:identifier.to_s].present?
 
     p.identifier = 'rightformat2007'
     p.valid?
-    assert ! p.errors.invalid?(:identifier)
+    assert ! p.errors[:identifier.to_s].present?
 
     p.identifier = 'rightformat'
     p.valid?
-    assert ! p.errors.invalid?(:identifier)
+    assert ! p.errors[:identifier.to_s].present?
 
     p.identifier = 'right_format'
     p.valid?
-    assert ! p.errors.invalid?(:identifier)
+    assert ! p.errors[:identifier.to_s].present?
 
     p.identifier = 'identifier-with-dashes'
     p.valid?
-    assert ! p.errors.invalid?(:identifier), 'Profile should accept identifier with dashes'
+    assert ! p.errors[:identifier.to_s].present?, 'Profile should accept identifier with dashes'
   end
 
   def test_has_domains
@@ -80,10 +81,10 @@ class ProfileTest < ActiveSupport::TestCase
   def test_name_should_be_mandatory
     p = Profile.new
     p.valid?
-    assert p.errors.invalid?(:name)
+    assert p.errors[:name.to_s].present?
     p.name = 'a very unprobable name'
     p.valid?
-    assert !p.errors.invalid?(:name)
+    assert !p.errors[:name.to_s].present?
   end
 
   def test_can_have_affiliated_people
@@ -275,7 +276,7 @@ class ProfileTest < ActiveSupport::TestCase
   should 'list tags for profile' do
     profile = create(Profile, :tag_list => 'first-tag, second-tag')
 
-    assert_equal(['first-tag', 'second-tag'], profile.tags.map(&:name))
+    assert_equivalent(['first-tag', 'second-tag'], profile.tags.map(&:name))
   end
 
   should 'find content tagged with given tag' do
@@ -284,9 +285,9 @@ class ProfileTest < ActiveSupport::TestCase
     second  = create(Article, :profile => profile, :tag_list => 'first-tag, second-tag')
     third   = create(Article, :profile => profile, :tag_list => 'first-tag, second-tag, third-tag')
 
-    assert_equivalent [ first, second, third], profile.find_tagged_with('first-tag')
-    assert_equivalent [ second, third ], profile.find_tagged_with('second-tag')
-    assert_equivalent [ third], profile.find_tagged_with('third-tag')
+    assert_equivalent [ first, second, third], profile.tagged_with('first-tag')
+    assert_equivalent [ second, third ], profile.tagged_with('second-tag')
+    assert_equivalent [ third], profile.tagged_with('third-tag')
   end
 
   should 'provide tag count' do
@@ -363,7 +364,7 @@ class ProfileTest < ActiveSupport::TestCase
     t2 = c.tasks.build; t2.save!; t2.finish
     t3 = c.tasks.build; t3.save!; t3.finish
 
-    assert_equal [t2, t3], c.tasks.finished
+    assert_equivalent [t2, t3], c.tasks.finished
   end
 
   should 'responds to categories' do
@@ -517,7 +518,7 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'be able to create a profile with categories' do
     pcat = create(Category)
-    c1 = create(Category, :parent_id => pcat)
+    c1 = create(Category, :parent_id => pcat.id)
     c2 = create(Category)
 
     profile = create(Profile, :category_ids => [c1.id, c2.id])
@@ -591,7 +592,7 @@ class ProfileTest < ActiveSupport::TestCase
     category2 = fast_create(Category, :parent_id => pcat.id)
     profile = create(Profile, :region => region, :category_ids => [category.id])
 
-    profile.update_attributes!(:category_ids => [category2.id])
+    profile.update_attribute(:category_ids, [category2.id])
 
     assert_includes profile.categories(true), region
     assert_includes profile.categories_including_virtual(true), pcat
@@ -604,7 +605,7 @@ class ProfileTest < ActiveSupport::TestCase
     category = fast_create(Category, :parent_id => pcat.id)
     profile = create(Profile, :region => region, :category_ids => [category.id])
 
-    profile.update_attributes!(:region => region2)
+    profile.update_attribute(:region, region2)
 
     assert_includes profile.categories(true), category
     assert_includes profile.categories_including_virtual(true), pcat
@@ -713,8 +714,8 @@ class ProfileTest < ActiveSupport::TestCase
     c3 = fast_create(Category, :parent_id => c1.id)
     profile = fast_create(Profile)
     profile.category_ids = [c2,c3,c3].map(&:id)
-    assert_equal [c2, c3], profile.categories(true)
-    assert_equal [c2, c1, c3], profile.categories_including_virtual(true)
+    assert_equivalent [c2, c3], profile.categories(true)
+    assert_equivalent [c1, c2, c3], profile.categories_including_virtual(true)
   end
 
   should 'not return nil members when a member is removed from system' do
@@ -742,11 +743,11 @@ class ProfileTest < ActiveSupport::TestCase
   should 'nickname be able to be nil' do
     p = Profile.new()
     p.valid?
-    assert_nil p.errors[:nickname]
+    assert_blank p.errors[:nickname]
   end
 
   should 'filter html from nickname' do
-    p = Profile.create!(:identifier => 'testprofile', :name => 'test profile', :environment => Environment.default)
+    p = create(Profile, :identifier => 'testprofile', :name => 'test profile', :environment => Environment.default)
     p.nickname = "<b>code</b>"
     p.save!
     assert_equal 'code', p.nickname
@@ -840,7 +841,7 @@ class ProfileTest < ActiveSupport::TestCase
   end
 
   should 'store theme' do
-    p = Profile.new(:theme => 'my-shiny-theme')
+    p = build(Profile, :theme => 'my-shiny-theme')
     assert_equal 'my-shiny-theme', p.theme
   end
 
@@ -1079,7 +1080,7 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal 'default title', p.boxes[0].blocks.first[:title]
   end
 
-  TMP_THEMES_DIR = RAILS_ROOT + '/test/tmp/profile_themes'
+  TMP_THEMES_DIR = Rails.root.join('test', 'tmp', 'profile_themes')
   should 'have themes' do
     Theme.stubs(:user_themes_dir).returns(TMP_THEMES_DIR)
 
@@ -1133,7 +1134,7 @@ class ProfileTest < ActiveSupport::TestCase
   should 'destroy tasks requested to it when destroyed' do
     p = Profile.create!(:name => 'test_profile', :identifier => 'test_profile')
 
-    assert_no_difference Task, :count do
+    assert_no_difference 'Task.count' do
       Task.create(:target => p)
       p.destroy
     end
@@ -1143,10 +1144,10 @@ class ProfileTest < ActiveSupport::TestCase
     env = fast_create(Environment)
 
     p1 = fast_create(Profile, :identifier => 'mytestprofile', :environment_id => env.id)
-    p2 = Profile.new(:identifier => 'mytestprofile', :environment => env)
+    p2 = build(Profile, :identifier => 'mytestprofile', :environment => env)
 
     assert !p2.valid?
-    assert p2.errors.on(:identifier)
+    assert p2.errors[:identifier]
     assert_equal p1.environment, p2.environment
   end
 
@@ -1198,14 +1199,14 @@ class ProfileTest < ActiveSupport::TestCase
   should 'enable contact for person only if its features enabled in environment' do
     env = Environment.default
     env.disable('disable_contact_person')
-    person = Person.new(:name => 'Contacted', :environment => env)
+    person = build(Person, :name => 'Contacted', :environment => env)
     assert person.enable_contact?
   end
 
   should 'enable contact for community only if its features enabled in environment' do
     env = Environment.default
     env.disable('disable_contact_person')
-    community = Community.new(:name => 'Contacted', :environment => env)
+    community = build(Community, :name => 'Contacted', :environment => env)
     assert community.enable_contact?
   end
 
@@ -1300,7 +1301,6 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'list folder articles' do
     profile = fast_create(Profile)
-    Article.destroy_all
     p1 = Folder.create!(:name => 'parent1', :profile => profile)
     p2 = Blog.create!(:name => 'parent2', :profile => profile)
 
@@ -1321,15 +1321,15 @@ class ProfileTest < ActiveSupport::TestCase
   end
 
   should 'profile be valid when image is empty' do
-    profile = Profile.new(:image_builder => {:uploaded_data => ""})
+    profile = build(Profile, :image_builder => {:uploaded_data => ""})
     profile.valid?
-    assert_nil profile.errors[:image]
+    assert_blank profile.errors[:image]
   end
 
   should 'profile be valid when has no image' do
     profile = Profile.new
     profile.valid?
-    assert_nil profile.errors[:image]
+    assert_blank profile.errors[:image]
   end
 
   should 'copy header and footer after create a person' do
@@ -1345,14 +1345,14 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'not have a profile as a template if it is not defined as a template' do
     template = fast_create(Profile)
-    profile = Profile.new(:template => template)
+    profile = build(Profile, :template => template)
     !profile.valid?
-    assert profile.errors.invalid?(:template)
+    assert profile.errors[:template.to_s].present?
 
     template.is_template = true
     template.save!
     profile.valid?
-    assert !profile.errors.invalid?(:template)
+    assert !profile.errors[:template.to_s].present?
   end
 
   should 'be able to have a template' do
@@ -1370,13 +1370,27 @@ class ProfileTest < ActiveSupport::TestCase
   end
 
   should 'return a list of templates' do
+    environment = Environment.default
     t1 = fast_create(Profile, :is_template => true)
     t2 = fast_create(Profile, :is_template => true)
     profile = fast_create(Profile)
 
-    assert_includes Profile.templates(Environment.default), t1
-    assert_includes Profile.templates(Environment.default), t2
-    assert_not_includes Profile.templates(Environment.default), profile
+    assert_includes environment.profiles.templates, t1
+    assert_includes environment.profiles.templates, t2
+    assert_not_includes environment.profiles.templates, profile
+  end
+
+  should 'return a list of profiles that are not templates' do
+    environment = Environment.default
+    p1 = fast_create(Profile, :is_template => false)
+    p2 = fast_create(Profile, :is_template => false)
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+
+    assert_includes environment.profiles.no_templates, p1
+    assert_includes environment.profiles.no_templates, p2
+    assert_not_includes environment.profiles.no_templates, t1
+    assert_not_includes environment.profiles.no_templates, t2
   end
 
   should 'not crash on a profile update with a destroyed template' do
@@ -1445,6 +1459,19 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal [today_event], profile.events.by_day(today)
   end
 
+  should 'list events by month' do
+    profile = fast_create(Profile)
+
+    today = Date.new(2014, 03, 2)
+    yesterday_event = Event.new(:name => 'Joao Birthday', :start_date => today - 1.day)
+    today_event = Event.new(:name => 'Ze Birthday', :start_date => today)
+    tomorrow_event = Event.new(:name => 'Mane Birthday', :start_date => today + 1.day)
+
+    profile.events << [yesterday_event, today_event, tomorrow_event]
+
+    assert_equal [yesterday_event, today_event, tomorrow_event], profile.events.by_month(today)
+  end
+
   should 'list events in a range' do
     profile = fast_create(Profile)
 
@@ -1474,13 +1501,13 @@ class ProfileTest < ActiveSupport::TestCase
     assert_not_includes profile.events.by_day(today), event_out_of_range
   end
 
-  should 'sort events by name' do
+  should 'sort events by date' do
     profile = fast_create(Profile)
     event1 = Event.new(:name => 'Noosfero Hackaton', :start_date => Date.today)
-    event2 = Event.new(:name => 'Debian Day', :start_date => Date.today)
-    event3 = Event.new(:name => 'Fisl 10', :start_date => Date.today)
+    event2 = Event.new(:name => 'Debian Day', :start_date => Date.today - 1)
+    event3 = Event.new(:name => 'Fisl 10', :start_date => Date.today + 1)
     profile.events << [event1, event2, event3]
-    assert_equal [event2, event3, event1], profile.events
+    assert_equal [event2, event1, event3], profile.events
   end
 
   should 'be available if identifier doesnt exist on environment' do
@@ -1500,7 +1527,7 @@ class ProfileTest < ActiveSupport::TestCase
     profile = Profile.new
     profile.description = long_description
     profile.valid?
-    assert profile.errors.invalid?(:description)
+    assert profile.errors[:description.to_s].present?
   end
 
   should 'sanitize name before validation' do
@@ -1508,7 +1535,7 @@ class ProfileTest < ActiveSupport::TestCase
     profile.name = "<h1 Bla </h1>"
     profile.valid?
 
-    assert profile.errors.invalid?(:name)
+    assert profile.errors[:name.to_s].present?
   end
 
   should 'filter fields with white_list filter' do
@@ -1662,6 +1689,7 @@ class ProfileTest < ActiveSupport::TestCase
     person = fast_create(Person)
     community = fast_create(Community)
     community.add_member(person)
+    community.reload
 
     assert_equal 1, community.members_count
   end
@@ -1724,22 +1752,22 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'get organization roles' do
     env = fast_create(Environment)
-    roles = %w(foo bar profile_foo profile_bar).map{ |r| Role.create!(:name => r, :key => r, :environment_id => env.id, :permissions => ["some"]) }
-    Role.create! :name => 'test', :key => 'profile_test', :environment_id => env.id + 1
+    roles = %w(foo bar profile_foo profile_bar).map{ |r| create(Role, :name => r, :key => r, :environment_id => env.id, :permissions => ["some"]) }
+    create Role, :name => 'test', :key => 'profile_test', :environment_id => env.id + 1
     Profile::Roles.expects(:all_roles).returns(roles)
     assert_equal roles[2..3], Profile::Roles.organization_member_roles(env.id)
   end
 
   should 'get all roles' do
     env = fast_create(Environment)
-    roles = %w(foo bar profile_foo profile_bar).map{ |r| Role.create!(:name => r, :environment_id => env.id, :permissions => ["some"]) }
-    Role.create! :name => 'test', :environment_id => env.id + 1
-    assert_equal roles, Profile::Roles.all_roles(env.id)
+    roles = %w(foo bar profile_foo profile_bar).map{ |r| create(Role, :name => r, :environment_id => env.id, :permissions => ["some"]) }
+    create Role, :name => 'test', :environment_id => env.id + 1
+    assert_equivalent roles, Profile::Roles.all_roles(env.id)
   end
 
   should 'define method for role' do
     env = fast_create(Environment)
-    r = Role.create! :name => 'Test Role', :environment_id => env.id
+    r = create Role, :name => 'Test Role', :environment_id => env.id
     assert_equal r, Profile::Roles.test_role(env.id)
     assert_raise NoMethodError do
       Profile::Roles.invalid_role(env.id)
@@ -1763,6 +1791,7 @@ class ProfileTest < ActiveSupport::TestCase
         Person.members_of(Community.find_by_identifier('community2'))
       end
     end
+    Noosfero::Plugin.stubs(:all).returns(['ProfileTest::Plugin1', 'ProfileTest::Plugin2'])
     Environment.default.enable_plugin(Plugin1)
     Environment.default.enable_plugin(Plugin2)
 
@@ -1775,11 +1804,12 @@ class ProfileTest < ActiveSupport::TestCase
     original_community.add_member(original_member)
     community1.add_member(plugin1_member)
     community2.add_member(plugin2_member)
+    original_community.reload
 
     assert_includes original_community.members, original_member
     assert_includes original_community.members, plugin1_member
     assert_includes original_community.members, plugin2_member
-    assert 3, original_community.members.count
+    assert_equal 3, original_community.members.count
   end
 
   private
@@ -1787,7 +1817,7 @@ class ProfileTest < ActiveSupport::TestCase
   def assert_invalid_identifier(id)
     profile = Profile.new(:identifier => id)
     assert !profile.valid?
-    assert profile.errors.invalid?(:identifier)
+    assert profile.errors[:identifier.to_s].present?
   end
 
   should 'respond to redirection_after_login' do
@@ -1810,12 +1840,12 @@ class ProfileTest < ActiveSupport::TestCase
     profile = fast_create(Profile)
     profile.redirection_after_login = 'invalid_option'
     profile.save
-    assert profile.errors.invalid?(:redirection_after_login)
+    assert profile.errors[:redirection_after_login.to_s].present?
 
     Environment.login_redirection_options.keys.each do |redirection|
       profile.redirection_after_login = redirection
       profile.save
-      assert !profile.errors.invalid?(:redirection_after_login)
+      assert !profile.errors[:redirection_after_login.to_s].present?
     end
   end
 
@@ -1833,4 +1863,96 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal f, p.fields_privacy
   end
 
+  should 'not display field if field is active but not public and user not logged in' do
+    profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(['field'])
+    profile.stubs(:public_fields).returns([])
+    assert !profile.may_display_field_to?('field', nil)
+  end
+
+  should 'not display field if field is active but not public and user is not friend' do
+    profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(['field'])
+    profile.expects(:public_fields).returns([])
+    user = mock
+    user.expects(:is_a_friend?).with(profile).returns(false)
+    assert !profile.may_display_field_to?('field', user)
+  end
+
+  should 'display field if field is active and not public but user is profile owner' do
+    user = profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(['field'])
+    profile.expects(:public_fields).returns([])
+    assert profile.may_display_field_to?('field', user)
+  end
+
+  should 'display field if field is active and not public but user is a friend' do
+    profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(['field'])
+    profile.expects(:public_fields).returns([])
+    user = mock
+    user.expects(:is_a_friend?).with(profile).returns(true)
+    assert profile.may_display_field_to?('field', user)
+  end
+
+  should 'call may_display on field name if the field is not active' do
+    user = fast_create(Person)
+    profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(['humble'])
+    profile.expects(:may_display_humble_to?).never
+    profile.expects(:may_display_bundle_to?).once
+
+    profile.may_display_field_to?('humble', user)
+    profile.may_display_field_to?('bundle', user)
+  end
+
+  # TODO Eventually we would like to specify it in a deeper granularity...
+  should 'not display location if any field is private' do
+    user = fast_create(Person)
+    profile = fast_create(Profile)
+    profile.stubs(:active_fields).returns(Profile::LOCATION_FIELDS)
+    Profile::LOCATION_FIELDS.each { |field| profile.stubs(:may_display_field_to?).with(field, user).returns(true)}
+    assert profile.may_display_location_to?(user)
+
+    profile.stubs(:may_display_field_to?).with(Profile::LOCATION_FIELDS[0], user).returns(false)
+    assert !profile.may_display_location_to?(user)
+  end
+
+  should 'destroy profile if its environment is destroyed' do
+    environment = fast_create(Environment)
+    profile = fast_create(Profile, :environment_id => environment.id)
+
+    environment.destroy
+    assert_raise(ActiveRecord::RecordNotFound) {profile.reload}
+  end
+
+  should 'list only public profiles' do
+    p1 = fast_create(Profile)
+    p2 = fast_create(Profile, :visible => false)
+    p3 = fast_create(Profile, :public_profile => false)
+    p4 = fast_create(Profile, :visible => false, :public_profile => false)
+
+    assert_includes Profile.public, p1
+    assert_not_includes Profile.public, p2
+    assert_not_includes Profile.public, p3
+    assert_not_includes Profile.public, p4
+  end
+
+  should 'folder_types search for folders in the plugins' do
+    class Folder1 < Folder
+    end
+
+    class Plugin1 < Noosfero::Plugin
+      def content_types
+        [Folder1]
+      end
+    end
+
+    environment = Environment.default
+    Noosfero::Plugin.stubs(:all).returns(['ProfileTest::Plugin1'])
+    environment.enable_plugin(Plugin1)
+    plugins = Noosfero::Plugin::Manager.new(environment, self)
+    p = fast_create(Profile)
+    assert p.folder_types.include?('ProfileTest::Folder1')
+  end
 end

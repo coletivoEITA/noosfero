@@ -7,11 +7,6 @@ class EventsControllerTest < ActionController::TestCase
   end
   attr_reader :profile
 
-  should 'hide sideboxes when show calendar' do
-    get :events, :profile => profile.identifier
-    assert_no_tag :tag => 'div', :attributes => {:id => 'boxes'}
-  end
-
   should 'list today events by default' do
     profile.events << Event.new(:name => 'Joao Birthday', :start_date => Date.today)
     profile.events << Event.new(:name => 'Maria Birthday', :start_date => Date.today)
@@ -32,27 +27,31 @@ class EventsControllerTest < ActionController::TestCase
     assert_tag :tag => 'table', :attributes => {:class => /current-month/}, :descendant => {:tag => 'caption', :content => /#{month}/}
   end
 
-  should 'display calendar of previous month' do
-    get :events, :profile => profile.identifier
-
-    month = (Date.today << 1).strftime("%B %Y")
-    assert_tag :tag => 'table', :attributes => {:class => /previous-month/}, :descendant => {:tag => 'caption', :content => /#{month}/}
-  end
-
-  should 'display calendar of next month' do
-    get :events, :profile => profile.identifier
-
-    month = (Date.today >> 1).strftime("%B %Y")
-    assert_tag :tag => 'table', :attributes => {:class => /next-month/}, :descendant => {:tag => 'caption', :content => /#{month}/}
-  end
-
   should 'display links to previous and next month' do
     get :events, :profile => profile.identifier
 
-    prev_month = Date.today << 1
-    next_month = Date.today >> 1
-    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{next_month.year}/#{next_month.month}"}, :content => /next/
-    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{prev_month.year}/#{prev_month.month}"}, :content => /previous/
+    prev_month = Date.today - 1.month
+    next_month = Date.today + 1.month
+    prev_month_name = prev_month.strftime("%B")
+    next_month_name = next_month.strftime("%B")
+    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{prev_month.year}/#{prev_month.month}"}, :content => prev_month_name
+    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{next_month.year}/#{next_month.month}"}, :content => next_month_name
+  end
+
+  should 'see the events paginated' do
+    30.times do |i|
+      profile.events << Event.new(:name => "Lesson #{i}", :start_date => Date.today)
+    end
+    get :events, :profile => profile.identifier
+    assert_equal 20, assigns(:events).size
+  end
+
+  should 'show events of specific day' do
+    profile.events << Event.new(:name => 'Joao Birthday', :start_date => Date.new(2009, 10, 28))
+
+    get :events_by_day, :profile => profile.identifier, :year => 2009, :month => 10, :day => 28
+
+    assert_tag :tag => 'a', :content => /Joao Birthday/
   end
 
 end

@@ -1,5 +1,7 @@
 class LinkListBlock < Block
 
+  attr_accessible :links
+
   ICONS = [
     ['no-icon', _('(No icon)')],
     ['edit', N_('Edit')],
@@ -33,6 +35,12 @@ class LinkListBlock < Block
     ['chat', N_('Chat')]
   ]
 
+  TARGET_OPTIONS = [
+    [N_('Same page'), '_self'],
+    [N_('New tab'), '_blank'],
+    [N_('New window'), '_new'],
+  ]
+
   settings_items :links, Array, :default => []
 
   before_save do |block|
@@ -50,20 +58,22 @@ class LinkListBlock < Block
   def content(args={})
     block_title(title) +
     content_tag('ul',
-      links.select{|i| !i[:name].blank? and !i[:address].blank?}.map{|i| content_tag('li', link_html(i))}
+      links.select{|i| !i[:name].blank? and !i[:address].blank?}.map{|i| content_tag('li', link_html(i))}.join
     )
   end
 
   def link_html(link)
     klass = 'icon-' + link[:icon] if link[:icon]
     sanitize_link(
-      link_to(link[:name], expand_address(link[:address]), :class => klass)
+      link_to(link[:name], expand_address(link[:address]), :target => link[:target], :class => klass, :title => link[:title])
     )
   end
 
   def expand_address(address)
     add = if owner.respond_to?(:identifier)
       address.gsub('{profile}', owner.identifier)
+    elsif owner.is_a?(Environment) && owner.enabled?('use_portal_community') && owner.portal_community
+      address.gsub('{portal}', owner.portal_community.identifier)
     else
       address
     end

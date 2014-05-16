@@ -7,42 +7,43 @@ class SuggestArticleTest < ActiveSupport::TestCase
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
     @profile = create_user('test_user').person
+    Noosfero::Plugin.stubs(:all).returns(['SuggestArticleTest::EverythingIsSpam', 'SuggestArticleTest::SpamNotification'])
   end
   attr_reader :profile
 
   should 'have the article_name' do
     t = SuggestArticle.new
-    assert !t.errors.invalid?(:article_name)
+    assert !t.errors[:article_name.to_s].present?
     t.valid?
-    assert t.errors.invalid?(:article_name)
+    assert t.errors[:article_name.to_s].present?
   end
 
   should 'have the article_body' do
     t = SuggestArticle.new
-    assert !t.errors.invalid?(:article_body)
+    assert !t.errors[:article_body.to_s].present?
     t.valid?
-    assert t.errors.invalid?(:article_body)
+    assert t.errors[:article_body.to_s].present?
   end
 
   should 'have the email' do
     t = SuggestArticle.new
-    assert !t.errors.invalid?(:email)
+    assert !t.errors[:email.to_s].present?
     t.valid?
-    assert t.errors.invalid?(:email)
+    assert t.errors[:email.to_s].present?
   end
 
   should 'have the name' do
     t = SuggestArticle.new
-    assert !t.errors.invalid?(:name)
+    assert !t.errors[:name.to_s].present?
     t.valid?
-    assert t.errors.invalid?(:name)
+    assert t.errors[:name.to_s].present?
   end
 
   should 'have the target_id' do
     t = SuggestArticle.new
-    assert !t.errors.invalid?(:target_id)
+    assert !t.errors[:target_id.to_s].present?
     t.valid?
-    assert t.errors.invalid?(:target_id)
+    assert t.errors[:target_id.to_s].present?
   end
 
   should 'have the article_abstract' do
@@ -145,10 +146,83 @@ class SuggestArticleTest < ActiveSupport::TestCase
   should 'deliver target notification message' do
     task = build(SuggestArticle, :target => @profile, :article_name => 'suggested article', :name => 'johndoe', :email => 'johndoe@example.com')
 
-    email = TaskMailer.deliver_target_notification(task, task.target_notification_message)
+    email = TaskMailer.target_notification(task, task.target_notification_message).deliver
 
     assert_match(/#{task.name}.*suggested the publication of the article: #{task.subject}/, email.subject)
   end
 
+  class EverythingIsSpam < Noosfero::Plugin
+    def check_for_spam(object)
+      object.spam!
+    end
+  end
+
+  should 'delegate spam detection to plugins' do
+    Environment.default.enable_plugin(EverythingIsSpam)
+
+    t1 = build(SuggestArticle, :target => @profile, :article_name => 'suggested article', :name => 'johndoe', :email => 'johndoe@example.com')
+
+    EverythingIsSpam.any_instance.expects(:check_for_spam)
+
+    t1.check_for_spam
+  end
+
+  class SpamNotification < Noosfero::Plugin
+    class << self
+      attr_accessor :marked_as_spam
+      attr_accessor :marked_as_ham
+    end
+
+    def check_for_spam(c)
+      # do nothing
+    end
+
+    def marked_as_spam(c)
+      self.class.marked_as_spam = c
+    end
+
+    def marked_as_ham(c)
+      self.class.marked_as_ham = c
+    end
+  end
+
+  should 'notify plugins of suggest_articles being marked as spam' do
+    Environment.default.enable_plugin(SpamNotification)
+
+    t = SuggestArticle.create!(:target => @profile, :article_name => 'suggested article', :name => 'johndoe', :article_body => 'wanna feel my body? my body baaaby', :email => 'johndoe@example.com')
+
+    t.spam!
+    process_delayed_job_queue
+
+    assert_equal t, SpamNotification.marked_as_spam
+  end
+
+  should 'notify plugins of suggest_articles being marked as ham' do
+    Environment.default.enable_plugin(SpamNotification)
+
+    t = SuggestArticle.create!(:target => @profile, :article_name => 'suggested article', :name => 'johndoe', :article_body => 'wanna feel my body? my body baaaby', :email => 'johndoe@example.com')
+
+    t.ham!
+    process_delayed_job_queue
+
+    assert_equal t, SpamNotification.marked_as_ham
+  end
+
+  should 'store User-Agent' do
+    t = SuggestArticle.new(:user_agent => 'foo')
+    assert_equal 'foo', t.user_agent
+  end
+
+  should 'store referrer' do
+    t = SuggestArticle.new(:referrer => 'bar')
+    assert_equal 'bar', t.referrer
+  end
+
+  should 'log spammer ip after marking comment as spam' do
+    t = SuggestArticle.create!(:target => @profile, :article_name => 'suggested article', :name => 'johndoe', :article_body => 'wanna feel my body? my body baaaby', :email => 'johndoe@example.com', :ip_address => '192.168.0.1')
+    t.spam!
+    log = File.open('log/test_spammers.log')
+    assert_match "SuggestArticle-id: #{t.id} IP: 192.168.0.1", log.read
+  end
 
 end

@@ -23,7 +23,6 @@ class LinkListBlockTest < ActiveSupport::TestCase
 
   should 'list links' do
     l = LinkListBlock.new(:links => [{:name => 'products', :address => '/cat/products'}])
-    l.expects(:links).returns([{:name => 'products', :address => '/cat/products'}])
     assert_match /products/, l.content
   end
 
@@ -38,6 +37,32 @@ class LinkListBlockTest < ActiveSupport::TestCase
     l = LinkListBlock.new(:links => [{:name => 'categ', :address => '/{profile}/address'}])
     l.stubs(:owner).returns(profile)
     assert_tag_in_string l.content, :tag => 'a', :attributes => {:href => '/test_profile/address'}
+  end
+
+  should 'replace {portal} with environment portal identifier' do
+    env = Environment.default
+    env.enable('use_portal_community')
+    portal = fast_create(Community, :identifier => 'portal-community', :environment_id => env.id)
+    env.portal_community = portal
+    env.save
+
+    stubs(:environment).returns(env)
+    l = LinkListBlock.new(:links => [{:name => 'categ', :address => '/{portal}/address'}])
+    l.stubs(:owner).returns(env)
+    assert_tag_in_string l.content, :tag => 'a', :attributes => {:href => '/portal-community/address'}
+  end
+
+  should 'not change address if no {portal} there' do
+    env = Environment.default
+    env.enable('use_portal_community')
+    portal = fast_create(Community, :identifier => 'portal-community', :environment_id => env.id)
+    env.portal_community = portal
+    env.save
+
+    stubs(:environment).returns(env)
+    l = LinkListBlock.new(:links => [{:name => 'categ', :address => '/address'}])
+    l.stubs(:owner).returns(env)
+    assert_tag_in_string l.content, :tag => 'a', :attributes => {:href => '/address'}
   end
 
   should 'display options for icons' do
@@ -77,10 +102,21 @@ class LinkListBlockTest < ActiveSupport::TestCase
   should 'be able to update display setting' do
     user = create_user('testinguser').person
     box = fast_create(Box, :owner_id => user.id)
-    block = LinkListBlock.create!(:display => 'never', :box => box)
+    block = LinkListBlock.new(:display => 'never').tap do |b|
+      b.box = box
+    end
     assert block.update_attributes!(:display => 'always')
     block.reload
     assert_equal 'always', block.display
+  end
+
+  should 'have options for links target' do
+    assert_equivalent LinkListBlock::TARGET_OPTIONS.map {|t|t[1]}, ['_self', '_blank', '_new']
+  end
+
+  should 'link with title' do
+    l = LinkListBlock.new
+    assert_match /title="mytitle"/, l.link_html({:name => 'mylink', :address => '/myaddress', :title => 'mytitle'})
   end
 
 end

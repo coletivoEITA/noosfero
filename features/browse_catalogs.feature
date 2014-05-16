@@ -9,7 +9,7 @@ Feature: browse catalogs
     And the following enterprises
       | identifier | owner     | name                               | enabled |
       | artebonito | joaosilva | Associação de Artesanato de Bonito | true    |
-    And feature "disable_products_for_enterprises" is disabled on environment
+    And feature "products_for_enterprises" is enabled on environment
     And the following product_categories
       | name   |
       | categ1 |
@@ -17,7 +17,7 @@ Feature: browse catalogs
     And I am on /catalog/artebonito
 
   Scenario: display titles
-    Then I should see "Associação de Artesanato de Bonito"
+    Then the page title should be "Associação de Artesanato de Bonito"
     And I should see "Products/Services"
 
   Scenario: display the simplest possible product

@@ -1,38 +1,44 @@
 require File.join(File.dirname(__FILE__), '..', 'test_helper')
 
 class ScrapTest < ActiveSupport::TestCase
+
+  def setup
+    Person.delete_all
+    Scrap.delete_all
+  end
+
   should "have the content" do
     s = Scrap.new
     s.valid?
-    assert s.errors.invalid?(:content)
+    assert s.errors[:content.to_s].present?
 
     s.content = ''
     s.valid?
-    assert s.errors.invalid?(:content)
+    assert s.errors[:content.to_s].present?
 
     s.content = 'some content'
     s.valid?
-    assert !s.errors.invalid?(:content)
+    assert !s.errors[:content.to_s].present?
   end
 
   should "have the sender" do
     s = Scrap.new
     s.valid?
-    assert s.errors.invalid?(:sender_id)
+    assert s.errors[:sender_id.to_s].present?
 
     s.sender_id = 1
     s.valid?
-    assert !s.errors.invalid?(:sender_id)
+    assert !s.errors[:sender_id.to_s].present?
   end
 
   should "have the receiver" do
     s = Scrap.new
     s.valid?
-    assert s.errors.invalid?(:receiver_id)
+    assert s.errors[:receiver_id.to_s].present?
 
     s.receiver_id = 1
     s.valid?
-    assert !s.errors.invalid?(:receiver_id)
+    assert !s.errors[:receiver_id.to_s].present?
   end
 
   should "be associated to Person as sender" do
@@ -81,7 +87,7 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "create the leave_scrap action tracker verb on scrap creation of one user to another" do
-    p1 = ActionTracker::Record.current_user_from_model
+    p1 = fast_create(Person)
     p2 = fast_create(Person)
     s = Scrap.new
     s.sender= p1
@@ -98,7 +104,7 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "create the leave_scrap action tracker verb on scrap creation of one user to community" do
-    p = Person.first
+    p = fast_create(Person)
     c = fast_create(Community)
     s = Scrap.new
     s.sender= p
@@ -116,11 +122,11 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "notify leave_scrap action tracker verb to friends and itself" do
-    p1 = ActionTracker::Record.current_user_from_model
+    p1 = fast_create(Person)
     p2 = fast_create(Person)
     p1.add_friend(p2)
-    ActionTrackerNotification.destroy_all
-    Delayed::Job.destroy_all
+    ActionTrackerNotification.delete_all
+    Delayed::Job.delete_all
     s = Scrap.new
     s.sender= p1
     s.receiver= p2
@@ -134,11 +140,11 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "notify leave_scrap action tracker verb to members of the communities and the community itself" do
-    p = Person.first
+    p = fast_create(Person)
     c = fast_create(Community)
     c.add_member(p)
-    ActionTrackerNotification.destroy_all
-    Delayed::Job.destroy_all
+    ActionTrackerNotification.delete_all
+    Delayed::Job.delete_all
     s = Scrap.new
     s.sender= p
     s.receiver= c
@@ -152,25 +158,25 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "create the leave_scrap_to_self action tracker verb on scrap creation of one user to itself" do
-    p1 = Person.first
+    p = fast_create(Person)
     s = Scrap.new
-    s.sender= p1
-    s.receiver= p1
+    s.sender= p
+    s.receiver= p
     s.content = 'some content'
     s.save!
     ta = ActionTracker::Record.last
     assert_equal s.content, ta.params['content']
     assert_equal s.sender.name, ta.params['sender_name']
     assert_equal 'leave_scrap_to_self', ta.verb
-    assert_equal p1, ta.user
+    assert_equal p, ta.user
   end
 
   should "notify leave_scrap_to_self action tracker verb to friends and itself" do
-    p1 = Person.first
+    p1 = fast_create(Person)
     p2 = fast_create(Person)
     p1.add_friend(p2)
-    ActionTrackerNotification.destroy_all
-    Delayed::Job.destroy_all
+    ActionTrackerNotification.delete_all
+    Delayed::Job.delete_all
     s = Scrap.new
     s.sender= p1
     s.receiver= p1
@@ -200,7 +206,6 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "remove the replies is the root is removed" do
-    Scrap.delete_all
     s = fast_create(Scrap)
     s1 = fast_create(Scrap, :scrap_id => s.id)
     s2 = fast_create(Scrap, :scrap_id => s.id)
@@ -211,11 +216,11 @@ class ScrapTest < ActiveSupport::TestCase
   end
 
   should "update the scrap on reply creation" do
-    Scrap.delete_all
+    person = fast_create(Person)
     s = fast_create(Scrap, :updated_at => DateTime.parse('2010-01-01'))
     assert_equal DateTime.parse('2010-01-01'), s.updated_at.strftime('%Y-%m-%d')
     DateTime.stubs(:now).returns(DateTime.parse('2010-09-07'))
-    s1 = Scrap.create(defaults_for_scrap(:scrap_id => s.id))
+    s1 = create(Scrap, :content => 'some content', :sender => person, :receiver => person, :scrap_id => s.id)
     s.reload
     assert_not_equal DateTime.parse('2010-01-01'), s.updated_at.strftime('%Y-%m-%d')
   end
@@ -228,22 +233,30 @@ class ScrapTest < ActiveSupport::TestCase
     assert_equal s, s2.root
   end
 
+  should "have the top_root defined" do
+    s = fast_create(Scrap)
+    s1 = fast_create(Scrap, :scrap_id => s.id)
+    s2 = fast_create(Scrap, :scrap_id => s1.id)
+    assert_equal s, s1.top_root
+    assert_equal s, s2.top_root
+  end
+
   should 'strip all html tags' do
     s, r = fast_create(Person), fast_create(Person)
-    s = Scrap.new :sender => s, :receiver => r, :content => "<p>Test <b>Rails</b></p>"
+    s = build Scrap, :sender => s, :receiver => r, :content => "<p>Test <b>Rails</b></p>"
     assert_equal "Test Rails", s.strip_all_html_tags
   end
 
   should 'strip html before save' do
     s, r = fast_create(Person), fast_create(Person)
-    s = Scrap.new :sender => s, :receiver => r, :content => "<p>Test <b>Rails</b></p>"
+    s = build Scrap, :sender => s, :receiver => r, :content => "<p>Test <b>Rails</b></p>"
     s.save!
     assert_equal "Test Rails", s.reload.content
   end
 
   should 'strip html before validate' do
     s, r = fast_create(Person), fast_create(Person)
-    s = Scrap.new :sender => s, :receiver => r, :content => "<p><b></b></p>"
+    s = build Scrap, :sender => s, :receiver => r, :content => "<p><b></b></p>"
     assert !s.valid?
     s.content = "<p>Test</p>"
     assert s.valid?
@@ -260,16 +273,26 @@ class ScrapTest < ActiveSupport::TestCase
 
   should 'scrap wall url be the root scrap receiver url if it is a reply' do
     p1, p2 = fast_create(Person), fast_create(Person)
-    r = Scrap.create! :sender => p1, :receiver => p2, :content => "Hello!"
-    s = Scrap.new :sender => p2, :receiver => p1, :content => "Hi!"
+    r = create Scrap, :sender => p1, :receiver => p2, :content => "Hello!"
+    s = build Scrap, :sender => p2, :receiver => p1, :content => "Hi!"
     r.replies << s; s.reload
     assert_equal s.scrap_wall_url, s.root.receiver.wall_url
   end
 
   should 'scrap wall url be the scrap receiver url if it is not a reply' do
     p1, p2 = fast_create(Person), fast_create(Person)
-    s = Scrap.create! :sender => p1, :receiver => p2, :content => "Hello!"
+    s = create Scrap, :sender => p1, :receiver => p2, :content => "Hello!"
     assert_equal s.scrap_wall_url, s.receiver.wall_url
+  end
+
+  should 'create activity with reply_scrap_on_self when top_root scrap receiver is the same as sender' do
+    s, r = fast_create(Person), fast_create(Person)
+    root = fast_create(Scrap, :sender_id => s.id, :receiver_id => r.id)
+    assert_difference 'ActionTracker::Record.count', 1 do
+      reply = create(Scrap, :sender => r, :receiver => s, :scrap_id => root.id, :content => 'sample')
+    end
+    activity = ActionTracker::Record.last
+    assert_equal 'reply_scrap_on_self', activity.verb.to_s
   end
 
 end

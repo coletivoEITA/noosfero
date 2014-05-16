@@ -29,7 +29,7 @@ class SearchController < PublicController
       @asset = key
       send(key)
       @order << key
-      @names[key] = getterm(description)
+      @names[key] = _(description)
     end
     @asset = nil
 
@@ -80,7 +80,7 @@ class SearchController < PublicController
   end
 
   def enterprises
-    @scope = visible_profiles(Enterprise, [{:products => :product_category}])
+    @scope = visible_profiles(Enterprise)
     full_text_search
   end
 
@@ -93,25 +93,27 @@ class SearchController < PublicController
     year = (params[:year] ? params[:year].to_i : Date.today.year)
     month = (params[:month] ? params[:month].to_i : Date.today.month)
     day = (params[:day] ? params[:day].to_i : Date.today.day)
-    date = build_date(params[:year], params[:month], params[:day])
-    date_range = (date - 1.month).at_beginning_of_month..(date + 1.month).at_end_of_month
+    @date = build_date(year, month, day)
+    date_range = (@date - 1.month).at_beginning_of_month..(@date + 1.month).at_end_of_month
 
-    @selected_day = nil
-    @events_of_the_day = []
+    @events = []
     if params[:day] || !params[:year] && !params[:month]
-      @selected_day = date
-      @events_of_the_day = @category ?
-        environment.events.by_day(@selected_day).in_category(Category.find(@category_id)) :
-        environment.events.by_day(@selected_day)
+      @events = @category ?
+        environment.events.by_day(@date).in_category(Category.find(@category_id)).paginate(:per_page => per_page, :page => params[:page]) :
+        environment.events.by_day(@date).paginate(:per_page => per_page, :page => params[:page])
+    end
+
+    if params[:year] || params[:month]
+      @events = @category ?
+        environment.events.by_month(@date).in_category(Category.find(@category_id)).paginate(:per_page => per_page, :page => params[:page]) :
+        environment.events.by_month(@date).paginate(:per_page => per_page, :page => params[:page])
     end
 
     @scope = date_range && params[:action] == 'events' ? environment.events.by_range(date_range) : environment.events
     full_text_search
 
     events = @searches[@asset][:results]
-    @calendar = populate_calendar(date, events)
-    @previous_calendar = populate_calendar(date - 1.month, events)
-    @next_calendar = populate_calendar(date + 1.month, events)
+    @calendar = populate_calendar(@date, events)
   end
 
   # keep old URLs workings
@@ -131,14 +133,14 @@ class SearchController < PublicController
     @tag = params[:tag]
     @tag_cache_key = "tag_#{CGI.escape(@tag.to_s)}_env_#{environment.id.to_s}_page_#{params[:npage]}"
     if is_cache_expired?(@tag_cache_key)
-      @searches[@asset] = {:results => environment.articles.find_tagged_with(@tag).paginate(paginate_options)}
+      @searches[@asset] = {:results => environment.articles.tagged_with(@tag).paginate(paginate_options)}
     end
   end
 
   def events_by_day
-    @selected_day = build_date(params[:year], params[:month], params[:day])
-    @events_of_the_day = environment.events.by_day(@selected_day)
-    render :partial => 'events/events_by_day'
+    @date = build_date(params[:year], params[:month], params[:day])
+    @events = environment.events.by_day(@date).paginate(:per_page => per_page, :page => params[:page])
+    render :partial => 'events/events'
   end
 
   #######################################################
@@ -157,7 +159,7 @@ class SearchController < PublicController
     if params[:category_path].blank?
       render_not_found if params[:action] == 'category_index'
     else
-      path = params[:category_path].join('/')
+      path = params[:category_path]
       @category = environment.categories.find_by_path(path)
       if @category.nil?
         render_not_found(path)
@@ -220,6 +222,10 @@ class SearchController < PublicController
     relations = [:image, :domains, :environment, :preferred_domain]
     relations += extra_relations
     @environment.send(klass.name.underscore.pluralize).visible.includes(relations)
+  end
+
+  def per_page
+    20
   end
 
 end

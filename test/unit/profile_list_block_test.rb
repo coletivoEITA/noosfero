@@ -2,6 +2,8 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ProfileListBlockTest < ActiveSupport::TestCase
 
+  include ActionView::Helpers::TagHelper
+
   should 'describe itself' do
     assert_not_equal Block.description, ProfileListBlock.description
   end
@@ -32,6 +34,7 @@ class ProfileListBlockTest < ActiveSupport::TestCase
     self.expects(:profile_image_link).with(person2, :minor).once
     self.expects(:profile_image_link).with(person3, :minor).once
 
+    self.stubs(:tag).returns('<div></div>')
     self.expects(:content_tag).returns('<div></div>').at_least_once
     self.expects(:block_title).returns('block title').at_least_once
 
@@ -149,9 +152,9 @@ class ProfileListBlockTest < ActiveSupport::TestCase
 
   should 'prioritize profiles with image if this option is turned on' do
     env = fast_create(Environment)
-    img1 = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img1 = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     p1 = fast_create(Person, :environment_id => env.id, :image_id => img1.id)
-    img2 = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img2 = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     p2 = fast_create(Person, :environment_id => env.id, :image_id => img2.id)
 
     p_without_image = fast_create(Person, :environment_id => env.id)
@@ -165,9 +168,9 @@ class ProfileListBlockTest < ActiveSupport::TestCase
 
   should 'list profiles without image only if profiles with image arent enought' do
     env = fast_create(Environment)
-    img1 = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img1 = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     p1 = fast_create(Person, :environment_id => env.id, :image_id => img1.id)
-    img2 = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img2 = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     p2 = fast_create(Person, :environment_id => env.id, :image_id => img2.id)
     p_without_image = fast_create(Person, :environment_id => env.id)
     block = ProfileListBlock.new
@@ -186,7 +189,7 @@ class ProfileListBlockTest < ActiveSupport::TestCase
     5.times do |n|
       fast_create(Person, :environment_id => env.id)
     end
-    img = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     with_image = fast_create(Person, :environment_id => env.id, :image_id => img.id)
     block = ProfileListBlock.new(:limit => 3)
     block.stubs(:prioritize_profiles_with_image).returns(true)
@@ -196,7 +199,7 @@ class ProfileListBlockTest < ActiveSupport::TestCase
 
   should 'not prioritize profiles with image if this option is turned off' do
     env = fast_create(Environment)
-    img = Image.create!(:uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    img = create(Image, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     with_image = fast_create(Person, :environment_id => env.id, :updated_at => DateTime.now, :image_id => img.id)
     5.times do |n|
       fast_create(Person, :environment_id => env.id, :updated_at => DateTime.now + 1.day)

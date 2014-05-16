@@ -1,6 +1,3 @@
-require_dependency 'comment_group_plugin/ext/article'
-require_dependency 'comment_group_plugin/ext/comment'
-
 class CommentGroupPlugin < Noosfero::Plugin
 
   def self.plugin_name
@@ -18,7 +15,7 @@ class CommentGroupPlugin < Noosfero::Plugin
   def comment_form_extra_contents(args)
     comment = args[:comment]
     group_id = comment.group_id || args[:group_id]
-    lambda {
+    proc {
       hidden_field_tag('comment[group_id]', group_id) if group_id
     }
   end
@@ -26,6 +23,11 @@ class CommentGroupPlugin < Noosfero::Plugin
   def js_files
     'comment_group_macro.js'
   end
+
+  def stylesheet?
+    true
+  end
+
 
 end
 

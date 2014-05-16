@@ -48,7 +48,15 @@ class ShoppingCartPluginMyprofileControllerTest < ActionController::TestCase
     price = 4.35
     post :edit, :profile => enterprise.identifier, :settings => {:delivery_price => price}
 
-    assert settings.delivery_price == price
+    assert settings.delivery_price == price.to_s
+  end
+
+  should 'be able to choose delivery_options' do
+    delivery_options = {:options => ['car', 'bike'], :prices => ['20', '5']}
+    post :edit, :profile => enterprise.identifier, :settings => {:delivery_options => delivery_options}
+
+    assert_equal '20', settings.delivery_options['car']
+    assert_equal '5', settings.delivery_options['bike']
   end
 
   should 'filter the reports correctly' do
@@ -73,9 +81,9 @@ class ShoppingCartPluginMyprofileControllerTest < ActionController::TestCase
   end
 
   should 'group filtered orders products and quantities' do
-    p1 = fast_create(Product, :enterprise_id => enterprise.id, :price => 1, :name => 'p1')
-    p2 = fast_create(Product, :enterprise_id => enterprise.id, :price => 2, :name => 'p2')
-    p3 = fast_create(Product, :enterprise_id => enterprise.id, :price => 3)
+    p1 = fast_create(Product, :profile_id => enterprise.id, :price => 1, :name => 'p1')
+    p2 = fast_create(Product, :profile_id => enterprise.id, :price => 2, :name => 'p2')
+    p3 = fast_create(Product, :profile_id => enterprise.id, :price => 3)
     po1_products = {p1.id => {:quantity => 1, :price => p1.price, :name => p1.name}, p2.id => {:quantity => 2, :price => p2.price, :name => p2.name }}
     po2_products = {p2.id => {:quantity => 1, :price => p2.price, :name => p2.name }, p3.id => {:quantity => 2, :price => p3.price, :name => p3.name}}
     po1 = ShoppingCartPlugin::PurchaseOrder.create!(:seller => enterprise, :products_list => po1_products, :status => ShoppingCartPlugin::PurchaseOrder::Status::OPENED)

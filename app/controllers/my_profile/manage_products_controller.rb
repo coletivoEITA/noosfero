@@ -6,10 +6,10 @@ class ManageProductsController < ApplicationController
   before_filter :login_required, :except => [:show]
   before_filter :create_product?, :only => [:new]
 
-  protected  
+  protected
 
   def check_environment_feature
-    if profile.environment.enabled?('disable_products_for_enterprises')
+    unless profile.environment.enabled?('products_for_enterprises')
       render_not_found
       return
     end
@@ -48,6 +48,7 @@ class ManageProductsController < ApplicationController
   end
 
   def new
+    @no_design_blocks = true
     @category = params[:selected_category_id] ? Category.find(params[:selected_category_id]) : nil
     @product = @profile.products.build(:product_category => @category)
     @categories = ProductCategory.top_level_for(environment)
@@ -85,7 +86,7 @@ class ManageProductsController < ApplicationController
     @edit = true
     @level = @category.level
     if request.post?
-      if @product.update_attributes(:product_category_id => params[:selected_category_id])
+      if @product.update_attributes({:product_category_id => params[:selected_category_id]}, :without_protection => true)
         render :partial => 'shared/redirect_via_javascript',
           :locals => { :url => url_for(:controller => 'manage_products', :action => 'show', :id => @product) }
       else
@@ -207,7 +208,7 @@ class ManageProductsController < ApplicationController
                       }.to_json
     else
       render :text => {:ok => false,
-                       :error_msg => _(cost.errors['name']) % {:fn => _('Name')}
+                       :error_msg => _(cost.errors['name'].join('\n')) % {:fn => _('Name')}
                       }.to_json
     end
   end

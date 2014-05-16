@@ -1,5 +1,3 @@
-require_dependency 'require_auth_to_comment_plugin/ext/profile'
-
 class RequireAuthToCommentPlugin < Noosfero::Plugin
 
   include ActionView::Helpers::TagHelper
@@ -19,7 +17,7 @@ class RequireAuthToCommentPlugin < Noosfero::Plugin
   end
 
   def profile_editor_extras
-    expanded_template('profile-editor-extras.rhtml')
+    expanded_template('profile-editor-extras.html.erb')
   end
 
   def stylesheet?

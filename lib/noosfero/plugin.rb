@@ -1,5 +1,4 @@
-require 'noosfero'
-include ActionView::Helpers::AssetTagHelper
+require_dependency 'noosfero'
 
 class Noosfero::Plugin
 
@@ -11,24 +10,30 @@ class Noosfero::Plugin
 
   class << self
 
-    def klass(dir)
-      (dir.to_s.camelize + 'Plugin').constantize # load the plugin
+    attr_writer :should_load
+
+    def should_load
+      @should_load.nil? && true || @boot
     end
 
-    def init_system
-      enabled_plugins = Dir.glob(File.join(Rails.root, 'config', 'plugins', '*'))
-      if Rails.env.test? && !enabled_plugins.include?(File.join(Rails.root, 'config', 'plugins', 'foo'))
-        enabled_plugins << File.join(Rails.root, 'plugins', 'foo')
-      end
-
-      enabled_plugins.select do |entry|
-        File.directory?(entry)
-      end.each do |dir|
-        load_plugin dir
+    def initialize!
+      return if !should_load
+      available_plugins.each do |plugin_dir|
+        plugin_name = File.basename(plugin_dir)
+        plugin = load_plugin(plugin_name)
+        load_plugin_extensions(plugin_dir)
+        load_plugin_filters(plugin)
       end
     end
 
-    def load_plugin dir
+    def setup(config)
+      return if !should_load
+      available_plugins.each do |dir|
+        setup_plugin(dir, config)
+      end
+    end
+
+    def setup_plugin(dir, config)
       plugin_name = File.basename(dir)
 
       plugin_dependencies_ok = true
@@ -42,38 +47,74 @@ class Noosfero::Plugin
         end
       end
 
-      return unless plugin_dependencies_ok
+      if plugin_dependencies_ok
+        %w[
+            controllers
+            controllers/public
+            controllers/profile
+            controllers/myprofile
+            controllers/admin
+        ].each do |folder|
+          config.autoload_paths << File.join(dir, folder)
+        end
+        [ config.autoload_paths, $:].each do |path|
+          path << File.join(dir, 'models')
+          path << File.join(dir, 'lib')
+          # load vendor/plugins
+          Dir.glob(File.join(dir, '/vendor/plugins/*')).each do |vendor_plugin|
+            path << "#{vendor_plugin}/lib" 
+            init = "#{vendor_plugin}/init.rb"
+            require init.gsub(/.rb$/, '') if File.file? init
+         end
+        end
 
-      # add load paths
-      Rails.configuration.controller_paths << File.join(dir, 'controllers')
-      ActiveSupport::Dependencies.load_paths << File.join(dir, 'controllers')
-      controllers_folders = %w[public profile myprofile admin]
-      controllers_folders.each do |folder|
-        Rails.configuration.controller_paths << File.join(dir, 'controllers', folder)
-        ActiveSupport::Dependencies.load_paths << File.join(dir, 'controllers', folder)
+        # add view path
+        ActionController::Base.view_paths.unshift(File.join(dir, 'views'))
       end
-      [ ActiveSupport::Dependencies.load_paths, $:].each do |path|
-        path << File.join(dir, 'models')
-        path << File.join(dir, 'lib')
-      end
+    end
 
-      # load vendor/plugins
-      Dir.glob(File.join(dir, '/vendor/plugins/*')).each do |vendor_plugin|
-        [ ActiveSupport::Dependencies.load_paths, $:].each{ |path| path << "#{vendor_plugin}/lib" }
-        init = "#{vendor_plugin}/init.rb"
-        require init.gsub(/.rb$/, '') if File.file? init
-      end
+    def load_plugin(plugin_name)
+      (plugin_name.to_s.camelize + 'Plugin').constantize
+    end
 
-      # load class
-      klass(plugin_name)
+    # This is a generic method that initialize any possible filter defined by a
+    # plugin to a specific controller
+    def load_plugin_filters(plugin)
+      plugin_methods = plugin.instance_methods.select {|m| m.to_s.end_with?('_filters')}
+      plugin_methods.each do |plugin_method|
+        controller_class = plugin_method.to_s.gsub('_filters', '').camelize.constantize
+        filters = plugin.new.send(plugin_method)
+        filters = [filters] if !filters.kind_of?(Array)
+
+        filters.each do |plugin_filter|
+          filter_method = (plugin.name.underscore.gsub('/','_') + '_' + plugin_filter[:method_name]).to_sym
+          controller_class.send(plugin_filter[:type], filter_method, (plugin_filter[:options] || {}))
+          controller_class.send(:define_method, filter_method) do
+            instance_eval(&plugin_filter[:block]) if environment.plugin_enabled?(plugin)
+          end
+        end
+      end
+    end
+
+    def load_plugin_extensions(dir)
+      Rails.configuration.to_prepare do
+        Dir[File.join(dir, 'lib', 'ext', '*.rb')].each {|file| require_dependency file }
+      end
+    end
+
+    def available_plugins
+      unless @available_plugins
+        path = File.join(Rails.root, 'config', 'plugins', '*')
+        @available_plugins = Dir.glob(path).select{ |i| File.directory?(i) }
+        if Rails.env.test? && !@available_plugins.include?(File.join(Rails.root, 'config', 'plugins', 'foo'))
+          @available_plugins << File.join(Rails.root, 'plugins', 'foo')
+        end
+      end
+      @available_plugins
     end
 
     def all
-      @all ||= []
-    end
-
-    def inherited(subclass)
-      all << subclass.to_s unless all.include?(subclass.to_s)
+      @all ||= available_plugins.map{ |dir| (File.basename(dir) + "_plugin").camelize }
     end
 
     def public_name
@@ -81,11 +122,11 @@ class Noosfero::Plugin
     end
 
     def public_path(file = '')
-      compute_public_path((public_name + '/' + file), 'plugins')
+      File.join('/plugins', public_name, file)
     end
 
     def root_path
-      File.join(RAILS_ROOT, 'plugins', public_name)
+      Rails.root.join('plugins', public_name)
     end
 
     def view_path
@@ -111,7 +152,7 @@ class Noosfero::Plugin
   end
 
   def expanded_template(file_path, locals = {})
-    views_path = "#{RAILS_ROOT}/plugins/#{self.class.public_name}/views"
+    views_path = Rails.root.join('plugins', "#{self.class.public_name}", 'views')
     ERB.new(File.read("#{views_path}/#{file_path}")).result(binding)
   end
 
@@ -152,6 +193,7 @@ class Noosfero::Plugin
 
   # Here the developer may specify the events to which the plugins can
   # register and must return true or false. The default value must be false.
+  # Must also explicitly define its returning variables.
 
   # -> If true, noosfero will include plugin_dir/public/style.css into
   # application
@@ -159,16 +201,19 @@ class Noosfero::Plugin
     false
   end
 
-  # Here the developer should specify the events to which the plugins can
-  # register to. Must be explicitly defined its returning
-  # variables.
-
   # -> Adds buttons to the control panel
   # returns = { :title => title, :icon => icon, :url => url }
   #   title = name that will be displayed.
   #   icon  = css class name (for customized icons include them in a css file).
   #   url   = url or route to which the button will redirect.
   def control_panel_buttons
+    nil
+  end
+
+  # -> Customize profile block design and behavior
+  # (overwrites profile_image_link function)
+  # returns = lambda block that creates html code.
+  def profile_image_link(profile, size, tag, extra_info)
     nil
   end
 
@@ -301,45 +346,16 @@ class Noosfero::Plugin
     scope
   end
 
-  # This method is called by the CommentHandler background job before sending
-  # the notification email. If the comment is marked as spam (i.e. by calling
-  # <tt>comment.spam!</tt>), then the notification email will *not* be sent.
-  #
-  # example:
-  #
-  #   def check_comment_for_spam(comment)
-  #     if anti_spam_service.is_spam?(comment)
-  #       comment.spam!
-  #     end
-  #   end
-  #
-  def check_comment_for_spam(comment)
+  # -> Allows plugins to check weather object is a spam
+  def check_for_spam(object)
   end
 
-  # This method is called when the user manually marks a comment as SPAM. A
-  # plugin implementing this method should train its spam detection mechanism
-  # by submitting this comment as a confirmed spam.
-  #
-  # example:
-  #
-  #   def comment_marked_as_spam(comment)
-  #     anti_spam_service.train_with_spam(comment)
-  #   end
-  #
-  def comment_marked_as_spam(comment)
+  # -> Allows plugins to know when an object is marked as a spam
+  def marked_as_spam(object)
   end
 
-  # This method is called when the user manually marks a comment a NOT SPAM. A
-  # plugin implementing this method should train its spam detection mechanism
-  # by submitting this coimment as a confirmed ham.
-  #
-  # example:
-  #
-  #   def comment_marked_as_ham(comment)
-  #     anti_spam_service.train_with_ham(comment)
-  #   end
-  #
-  def comment_marked_as_ham(comment)
+  # -> Allows plugins to know when an object is marked as a ham
+  def marked_as_ham(object)
   end
 
   # Adds extra actions for comments
@@ -366,6 +382,12 @@ class Noosfero::Plugin
     []
   end
 
+  # -> Adds adicional content to article
+  # returns = lambda block that creates html code
+  def article_extra_contents(article)
+    nil
+  end
+
   # -> Adds fields to the signup form
   # returns = lambda block that creates html code
   def signup_extra_contents
@@ -388,6 +410,13 @@ class Noosfero::Plugin
   # returns = An instance of ActiveRecord::NamedScope::Scope retrieved through
   # Person.members_of method.
   def organization_members(organization)
+    nil
+  end
+
+  # -> Extends person memberships list
+  # returns = An instance of ActiveRecord::NamedScope::Scope retrived through
+  # Person.memberships_of method.
+  def person_memberships(person)
     nil
   end
 
@@ -446,11 +475,42 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Adds adicional content to article header
+  # returns = lambda block that creates html code
+  def article_header_extra_contents(article)
+    nil
+  end
+
+  # -> Adds adittional content to comment visualization
+  # returns = lambda block that creates html code
+  def comment_extra_contents(args)
+    nil
+  end
+
+  # This method is called when the user clicks to send a comment.
+  # A plugin can add new content to comment form and this method can process the params sent to avoid creating field on core tables.
+  # returns = params after processed by plugins
+  # example:
+  #
+  #   def process_extra_comment_params(params)
+  #     params.delete(:extra_field)
+  #   end
+  #
+  def process_extra_comment_params(params)
+    params
+  end
+
   # -> Finds objects by their contents
   # returns = {:results => [a, b, c, ...], ...}
   # P.S.: The plugin might add other informations on the return hash for its
   # own use in specific views
   def find_by_contents(asset, scope, query, paginate_options={}, options={})
+  end
+
+  # -> Adds aditional fields for change_password
+  # returns = [{:field => 'field1', :name => 'field 1 name', :model => 'person'}, {...}]
+  def change_password_fields
+    nil
   end
 
   # -> Adds additional blocks to profiles and environments.
@@ -542,7 +602,13 @@ class Noosfero::Plugin
   def content_actions
     #FIXME 'new' and 'upload' only works for content_remove. It should work for
     #content_expire too.
-    %w[edit delete spread locale suggest home new upload]
+    %w[edit delete spread locale suggest home new upload undo]
   end
 
 end
+
+require 'noosfero/plugin/hot_spot'
+require 'noosfero/plugin/manager'
+require 'noosfero/plugin/active_record'
+require 'noosfero/plugin/mailer_base'
+require 'noosfero/plugin/settings'

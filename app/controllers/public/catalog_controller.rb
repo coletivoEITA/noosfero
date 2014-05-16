@@ -1,6 +1,5 @@
 class CatalogController < PublicController
   needs_profile
-  no_design_blocks
 
   before_filter :check_enterprise_and_environment
 
@@ -12,7 +11,7 @@ class CatalogController < PublicController
   protected
 
   def check_enterprise_and_environment
-    unless profile.kind_of?(Enterprise) && !profile.environment.enabled?('disable_products_for_enterprises')
+    unless profile.kind_of?(Enterprise) && @profile.environment.enabled?('products_for_enterprises')
       redirect_to :controller => 'profile', :profile => profile.identifier, :action => 'index'
     end
   end

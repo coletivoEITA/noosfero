@@ -34,7 +34,9 @@ class ArticleBlockTest < ActiveSupport::TestCase
   should 'not crash when referenced article is removed' do
     person = create_user('testuser').person
     a = person.articles.create!(:name => 'test')
-    block = ArticleBlock.create(:article => a)
+    block = ArticleBlock.create.tap do |b|
+      b.article = a
+    end
     person.boxes.first.blocks << block
     block.save!
 
@@ -58,7 +60,9 @@ class ArticleBlockTest < ActiveSupport::TestCase
     person.articles.delete_all
     assert_equal [], person.articles
     a = person.articles.create!(:name => 'test')
-    block = ArticleBlock.create(:article => a)
+    block = ArticleBlock.create.tap do |b|
+      b.article = a
+    end
     person.boxes.first.blocks << block
     block.save!
     
@@ -68,13 +72,13 @@ class ArticleBlockTest < ActiveSupport::TestCase
 
   should "take available articles with an environment as the box owner" do
     env = Environment.create!(:name => 'test env')
-    env.articles.destroy_all
+    env.profiles.each { |profile| profile.articles.destroy_all }
     assert_equal [], env.articles
     community = fast_create(Community)
     a = fast_create(TextArticle, :profile_id => community.id, :name => 'test')
     env.portal_community=community
     env.save
-    block = ArticleBlock.create(:article => a)
+    block = create(ArticleBlock, :article => a)
     env.boxes.first.blocks << block
     block.save!
     
@@ -105,25 +109,26 @@ class ArticleBlockTest < ActiveSupport::TestCase
   should 'display image if article is an image' do
     profile = create_user('testuser').person
     block = ArticleBlock.new
-    image = UploadedFile.create!(:profile => profile, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
+    image = create(UploadedFile, :profile => profile, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
 
     block.article = image
     block.save!
 
-    expects(:image_tag).with(image.public_filename(:display), :class => image.css_class_name, :style => 'max-width: 100%').returns('image')
-
-    assert_match(/image/, instance_eval(&block.content))
+    assert_tag_in_string instance_eval(&block.content),
+        :tag => 'img',
+        :attributes => {
+            :src => image.public_filename(:display),
+            :class => /file-image/
+        }
   end
 
   should 'not display gallery pages navigation in content' do
     profile = create_user('testuser').person
     block = ArticleBlock.new
     gallery = fast_create(Gallery, :profile_id => profile.id)
-    image = UploadedFile.create!(:profile => profile, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'), :parent => gallery)
+    image = create(UploadedFile, :profile => profile, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'), :parent => gallery)
     block.article = image
     block.save!
-
-    expects(:image_tag).with(image.public_filename(:display), :class => image.css_class_name, :style => 'max-width: 100%').returns('image')
 
     assert_no_match(/Previous/, instance_eval(&block.content))
   end
@@ -131,7 +136,7 @@ class ArticleBlockTest < ActiveSupport::TestCase
   should 'display link to archive if article is an archive' do
     profile = create_user('testuser').person
     block = ArticleBlock.new
-    file = UploadedFile.create!(:profile => profile, :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'))
+    file = create(UploadedFile, :profile => profile, :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'))
 
     block.article = file
     block.save!

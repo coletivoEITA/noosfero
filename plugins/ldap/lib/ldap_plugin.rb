@@ -1,6 +1,4 @@
-require_dependency File.dirname(__FILE__) + '/ext/environment'
 require File.dirname(__FILE__) + '/ldap_authentication.rb'
-
 
 class LdapPlugin < Noosfero::Plugin
 
@@ -72,7 +70,7 @@ class LdapPlugin < Noosfero::Plugin
   end
 
   def login_extra_contents
-    lambda do
+    proc do
       @person = Person.new(:environment => @environment)
       @profile_data = @person
       labelled_fields_for :profile_data, @person do |f|

@@ -11,12 +11,11 @@ class CommentGroupPlugin::AllowComment < Noosfero::Plugin::Macro
       :css_files => 'comment_group.css' }
   end
 
-  #FIXME Make this test
   def parse(params, inner_html, source)
     group_id = params[:group_id].to_i
     article = source
     count = article.group_comments.without_spam.in_group(group_id).count
 
-    lambda {render :partial => 'plugins/comment_group/views/comment_group.rhtml', :locals => {:group_id => group_id, :article_id => article.id, :inner_html => inner_html, :count => count, :profile_identifier => article.profile.identifier }}
+    proc {render :partial => 'comment_group_plugin_profile/comment_group', :locals => {:group_id => group_id, :article_id => article.id, :inner_html => inner_html, :count => count, :profile_identifier => article.profile.identifier }}
   end
 end

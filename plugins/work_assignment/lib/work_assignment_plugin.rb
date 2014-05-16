@@ -1,5 +1,3 @@
-require_dependency 'ext/uploaded_file'
-
 class WorkAssignmentPlugin < Noosfero::Plugin
 
   def self.plugin_name
@@ -20,7 +18,7 @@ class WorkAssignmentPlugin < Noosfero::Plugin
   end
 
   def content_types
-    [WorkAssignmentPlugin::WorkAssignment] if context.profile.organization?
+    [WorkAssignmentPlugin::WorkAssignment] if context.respond_to?(:profile) && context.profile.organization?
   end
 
   def stylesheet?
@@ -32,12 +30,14 @@ class WorkAssignmentPlugin < Noosfero::Plugin
   end
 
   def content_remove_upload(content)
-    !content.profile.members.include?(context.send(:user))
+    if content.kind_of?(WorkAssignmentPlugin::WorkAssignment)
+      !content.profile.members.include?(context.send(:user))
+    end
   end
 
   def content_viewer_controller_filters
-    block = lambda do
-      path = params[:page].join('/')
+    block = proc do
+      path = params[:page]
       content = profile.articles.find_by_path(path)
 
       if WorkAssignmentPlugin.is_submission?(content) && !WorkAssignmentPlugin.can_download_submission?(user, content)

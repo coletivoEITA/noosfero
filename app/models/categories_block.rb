@@ -30,9 +30,12 @@ class CategoriesBlock < Block
 
   def content(args={})
     block = self
-    lambda do
+    proc do
       render :file => 'blocks/categories', :locals => { :block => block }
     end
   end
 
+  def self.expire_on
+      { :profile => [], :environment => [:category] }
+  end
 end
