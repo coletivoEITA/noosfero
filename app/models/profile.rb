@@ -132,6 +132,7 @@ class Profile < ActiveRecord::Base
   end
 
   scope :visible, :conditions => { :visible => true, :secret => false }
+  scope :invisible, :conditions => ['profiles.visible <> ?', true]
   scope :disabled, :conditions => { :visible => false }
   scope :public, :conditions => { :visible => true, :public_profile => true, :secret => false }
   scope :enabled, :conditions => { :enabled => true }
