@@ -511,7 +511,7 @@ jQuery(function($) {
   $.ajaxSetup({
     cache: false,
     headers: {
-      'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+      'X-CSRF-Token': $.cookie("_noosfero_.XSRF-TOKEN")
     }
   });
 
@@ -523,6 +523,8 @@ jQuery(function($) {
       if (data.chat_enabled) {
         setInterval(function(){ $.getJSON('/account/user_data', chatOnlineUsersDataCallBack)}, 10000);
       }
+      $('head').append('<meta content="authenticity_token" name="csrf-param" />');
+      $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
     } else {
       // not logged in
       $('#user .not-logged-in, .login-block .not-logged-user').fadeIn();
@@ -681,7 +683,6 @@ function hide_and_show(hide_elements, show_elements) {
 
 function limited_text_area(textid, limit) {
   var text = jQuery('#' + textid).val();
-  grow_text_area(textid);
   var textlength = text.length;
   jQuery('#' + textid + '_left span').html(limit - textlength);
   if (textlength > limit) {
@@ -696,14 +697,9 @@ function limited_text_area(textid, limit) {
   }
 }
 
-function grow_text_area(textid) {
-  var height = jQuery('#' + textid).attr('scrollHeight');
-  if (jQuery.browser.webkit) {
-    height -= parseInt(jQuery('#' + textid).css('padding-top')) +
-              parseInt(jQuery('#' + textid).css('padding-bottom'));
-  }
-  jQuery('#' + textid).css('height', height + 'px');
-}
+jQuery(function($) {
+  $('.autogrow').autogrow();
+});
 
 jQuery(function($) {
   $('a').each(function() {
