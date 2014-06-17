@@ -550,7 +550,7 @@ class DisplayContentBlockTest < ActiveSupport::TestCase
 
     Noosfero::Plugin.stubs(:all).returns([Plugin1.name])
     env = fast_create(Environment)
-    env.enable_plugin(Plugin1)
+    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([Plugin1.new])
 
     block = DisplayContentBlock.new
     box = mock()
@@ -558,6 +558,21 @@ class DisplayContentBlockTest < ActiveSupport::TestCase
     box.stubs(:environment).returns(env)
     block.stubs(:box).returns(box)
     assert_equal [a1], block.articles_of_parent
+  end
+
+  should 'do not fail if a selected article was removed' do
+    profile = create_user('testuser').person
+    Article.delete_all
+    f1 = fast_create(Folder, :name => 'test folder 1', :profile_id => profile.id)
+    a1 = fast_create(TextileArticle, :name => 'test article 1', :profile_id => profile.id, :parent_id => f1.id)
+
+    checked_articles= {a1.id => true}
+
+    block = DisplayContentBlock.new
+    block.stubs(:holder).returns(profile)
+    block.checked_nodes= checked_articles
+    a1.destroy
+    assert_equal [], block.parent_nodes
   end
 
 end
