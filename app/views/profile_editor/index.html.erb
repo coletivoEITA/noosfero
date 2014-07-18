@@ -58,7 +58,8 @@
     <% end %>
   <% end %>
 
-  <% if profile.enterprise? %>
+
+  <% if profile.enterprise? and user.is_admin? environment %>
     <% if profile.enabled? %>
       <%= control_panel_button(_('Disable'), 'disable', :action => 'disable') %>
     <% else %>

@@ -37,6 +37,8 @@ class Enterprise < Organization
   extend SetProfileRegionFromCityState::ClassMethods
   set_profile_region_from_city_state
 
+  after_create :create_activation_task
+
   before_save do |enterprise|
     enterprise.organization_website = enterprise.maybe_add_http(enterprise.organization_website)
   end
@@ -126,11 +128,10 @@ class Enterprise < Organization
     end
   end
 
-  after_create :create_activation_task
+  # Use to create an enterprise manually (via console) that is not enabled
   def create_activation_task
-    if !self.enabled
-      EnterpriseActivation.create!(:enterprise => self, :code_length => 7)
-    end
+    return if self.enabled
+    EnterpriseActivation.create! :enterprise => self, :code_length => 7
   end
 
   def default_set_of_blocks
