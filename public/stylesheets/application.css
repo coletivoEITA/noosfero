@@ -2170,7 +2170,7 @@ a.button.disabled, input.disabled {
 .recent-documents-block .block-footer-content a:hover {
   text-decoration: underline;
 }
-/* ==> blocks/disabled-enterprise-message-block.css <<= */ 
+/* ==> blocks/disabled-enterprise-message-block.css <<= */
 
 
 .disabled-enterprise-message-block {
@@ -2186,12 +2186,12 @@ a.button.disabled, input.disabled {
   font-size: 80%;
   background: #ffffa9;
 }
-/* ==> blocks/article-block.css <<= */ 
+/* ==> blocks/article-block.css <<= */
 
 .article-block {
   overflow: hidden;
 }
-/* ==> blocks/main-block.css <<= */ 
+/* ==> blocks/main-block.css <<= */
 
 /*
 Use article.css for article related css
@@ -2212,7 +2212,7 @@ div#activation_enterprise {
 div#activation_enterprise label, div#activation_enterprise input, div#activation_enterprise div {
   display: inline
 }
-/* ==> blocks/slideshow-block.css <<= */ 
+/* ==> blocks/slideshow-block.css <<= */
 
 .slideshow-block .slideshow-container {
   margin-bottom: 10px;
@@ -2277,7 +2277,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   display: inline-block;
   width: 16px;
 }
-/* ==> blocks/products-block.css <<= */ 
+/* ==> blocks/products-block.css <<= */
 
 .products-block ul {
   margin: 0px;
@@ -2310,7 +2310,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
 #content .products-block li a:hover {
   color: #fff;
 }
-/* ==> blocks/blog-archives-block.css <<= */ 
+/* ==> blocks/blog-archives-block.css <<= */
 
 #content .blog-archives-block {
   padding: 10px 0px 10px 10px;
@@ -2330,7 +2330,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   padding: 5px 0px 10px 10px;
   font-size: 12px;
 }
-/* ==> blocks/profile-info-block.css <<= */ 
+/* ==> blocks/profile-info-block.css <<= */
 
 
 .profile-info-block h2 {
@@ -2433,7 +2433,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   margin: 0px 0px 5px 0px;
   padding: 2px;
 }
-/* ==> blocks/location-block.css <<= */ 
+/* ==> blocks/location-block.css <<= */
 
 .location-block {
   text-align: center;
@@ -2446,7 +2446,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   background: #FFF;
   border: 1px solid #888;
 }
-/* ==> blocks/profile-image-block.css <<= */ 
+/* ==> blocks/profile-image-block.css <<= */
 
 
 .profile-image-block {
@@ -2481,7 +2481,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   list-style: none;
   margin-bottom: 8px;
 }
-/* ==> blocks/sellers-search-block.css <<= */ 
+/* ==> blocks/sellers-search-block.css <<= */
 
 
 #content .sellers-search-block {
@@ -2540,7 +2540,7 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   margin: 0px;
   float: none;
 }
-/* ==> blocks/feed-reader-block.css <<= */ 
+/* ==> blocks/feed-reader-block.css <<= */
 
 #content .feed-reader-block {
   padding: 10px 0px 10px 10px;
@@ -2733,26 +2733,6 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
 .logged-user-info .user-actions {
   padding-left: 50px;
 }
-/* ==> public/stylesheets/controller_account.css <== */
-.controller-account #profile-data .type-text input, .controller-account #profile-data .type-password input, .controller-account #profile-data .type-select select {
-  width: 220px
-}
-.controller-account #profile-data .type-select select.select-schooling {
-  width: 108px;
-}
-.controller-account #profile-data .select-birth-date select#profile_data_birth_date_3i {
-  width: 47px;
-}
-.controller-account .button.disabled {
-  opacity: 0.5;
-}
-.controller-account #content .icon-forward.disabled {
-  background-image: url('/designs/icons/default/go-right-disabled-HC.gif');
-}
-.controller-account .no-boxes {
-  margin-left: 200px;
-  margin-right: 200px;
-}
 /* ==> public/stylesheets/controller_admin_panel.css <== */
 .controller-admin_panel #available-folders select {
   width: 50%;
@@ -2812,7 +2792,6 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   -moz-border-radius: 10px 0px 0px 10px;
   -webkit-border-radius: 10px 0px 0px 10px;
   border-radius: 10px 0px 0px 10px;
-  width: 202px;
   position: relative;
 }
 #product-list .expand-box > span {
@@ -2959,7 +2938,6 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
   background-repeat: no-repeat;
   background-position: 50% 50%;
   display: block;
-  width: 200px;
   height: 160px;
 }
 #product-list .ui-button {
@@ -2975,7 +2953,6 @@ div#activation_enterprise label, div#activation_enterprise input, div#activation
 }
 #product-list .product-image-link {
   position: relative;
-  width: 200px;
   height: 160px;
   border: 1px solid #BFBFBF;
   position: relative; /* work arround msie bug */
@@ -3731,7 +3708,6 @@ div#article-parent {
   margin: 10px 0px;
 }
 #agenda #events-of-the-day {
-  width: 45%;
   height: 100%;
   padding-left: 20px;
   display: inline-block;
@@ -3891,7 +3867,6 @@ h1#agenda-title {
 }
 .categories_container {
   min-height: 176px;
-  min-width: 100px;
   display: inline-block;
   position: relative;
 }
@@ -4100,9 +4075,7 @@ h1#agenda-title {
 .no-boxes {
   margin: 0px;
 }
-.controller-content_viewer .no-boxes, .controller-profile .no-boxes {
-  margin: 0px 200px;
-}
+
 .controller-profile #content .no-boxes h1, .controller-profile #content .no-boxes table th {
   text-align: left;
 }
@@ -4141,7 +4114,6 @@ h1#agenda-title {
 .controller-profile_editor .control-panel a {
   display: block;
   float: left;
-  width: 140px;
   background-repeat: no-repeat;
   background-position: 0px 50%;
   height: 48px;
@@ -6152,167 +6124,6 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
   text-align: center;
 }
 
-#signup-form {
-  color: #4A4A4A;
-  display: inline-block;
-}
-
-#signup-form small {
-   display: none;
-}
-
-#signup-form #signup-form-header {
-  -moz-border-radius: 8px;
-  border-radius: 8px;
-  -webkit-border-radius: 8px;
-  margin: 60px auto 5px;
-  position: relative;
-}
-
-#signup-form input.invalid_input {
-  border: 1px solid #7f0000;
-  background: #FFF;
-  box-shadow: 0 0 7px red;
-}
-
-#signup-form input.valid_input {
-  border: 1px solid #005000;
-  background: #FFF;
-}
-
-#signup-form select,
-#signup-form textarea,
-#signup-form input {
-  padding: 7px 7% 10px 3%;
-  height: 20px;
-  width: 90%;
-  color: #6d786e;
-  font-size: 18px;
-}
-
-#signup-form #profile_data_login {
-  margin: 3px 0px 0px 5px;
-}
-
-#signup-form .filled-in,
-#signup-form .invalid,
-#signup-form input.validated,
-#signup-form .checking {
-  border-width: 1px;
-  border-style: solid;
-  background-color: #fff;
-  background-position: right center;
-  background-repeat: no-repeat;
-  padding: 7px 7% 8px 3%;
-  color: #4A4A4A;
-  box-shadow: 0 0 7px green;
-}
-
-#signup-form input.checking {
-  box-shadow: none;
-}
-
-#signup-form select {
-  height: auto;
-  padding-right: 3px;
-  width: 365px;
-}
-
-#signup-form .select-birth-date select {
-  width: 93px;
-  margin-right: 2px;
-  margin-left: 0;
-}
-
-.webkit #signup-form select {
-  background: #fff;
-}
-
-#signup-form textarea {
-  background: #fff;
-  height: 100px;
-  padding-right: 3px;
-  width: 365px;
-}
-
-#signup-form input[type=file] {
-  font-size: 12px;
-}
-
-#signup-form input[type=radio] {
-  height: auto;
-  margin: 0px 5px 0px 3px;
-  width: auto;
-}
-
-#signup-form .fieldgroup {
-  margin: 5px 10px;
-}
-
-#signup-form #template-options li label {
-  font-size: 18px;
-}
-
-#signup-form #template-options li a {
-  color: #555753
-}
-
-#signup-form label[for=profile_data_sex_female],
-#signup-form label[for=profile_data_sex_male] {
-  color: #6d786e;
-  font-size: 20px;
-  display: inline;
-  margin-left: 8px;
-}
-
-#signup-form label[for=profile_data_country],
-#signup-form label[for=profile_data_preferred_domain_id],
-#signup-form label[for=profile_data_birth_date_2i],
-#signup-form label[for=profile_data_birth_date_3i],
-#signup-form label[for=profile_data_schooling],
-#signup-form label[for=profile_data_formation],
-#signup-form label[for=profile_data_area_of_study],
-#signup-form label[for=profile_data_image_builder_uploaded_data] {
-  display: block;
-}
-
-#signup-form .invalid {
-  border-color: #7f0000;
-  background-image: url(../images/passwords_nomatch.png);
-  box-shadow: 0 0 7px red;
-}
-
-#signup-form span.invalid {
-  border: none;
-  padding: 0px;
-  background: transparent;
-  color: #7f0000;
-  box-shadow: none;
-}
-
-#signup-form .checking {
-  border-color: #4A4A4A;
-  background-image: url(../images/login_checking.png);
-}
-
-#signup-form span.checking {
-  border: none;
-  padding: 0px;
-  background: transparent;
-  color: #4A4A4A;
-  box-shadow: none;
-}
-
-#signup-form .validated {
-  border-color: #005000;
-  background-image: url(../images/passwords_match.png);
-}
-
-#signup-form span.validated {
-  background: transparent;
-  color: #005000;
-}
-
 #signup-domain {
   float: left;
   display: inline-block;
@@ -6579,7 +6390,7 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 
 /* AutoComplete*/
 .formfield input.ui-autocomplete-loading { background: url('/images/loading-small.gif') right center no-repeat, url("../images/input-bg.gif") no-repeat left top;  }
- 
+
 .ui-autocomplete-category {
      font-weight: bold;
      padding: .2em .4em;
