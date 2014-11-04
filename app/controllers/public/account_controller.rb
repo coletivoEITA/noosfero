@@ -16,7 +16,7 @@ class AccountController < ApplicationController
   def activate
     @user = User.find_by_activation_code(params[:activation_code]) if params[:activation_code]
     if @user
-      unless @user.environment.enabled?('admin_must_approve_new_users') 
+      unless @user.environment.enabled?('admin_must_approve_new_users')
         if @user.activate
           @message = _("Your account has been activated, now you can log in!")
           check_redirection
@@ -30,7 +30,7 @@ class AccountController < ApplicationController
           @user.activation_code = nil
           @user.save!
           redirect_to :controller => :home
-        end      
+        end
       end
     else
       session[:notice] = _("It looks like you're trying to activate an account. Perhaps have already activated this account?")
@@ -287,7 +287,16 @@ class AccountController < ApplicationController
       @status_class = 'invalid'
       @status = _('This field can\'t be blank')
     end
-    render :partial => 'identifier_status'
+
+    respond_to do |format|
+      format.html { render :partial => 'identifier_status' }
+      format.json { render :json => {
+          :status => @status,
+          :status_class => @status_class,
+          :suggested_usernames => @suggested_usernames
+      }  }
+    end
+
   end
 
   def check_email
@@ -298,7 +307,13 @@ class AccountController < ApplicationController
       @status = _('This e-mail address is taken')
       @status_class = 'invalid'
     end
-    render :partial => 'email_status'
+    respond_to do |format|
+      format.html { render :partial => 'email_status' }
+      format.json { render :json => {
+          :status => @status,
+          :status_class => @status_class
+      }  }
+    end
   end
 
   def user_data
