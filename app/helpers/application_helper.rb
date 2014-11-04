@@ -624,15 +624,12 @@ module ApplicationHelper
     render :partial => 'shared/select_categories_top', :locals => {:object_name => object_name, :title => title, :title_size => title_size, :multiple => true, :categories_selected => @object.categories }, :layout => false
   end
 
+  def theme_options
+    @theme_options ||= YAML.load_file "#{Rails.root}/public#{theme_path}/theme.yml" rescue {}
+  end
+
   def theme_option(opt = nil)
-    conf = Rails.root.to_s() +
-           '/public' + theme_path +
-           '/theme.yml'
-    if File.exists?(conf)
-      opt ? YAML.load_file(conf)[opt.to_s()] : YAML.load_file(conf)
-    else
-      nil
-    end
+    if opt then theme_options[opt.to_s] else theme_options end
   end
 
   def theme_opt_menu_search
