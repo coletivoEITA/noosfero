@@ -34,10 +34,10 @@ class EnvironmentThemesControllerTest < ActionController::TestCase
     get :index
 
     %w[ t1 t2 ].each do |item|
-      assert_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set/#{item}" }
+      assert_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set\/#{item}/ }
     end
 
-    assert_no_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set/t3" }
+    assert_no_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set\/t3/ }
   end
 
   should 'highlight current theme' do
@@ -52,7 +52,7 @@ class EnvironmentThemesControllerTest < ActionController::TestCase
     get :index
 
     assert_tag :attributes => { :class => 'theme-opt list-opt selected' }
-    assert_no_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set/one" }
+    assert_no_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set\/one/ }
   end
 
   should 'save selection of theme' do
@@ -76,12 +76,12 @@ class EnvironmentThemesControllerTest < ActionController::TestCase
     Theme.stubs(:system_themes).returns([Theme.new('new-theme')])
 
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/unset" }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/unset/ }
   end
 
   should 'point back to admin panel' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href =>  '/admin' }, :content => 'Back'
+    assert_tag tag: 'a', attributes: { href:  /\/admin/ }, content: 'Back'
   end
 
   should 'list templates' do
@@ -101,8 +101,8 @@ class EnvironmentThemesControllerTest < ActionController::TestCase
     LayoutTemplate.expects(:all).returns([t1, t2])
 
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set_layout_template/default"}
-    assert_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set_layout_template/leftbar"}
+    assert_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set_layout_template\/default/}
+    assert_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set_layout_template\/leftbar/}
   end
 
   should 'highlight current template' do
@@ -116,7 +116,7 @@ class EnvironmentThemesControllerTest < ActionController::TestCase
 
     get :index
     assert_tag :attributes => { :class => 'template-opt list-opt selected' }
-    assert_no_tag :tag => 'a', :attributes => { :href => "/admin/environment_themes/set_layout_template/default"}
+    assert_no_tag tag: 'a', attributes: { href: /\/admin\/environment_themes\/set_layout_template\/default/}
   end
 
   should 'set template' do

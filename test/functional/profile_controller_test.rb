@@ -35,14 +35,14 @@ class ProfileControllerTest < ActionController::TestCase
   should 'point to manage friends in user is seeing his own friends' do
     login_as('testuser')
     get :friends
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/testuser/friends' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/testuser\/friends/ }
   end
 
   should 'not point to manage friends of other users' do
     create_user('ze')
     login_as('ze')
     get :friends
-    assert_no_tag :tag => 'a', :attributes => { :href => '/myprofile/testuser/friends' }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/testuser\/friends/ }
   end
 
   should 'list communities' do
@@ -126,7 +126,7 @@ class ProfileControllerTest < ActionController::TestCase
     @profile.articles.create!(:name => 'testarticle', :tag_list => 'tag1')
     get :content_tagged, :profile => @profile.identifier, :id => 'tag1'
 
-    assert_tag :tag => 'a', :attributes => { :href => '/tag/tag1' }, :content => 'See content tagged with "tag1" in the entire site'.html_safe
+    assert_tag tag: 'a', attributes: { href: /\/tag\/tag1/ }, content: 'See content tagged with "tag1" in the entire site'.html_safe
   end
 
   should 'show a link to own control panel' do
@@ -241,8 +241,8 @@ class ProfileControllerTest < ActionController::TestCase
     Person.any_instance.stubs(:article_tags).returns({ 'one' => 1, 'two' => 2})
     get :tags, :profile => 'testuser'
 
-    assert_tag :tag => 'div', :attributes => { :class => /main-block/ }, :descendant => { :tag => 'a', :attributes => { :href => '/profile/testuser/tags/one'} }
-    assert_tag :tag => 'div', :attributes => { :class => /main-block/ }, :descendant => { :tag => 'a', :attributes => { :href => '/profile/testuser/tags/two'} }
+    assert_tag tag: 'div', attributes: { class: /main-block/ }, descendant: { tag: 'a', attributes: { href: /\/profile\/testuser\/tags\/one/} }
+    assert_tag tag: 'div', attributes: { class: /main-block/ }, descendant: { tag: 'a', attributes: { href: /\/profile\/testuser\/tags\/two/} }
   end
 
   should 'not show e-mail for non friends on profile page' do
@@ -512,7 +512,7 @@ class ProfileControllerTest < ActionController::TestCase
     profile.articles << Event.new(:name => 'Unpublished event', :start_date => Date.today, :published => false)
 
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :content => '1', :attributes => { :href => "/profile/testuser/events" }
+    assert_tag :tag => 'a', :content => '1', :attributes => { :href => /\/profile\/testuser\/events/ }
   end
 
   should 'show number of published posts in index' do

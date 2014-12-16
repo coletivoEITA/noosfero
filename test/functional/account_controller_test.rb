@@ -219,9 +219,7 @@ class AccountControllerTest < ActionController::TestCase
 
   should 'provide a "I forget my password" link at the login page' do
     get :login
-    assert_tag :tag => 'a', :attributes => {
-      :href => '/account/forgot_password'
-    }
+    assert_tag tag: 'a', attributes: { href: /\/account\/forgot_password/ }
   end
 
   should 'provide a "forgot my password" form' do
@@ -865,7 +863,7 @@ class AccountControllerTest < ActionController::TestCase
 
     get :login
 
-    assert_no_tag :tag => 'a', :attributes => {:href => '/account/signup'}
+    assert_no_tag tag: 'a', attributes: {href: /\/account\/signup/}
   end
 
   should "redirect user on forgot_password action if a plugin doesn't allow user to recover its password" do
@@ -903,7 +901,7 @@ class AccountControllerTest < ActionController::TestCase
 
     get :login
 
-    assert_no_tag :tag => 'a', :attributes => {:href => '/account/forgot_password'}
+    assert_no_tag tag: 'a', attributes: {href: /\/account\/forgot_password/}
   end
 
   should 'add extra content on login form from plugins' do

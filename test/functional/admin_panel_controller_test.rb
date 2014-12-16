@@ -22,37 +22,37 @@ class AdminPanelControllerTest < ActionController::TestCase
 
   should 'link to site_info editing page' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/admin_panel/site_info' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/admin_panel\/site_info/ }
   end
 
   should 'link to cateogries editing' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/categories' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/categories/ }
   end
 
   should 'link to design editor' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/environment_design' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/environment_design/ }
   end
 
   should 'link to features editing screen' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/features' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/features/ }
   end
 
   should 'link to role editing screen' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/role' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/role/ }
   end
 
   should 'link to region validator screen' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/region_validators' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/region_validators/ }
   end
 
   should 'link to edit message for disabled enterprise' do
     get :index
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/admin_panel/message_for_disabled_enterprise' }
+    assert_tag tag: 'a', attributes: { href: /\/admin\/admin_panel\/message_for_disabled_enterprise/ }
   end
 
   should 'display form for editing site info' do

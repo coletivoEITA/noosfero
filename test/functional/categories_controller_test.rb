@@ -22,7 +22,7 @@ class CategoriesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_template 'index'
-    assert_tag :tag => 'a', :attributes => { :href => '/admin/categories/new'}
+    assert_tag tag: 'a', attributes: { href: /\/admin\/categories\/new/}
   end
 
   def test_edit

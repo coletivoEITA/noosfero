@@ -12,7 +12,7 @@ class AssetsMenuTest < ActionDispatch::IntegrationTest
 
   should 'link to uncategorized assets at site root' do
     get '/'
-    assert_tag :tag => 'a', :attributes => { :href => '/search/contents' }
+    assert_tag tag: 'a', attributes: { href: /\/search\/contents/ }
   end
 
   should 'link to assets inside category root' do
@@ -22,7 +22,7 @@ class AssetsMenuTest < ActionDispatch::IntegrationTest
     end
 
     get '/cat/parent-category/category-a'
-    assert_tag :tag => 'a', :attributes => { :href => '/search/enterprises/parent-category/category-a' }
+    assert_tag tag: 'a', attributes: { href: /\/search\/enterprises\/parent-category\/category-a/ }
   end
 
 end

@@ -13,11 +13,10 @@ class EventsControllerTest < ActionController::TestCase
 
     get :events, :profile => profile.identifier
 
-    today = DateTime.now.strftime("%B %d, %Y").html_safe
-    assert_tag :tag => 'div', :attributes => {:id => "agenda-items"},
-      :descendant => {:tag => 'h3', :content => "Events for #{today}"},
-      :descendant => {:tag => 'tr', :content => "Joao Birthday"},
-      :descendant => {:tag => 'tr', :content => "Maria Birthday"}
+    assert_tag tag: 'div', attributes: {id: "agenda-items"},
+      descendant: {tag: 'tr', content: "Joao Birthday"}
+    assert_tag tag: 'div', attributes: {id: "agenda-items"},
+      descendant: {tag: 'tr', content: "Maria Birthday"}
   end
 
   should 'display calendar of current month' do
@@ -34,8 +33,8 @@ class EventsControllerTest < ActionController::TestCase
     next_month = DateTime.now + 1.month
     prev_month_name = prev_month.strftime("%B")
     next_month_name = next_month.strftime("%B")
-    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{prev_month.year}/#{prev_month.month}"}, :content => prev_month_name
-    assert_tag :tag =>'a', :attributes => {:href => "/profile/#{profile.identifier}/events/#{next_month.year}/#{next_month.month}"}, :content => next_month_name
+    assert_tag tag:'a', attributes: {href: /\/profile\/#{profile.identifier}\/events\/#{prev_month.year}\/#{prev_month.month}/}, content: prev_month_name
+    assert_tag tag:'a', attributes: {href: /\/profile\/#{profile.identifier}\/events\/#{next_month.year}\/#{next_month.month}/}, content: next_month_name
   end
 
   should 'see the events paginated' do

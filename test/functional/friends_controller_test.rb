@@ -43,7 +43,7 @@ class FriendsControllerTest < ActionController::TestCase
 
   should 'display find people button' do
     get :index, :profile => 'testuser'
-    assert_tag :tag => 'a', :content => 'Find people', :attributes => { :href => '/search/assets?asset=people'.html_safe }
+    assert_tag tag: 'a', content: 'Find people', attributes: { href: /\/search\/assets\?asset=people/ }
   end
 
   should 'not display invite friends button if any plugin tells not to' do
@@ -63,31 +63,31 @@ class FriendsControllerTest < ActionController::TestCase
     e.enable_plugin(Plugin1.name)
     e.enable_plugin(Plugin2.name)
 
-    get :index, :profile => 'testuser'
-    assert_no_tag :tag => 'a', :attributes => { :href => "/profile/testuser/invite/friends" }
+    get :index, profile: 'testuser'
+    assert_no_tag tag: 'a', attributes: { href: /\/profile\/testuser\/invite\/friends/ }
   end
 
   should 'not display list suggestions button if there is no suggestion' do
-    get :index, :profile => 'testuser'
-    assert_no_tag :tag => 'a', :content => 'Suggest friends', :attributes => { :href => "/myprofile/testuser/friends/suggest" }
+    get :index, profile: 'testuser'
+    assert_no_tag tag: 'a', content: 'Suggest friends', attributes: { href: /\/myprofile\/testuser\/friends\/suggest/ }
   end
 
   should 'display people suggestions' do
     profile.suggested_profiles.create(:suggestion => friend)
-    get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :content => "+ #{friend.name}", :attributes => { :href => "/profile/#{friend.identifier}/add" }
+    get :suggest, profile: 'testuser'
+    assert_tag tag: 'a', content: "+ #{friend.name}", attributes: { href: /\/profile\/#{friend.identifier}\/add/ }
   end
 
   should 'display button to add friend suggestion' do
     profile.suggested_profiles.create(:suggestion => friend)
     get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :attributes => { :href => "/profile/#{friend.identifier}/add" }
+    assert_tag tag: 'a', attributes: { href: /\/profile\/#{friend.identifier}\/add/ }
   end
 
   should 'display button to remove people suggestion' do
     profile.suggested_profiles.create(:suggestion => friend)
     get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :attributes => { :href => /\/myprofile\/testuser\/friends\/remove_suggestion\/#{friend.identifier}/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/testuser\/friends\/remove_suggestion\/#{friend.identifier}/ }
   end
 
   should 'remove suggestion of friend' do

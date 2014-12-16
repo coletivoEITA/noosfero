@@ -322,7 +322,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     login_as(create_user_with_permission('test_user','edit_profile_design',p).identifier )
     get :index, :profile => p.identifier
 
-    assert_tag :tag => 'a', :attributes => {:href => '/myprofile/test_profile'}
+    assert_tag tag: 'a', attributes: {href: /\/myprofile\/test_profile/}
   end
 
   should 'offer to create blog archives block only if has blog' do

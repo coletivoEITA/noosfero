@@ -149,7 +149,7 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     login_as(create_admin_user(Environment.default))
     get :index
 
-    assert_tag :tag => 'a', :attributes => {:href => '/admin'}, :child => {:tag => 'span', :content => "Back to control panel"}
+    assert_tag tag: 'a', attributes: {href: /\/admin/}, child: {tag: 'span', content: "Back to control panel"}
   end
 
   should 'a environment block plugin add new blocks for environments' do

@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
   include PermissionCheck
   include CustomDesign
   include NeedsProfile
+  include UrlSupport
 
   # implementations
   include FindByContents

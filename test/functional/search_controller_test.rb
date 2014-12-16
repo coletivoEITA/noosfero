@@ -163,17 +163,17 @@ class SearchControllerTest < ActionController::TestCase
 
   should 'offer text box to enter a new search in general context' do
     get :index, :query => 'a sample search'
-    assert_tag :tag => 'form', :attributes => { :action => '/search' }, :descendant => {
-      :tag => 'input',
-      :attributes => { :name => 'query', :value => 'a sample search' }
+    assert_tag tag: 'form', attributes: { action: /\/search/ }, descendant: {
+      tag:        'input',
+      attributes: { name: 'query', value: 'a sample search' },
     }
   end
 
   should 'offer text box to enter a new seach in specific context' do
     get :index, :category_path => [ 'my-category'], :query => 'a sample search'
-    assert_tag :tag => 'form', :attributes => { :action => '/search/index/my-category' }, :descendant => {
-      :tag => 'input',
-      :attributes => { :name => 'query', :value => 'a sample search' }
+    assert_tag tag: 'form', attributes: { action: /\/search\/index\/my-category/ }, descendant: {
+      tag: 'input',
+      attributes: { name: 'query', value: 'a sample search' },
     }
   end
 
@@ -328,7 +328,7 @@ class SearchControllerTest < ActionController::TestCase
     end
 
     get :category_index, :category_path => [ 'my-category' ]
-    assert_tag :tag => 'div', :attributes => {:class => /search-results-articles/} , :descendant => {:tag => 'a', :attributes => { :href => '/search/articles/my-category'}}
+    assert_tag tag: 'div', attributes: {class: /search-results-articles/} , descendant: {tag: 'a', attributes: { href: /\/search\/articles\/my-category/}}
   end
 
   should 'indicate more than the page limit for total_entries' do

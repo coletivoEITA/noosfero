@@ -232,10 +232,9 @@ class ApplicationControllerTest < ActionController::TestCase
     Theme.expects(:find).with('my-test-theme').returns(theme).at_least_once
     get :index
 
-    assert_tag :tag => 'div', :attributes => { :id => 'theme-test-panel' }, :descendant => {
-      :tag => 'a', :attributes => { :href => '/myprofile/testinguser/profile_themes/edit/my-test-theme'}
+    assert_tag tag: 'div', attributes: { id: 'theme-test-panel' }, descendant: {
+      tag: 'a', attributes: { href: /\/myprofile\/testinguser\/profile_themes\/edit\/my-test-theme/}
     }
-      #{ :tag => 'a', :attributes => { :href => '/myprofile/testinguser/themes/stop_test/my-test-theme'} }
   end
 
   should 'not display theme test panel in general' do
@@ -288,7 +287,7 @@ class ApplicationControllerTest < ActionController::TestCase
     uses_host 'other.environment'
     get :index
     assert_tag :tag => 'div', :attributes => {:id => 'user_menu_ul'}
-    assert_tag tag: 'div', attributes: {id: 'user_menu_ul'}, descendant: {tag: 'a', attributes: { href: '/admin' }}
+    assert_tag tag: 'div', attributes: {id: 'user_menu_ul'}, descendant: {tag: 'a', attributes: { href: /\/admin/ }}
   end
 
   should 'not display invisible blocks' do

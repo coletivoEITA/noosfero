@@ -30,6 +30,9 @@ class Domain < ApplicationRecord
   # we cannot have two domains with the same name
   validates_uniqueness_of :name
 
+  after_create  :clear_cache
+  after_destroy :clear_cache
+
   # businessl logic
   #################
 
@@ -77,6 +80,7 @@ class Domain < ApplicationRecord
   # database is hit only for the first query for a given domain name. This way,
   # transfering a domain from a profile to an environment of vice-versa
   # requires restarting the application.
+  #
   def self.hosting_profile_at(domainname)
     return false unless domainname
     Noosfero::MultiTenancy.setup!(domainname)
@@ -90,6 +94,10 @@ class Domain < ApplicationRecord
   # clears the cache of hosted domains. Used for testing.
   def self.clear_cache
     @hosting = {}
+  end
+
+  def clear_cache
+    self.class.clear_cache
   end
 
   # Detects a domain's custom text domain chain if available based on a domain

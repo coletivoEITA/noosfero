@@ -8,9 +8,11 @@ class ApplicationMailer < ActionMailer::Base
 
   attr_accessor :environment
 
-  def default_url_options options = nil
-    options ||= {}
+  def default_url_options
+    options = super
+
     options[:host] = environment.default_hostname if environment
+
     options
   end
 

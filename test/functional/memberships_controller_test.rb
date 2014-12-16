@@ -49,7 +49,7 @@ class MembershipsControllerTest < ActionController::TestCase
 
   should 'link to new community creation in index' do
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/memberships/new_community" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/memberships\/new_community/ }
   end
 
   should 'filter html from name' do
@@ -89,7 +89,7 @@ class MembershipsControllerTest < ActionController::TestCase
     community = Community.create!(:name => 'my test community', :description => 'description test')
     community.add_member(profile)
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/profile/#{community.identifier}/leave?reload=true" }, :content => 'Leave community'
+    assert_tag tag: 'a', attributes: { href: /\/profile\/#{community.identifier}\/leave\?reload=true/ }, content: 'Leave community'
   end
 
   should 'current user is added as admin after create new community' do
@@ -99,7 +99,7 @@ class MembershipsControllerTest < ActionController::TestCase
 
   should 'display button to create community' do
     get :index, :profile => 'testuser'
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/testuser/memberships/new_community" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/testuser\/memberships\/new_community/ }
   end
 
   should 'display destroy link to communities and enterprise' do
@@ -112,8 +112,8 @@ class MembershipsControllerTest < ActionController::TestCase
 
     get :index, :profile => 'testuser'
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{enterprise.identifier}/profile_editor/destroy_profile" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{community.identifier}\/profile_editor\/destroy_profile/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{enterprise.identifier}\/profile_editor\/destroy_profile/ }
   end
 
   should 'not display destroy link to normal members' do
@@ -128,7 +128,7 @@ class MembershipsControllerTest < ActionController::TestCase
     get :index, :profile => 'testuser'
 
     assert_template 'index'
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{community.identifier}\/profile_editor\/destroy_profile/ }
   end
 
   should 'use the current environment for the template of user' do
@@ -274,8 +274,8 @@ class MembershipsControllerTest < ActionController::TestCase
     get :index, :profile => 'testuser'
 
     assert_template 'index'
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{c2.identifier}" }
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{c1.identifier}" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{c2.identifier}/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{c1.identifier}/ }
   end
 
   should 'filter memberships by role' do
@@ -340,28 +340,28 @@ class MembershipsControllerTest < ActionController::TestCase
     community = fast_create(Community)
     profile.suggested_profiles.create(:suggestion => community)
     get :index, :profile => 'testuser'
-    assert_tag :tag => 'a', :content => 'See some suggestions of communities...', :attributes => { :href => "/myprofile/testuser/memberships/suggest" }
+    assert_tag tag: 'a', content: 'See some suggestions of communities...', attributes: { href: /\/myprofile\/testuser\/memberships\/suggest/ }
   end
 
   should 'display communities suggestions' do
     community = fast_create(Community)
     profile.suggested_profiles.create(:suggestion => community)
     get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :content => "+ #{community.name}", :attributes => { :href => "/profile/#{community.identifier}/join" }
+    assert_tag tag: 'a', content: "+ #{community.name}", attributes: { href: /\/profile\/#{community.identifier}\/join/ }
   end
 
   should 'display button to join on community suggestion' do
     community = fast_create(Community)
     profile.suggested_profiles.create(:suggestion => community)
     get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :attributes => { :href => "/profile/#{community.identifier}/join" }
+    assert_tag tag: 'a', attributes: { href: /\/profile\/#{community.identifier}\/join/ }
   end
 
   should 'display button to remove community suggestion' do
     community = fast_create(Community)
     profile.suggested_profiles.create(:suggestion => community)
     get :suggest, :profile => 'testuser'
-    assert_tag :tag => 'a', :attributes => { :href => /\/myprofile\/testuser\/memberships\/remove_suggestion\/#{community.identifier}/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/testuser\/memberships\/remove_suggestion\/#{community.identifier}/ }
   end
 
   should 'remove suggestion of community' do

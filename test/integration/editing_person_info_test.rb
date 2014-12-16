@@ -15,7 +15,7 @@ class EditingPersonInfoTest < ActionDispatch::IntegrationTest
     get "/myprofile/#{profile.identifier}"
     assert_response :success
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_editor/edit" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/profile_editor\/edit/ }
 
     get "/myprofile/#{profile.identifier}/profile_editor/edit"
     assert_response :success

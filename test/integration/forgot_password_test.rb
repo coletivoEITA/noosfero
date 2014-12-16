@@ -17,9 +17,9 @@ class ForgotPasswordTest < ActionDispatch::IntegrationTest
     get '/account/forgot_password'
 
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => '/account/forgot_password', :method => 'post' }
+    assert_tag tag: 'form', attributes: { action: /\/account\/forgot_password/, method: 'post' }
 
-    post '/account/forgot_password', :field => 'login', :value => 'forgotten', :environment_id => Environment.default.id
+    post '/account/forgot_password', field: 'login', value: 'forgotten', environment_id: Environment.default.id
 
     assert_response :success
     assert_template 'password_recovery_sent'
@@ -29,12 +29,12 @@ class ForgotPasswordTest < ActionDispatch::IntegrationTest
 
     get "/account/new_password/#{code}"
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => "/account/new_password/#{code}" }
+    assert_tag tag: 'form', attributes: { action: /\/account\/new_password\/#{code}/ }
 
     post "/account/new_password/#{code}", :change_password => { :password => 'newpass', :password_confirmation => 'newpass'}
     assert_response :success
     assert_template 'new_password_ok'
-    assert_tag :tag => 'a', :attributes => { :href => "/account/login" }
+    assert_tag tag: 'a', attributes: { href: /\/account\/login/ }
 
     login('forgotten', 'newpass')
   end
@@ -50,7 +50,7 @@ class ForgotPasswordTest < ActionDispatch::IntegrationTest
     get '/account/forgot_password'
 
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => '/account/forgot_password', :method => 'post' }
+    assert_tag tag: 'form', attributes: { action: /\/account\/forgot_password/, method: 'post' }
 
     post '/account/forgot_password', :field => 'email', :value => 'forgotten@localhost.localdomain', :environment_id => Environment.default.id
 
@@ -62,12 +62,12 @@ class ForgotPasswordTest < ActionDispatch::IntegrationTest
 
     get "/account/new_password/#{code}"
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => "/account/new_password/#{code}" }
+    assert_tag tag: 'form', attributes: { action: /\/account\/new_password\/#{code}/ }
 
     post "/account/new_password/#{code}", :change_password => { :password => 'newpass', :password_confirmation => 'newpass'}
     assert_response :success
     assert_template 'new_password_ok'
-    assert_tag :tag => 'a', :attributes => { :href => "/account/login" }
+    assert_tag tag: 'a', attributes: { href: /\/account\/login/ }
 
     login('forgotten', 'newpass')
   end

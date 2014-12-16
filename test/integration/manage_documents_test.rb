@@ -9,19 +9,19 @@ class ManageDocumentsTest < ActionDispatch::IntegrationTest
     user.activate
 
     login('myuser', 'myuser')
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{user.login}"  }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{user.login}/ }
 
     get '/myprofile/myuser'
     assert_response :success
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/myuser/cms' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms/ }
 
     get '/myprofile/myuser/cms/new'
     assert_response :success
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/myuser/cms/new?type=TinyMceArticle' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms\/new\?type=TinyMceArticle/ }
 
     get '/myprofile/myuser/cms/new?type=TinyMceArticle'
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => '/myprofile/myuser/cms/new', :method => /post/i }
+    assert_tag tag: 'form', attributes: { action: /\/myprofile\/myuser\/cms\/new/, method: /post/i }
 
     assert_difference 'Article.count' do
       post_via_redirect '/myprofile/myuser/cms/new', :type => 'TinyMceArticle', :article => { :name => 'my article', :body => 'this is the body of ther article'}
@@ -39,19 +39,19 @@ class ManageDocumentsTest < ActionDispatch::IntegrationTest
     article.save!
 
     login('myuser', 'myuser')
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}"  }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}/ }
 
     get '/myprofile/myuser'
     assert_response :success
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/myuser/cms' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms/ }
 
     get '/myprofile/myuser/cms'
     assert_response :success
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/myuser/cms/edit/#{article.id}"}
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms\/edit\/#{article.id}/}
 
     get "/myprofile/myuser/cms/edit/#{article.id}"
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => "/myprofile/myuser/cms/edit/#{article.id}", :method => /post/i }
+    assert_tag tag: 'form', attributes: { action: /\/myprofile\/myuser\/cms\/edit\/#{article.id}/, method: /post/i }
 
     assert_no_difference 'Article.count' do
       post_via_redirect "/myprofile/myuser/cms/edit/#{article.id}", :article => { :name => 'my article', :body => 'this is the body of the article'}
@@ -73,15 +73,15 @@ class ManageDocumentsTest < ActionDispatch::IntegrationTest
 
     login('myuser', 'myuser')
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}"  }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}/ }
     get '/myprofile/myuser'
     assert_response :success
 
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/myuser/cms' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms/ }
     get '/myprofile/myuser/cms'
     assert_response :success
 
-    assert_tag tag: 'a', attributes: { href: "/myprofile/myuser/cms/destroy/#{article.id}", 'data-confirm' => /Are you sure/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myuser\/cms\/destroy\/#{article.id}/, 'data-confirm' => /Are you sure/ }
     post_via_redirect "/myprofile/myuser/cms/destroy/#{article.id}"
 
     assert_response :success

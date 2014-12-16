@@ -51,11 +51,8 @@ class MailconfControllerTest < ActionController::TestCase
   should 'present enable/disable for e-mail use'  do
     login_as('ze')
     get :index, :profile => 'ze'
-    assert_tag(
-      :tag => 'a',
-      :content => 'Enable e-Mail',
-      :attributes => {:href => '/myprofile/ze/mailconf/enable'}
-    )
+    assert_tag tag: 'a', content: 'Enable e-Mail',
+      attributes: {href: /\/myprofile\/ze\/mailconf\/enable/}
   end
 
   should 'display correctly the state false of e-mail enable/disable' do
@@ -63,7 +60,7 @@ class MailconfControllerTest < ActionController::TestCase
     user.update!(:enable_email => false)
     get :index, :profile => 'ze'
     assert_tag :tag => 'a', :content => 'Enable e-Mail'
-    assert_no_tag :tag => 'a', :content => 'Disable e-Mail', :attributes => { :href => '/myprofile/ze/mailconf/disable' }
+    assert_no_tag tag: 'a', content: 'Disable e-Mail', attributes: { href: /\/myprofile\/ze\/mailconf\/disable/ }
   end
 
   should 'not display www in email address when force_www=true' do
@@ -123,7 +120,7 @@ class MailconfControllerTest < ActionController::TestCase
   should 'link back to control panel' do
     login_as('ze')
     get :index, :profile => 'ze'
-    assert_tag :tag => 'div', :attributes => { :id => 'content'}, :descendant => { :tag => 'a', :attributes => { :href => '/myprofile/ze' } }
+    assert_tag tag: 'div', attributes: { id: 'content'}, descendant: { tag: 'a', attributes: { href: /\/myprofile\/ze/ } }
   end
 
   should 'not display input for enable/disable e-mail when has pending_enable_email' do

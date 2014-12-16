@@ -51,7 +51,7 @@ class CmsControllerTest < ActionController::TestCase
 
     # TODO add more types here !!
     [ TinyMceArticle, TextileArticle ].each do |item|
-      assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?type=#{item.name}" }
+      assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?type=#{item.name}/ }
     end
   end
 
@@ -59,7 +59,7 @@ class CmsControllerTest < ActionController::TestCase
     get :new, :profile => profile.identifier, :type => 'TinyMceArticle'
     assert_template 'edit'
 
-    assert_tag :tag => 'form', :attributes => { :action => "/myprofile/#{profile.identifier}/cms/new", :method => /post/i }, :descendant => { :tag => "input", :attributes => { :type => 'hidden', :value => 'TinyMceArticle' }}
+    assert_tag tag: 'form', attributes: { action: /\/myprofile\/#{profile.identifier}\/cms\/new/, method: /post/i }, descendant: { tag: "input", attributes: { type: 'hidden', value: 'TinyMceArticle' }}
   end
 
   should 'be able to save a document' do
@@ -72,24 +72,24 @@ class CmsControllerTest < ActionController::TestCase
     a = fast_create(TextileArticle, :profile_id => profile.id, :updated_at => DateTime.now)
     Article.stubs(:short_description).returns('bli')
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{a.id}" }
+    assert_tag tag: 'a', content: 'Use as homepage', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/set_home_page\/#{a.id}/ }
   end
 
   should 'display set as home page link to folder' do
     a = Folder.new(:name => 'article folder'); profile.articles << a;  a.save!
     Article.stubs(:short_description).returns('bli')
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{a.id}" }
+    assert_tag tag: 'a', content: 'Use as homepage', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/set_home_page\/#{a.id}/ }
   end
 
   should 'not display set as home page if disabled in environment' do
-    article = profile.articles.create!(:name => 'my new home page')
-    folder = Folder.new(:name => 'article folder'); profile.articles << folder;  folder.save!
+    article = profile.articles.create!(name: 'my new home page')
+    folder = Folder.new(name: 'article folder'); profile.articles << folder;  folder.save!
     Article.stubs(:short_description).returns('bli')
     env = Environment.default; env.enable('cant_change_homepage'); env.save!
-    get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{article.id}" }
-    assert_no_tag :tag => 'a', :content => 'Use as homepage', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/set_home_page/#{folder.id}" }
+    get :index, profile: profile.identifier
+    assert_no_tag tag: 'a', content: 'Use as homepage', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/set_home_page\/#{article.id}/ }
+    assert_no_tag tag: 'a', content: 'Use as homepage', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/set_home_page\/#{folder.id}/ }
   end
 
   should 'display the profile homepage if can change homepage' do
@@ -430,15 +430,15 @@ class CmsControllerTest < ActionController::TestCase
     get :index, :profile => profile.identifier
     assert_response :success
     assert_template 'view'
-    assert_tag :tag => 'a', :attributes => { :title => 'New content', :href => "/myprofile/#{profile.identifier}/cms/new?cms=true"}
+    assert_tag tag: 'a', attributes: { title: 'New content', href: /\/myprofile\/#{profile.identifier}\/cms\/new\?cms=true/}
   end
 
   should 'offer to create new content when viewing an article' do
-    article = fast_create(Article, :profile_id => profile.id)
-    get :view, :profile => profile.identifier, :id => article.id
+    article = fast_create(Article, profile_id: profile.id)
+    get :view, profile: profile.identifier, id: article.id
     assert_response :success
     assert_template 'view'
-    assert_tag :tag => 'a', :attributes => { :title => 'New content', :href => "/myprofile/#{profile.identifier}/cms/new?cms=true&parent_id=#{article.id}"}
+    assert_tag tag: 'a', attributes: { title: 'New content', href: /\/myprofile\/#{profile.identifier}\/cms\/new\?cms=true&parent_id=#{article.id}/}
   end
 
   should 'offer to create children' do
@@ -448,21 +448,21 @@ class CmsControllerTest < ActionController::TestCase
     article.profile = profile
     article.save!
 
-    get :new, :profile => profile.identifier, :parent_id => article.id, :cms => true
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?parent_id=#{article.id}&type=TextileArticle"}
+    get :new, profile: profile.identifier, parent_id: article.id, cms: true
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?parent_id=#{article.id}&type=TextileArticle/}
   end
 
   should 'not offer to create children if article does not accept them' do
     Article.any_instance.stubs(:allow_children?).returns(false)
 
-    article = Article.new(:name => 'test')
+    article = Article.new(name: 'test')
     article.profile = profile
     article.save!
 
-    get :view, :profile => profile.identifier, :id => article.id
+    get :view, profile: profile.identifier, id: article.id
     assert_response :success
     assert_template 'view'
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?parent_id=#{article.id}"}
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?parent_id=#{article.id}/}
   end
 
   should 'refuse to create children of non-child articles' do
@@ -594,15 +594,15 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'offer to create new top-level folder' do
-    get :new, :profile => profile.identifier, :cms => true
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?type=Folder"}
+    get :new, profile: profile.identifier, cms: true
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?type=Folder/}
   end
 
   should 'offer to create sub-folder' do
-    f = Folder.new(:name => 'f'); profile.articles << f; f.save!
-    get :new, :profile => profile.identifier, :parent_id => f.id, :cms => true
+    f = Folder.new(name: 'f'); profile.articles << f; f.save!
+    get :new, profile: profile.identifier, parent_id: f.id, cms: true
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?parent_id=#{f.id}&type=Folder" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?parent_id=#{f.id}&type=Folder/ }
   end
 
   should 'redirect to article after creating top-level article' do
@@ -633,35 +633,35 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'point back to index when cancelling creation of top-level article' do
-    get :new, :profile => profile.identifier, :type => 'Folder'
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms" }, :descendant => { :content => /Cancel/ }
+    get :new, profile: profile.identifier, type: 'Folder'
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms/ }, descendant: { content: /Cancel/ }
   end
 
   should 'point back to index when cancelling edition of top-level article' do
-    f = Folder.new(:name => 'f'); profile.articles << f; f.save!
-    get :edit, :profile => profile.identifier, :id => f.id
+    f = Folder.new(name: 'f'); profile.articles << f; f.save!
+    get :edit, profile: profile.identifier, id: f.id
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms" }, :descendant => { :content => /Cancel/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms/ }, descendant: { content: /Cancel/ }
   end
 
   should 'point back to folder when cancelling creation of an article inside it' do
-    f = Folder.new(:name => 'f'); profile.articles << f; f.save!
-    get :new, :profile => profile.identifier, :type => 'Folder', :parent_id => f.id
+    f = Folder.new(name: 'f'); profile.articles << f; f.save!
+    get :new, profile: profile.identifier, type: 'Folder', parent_id: f.id
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/view/#{f.id}" }, :descendant => { :content => /Cancel/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/view\/#{f.id}/ }, descendant: { content: /Cancel/ }
   end
 
   should 'point back to folder when cancelling edition of an article inside it' do
-    f = Folder.new(:name => 'f'); profile.articles << f; f.save!
-    a = create(TextileArticle, :name => 'test', :parent => f, :profile_id => profile.id)
-    get :edit, :profile => profile.identifier, :id => a.id
+    f = Folder.new(name: 'f'); profile.articles << f; f.save!
+    a = create(TextileArticle, name: 'test', parent: f, profile_id: profile.id)
+    get :edit, profile: profile.identifier, id: a.id
 
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/view/#{f.id}" }, :descendant => { :content => /Cancel/ }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/view\/#{f.id}/ }, descendant: { content: /Cancel/ }
   end
 
   should 'link to page explaining about categorization' do
-    get :edit, :profile => profile.identifier, :id => profile.home_page.id
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/why_categorize" }
+    get :edit, profile: profile.identifier, id: profile.home_page.id
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/why_categorize/ }
   end
 
   should 'present popup' do
@@ -759,7 +759,7 @@ class CmsControllerTest < ActionController::TestCase
 
     get :edit, :profile => 'testinguser', :id => article.id
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'back_to', :value => @request.referer }
-    assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => /^https?:\/\/colivre.net\/testinguser\/myarticle/ }
+    assert_tag tag: 'a', descendant: { content: 'Cancel' }, attributes: { href: /^https?:\/\/colivre.net\/testinguser\/myarticle/ }
   end
 
   should 'detect when comming from home page' do
@@ -780,7 +780,7 @@ class CmsControllerTest < ActionController::TestCase
     @request.expects(:referer).returns('http://colivre.net/testinguser/testingusers-home-page').at_least_once
     get :new, :profile => 'testinguser', :type => 'TextileArticle'
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'back_to', :value => @request.referer }
-    assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => 'http://colivre.net/testinguser/testingusers-home-page' }
+    assert_tag tag: 'a', descendant: { content: 'Cancel' }, attributes: { href: 'http://colivre.net/testinguser/testingusers-home-page' }
   end
 
   should 'go to public view after creating article coming from there' do
@@ -930,8 +930,8 @@ class CmsControllerTest < ActionController::TestCase
 
   should 'not offer to create special article types' do
     get :new, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?type=Blog"}
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?type=Forum"}
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new?type=Blog/}
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new?type=Forum/}
   end
 
   should 'not offer folders if in a blog' do
@@ -951,7 +951,7 @@ class CmsControllerTest < ActionController::TestCase
 
     b = profile.blog
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{b.id}"}
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/edit\/#{b.id}/}
   end
 
   should 'not offer to add folder to blog' do
@@ -961,7 +961,7 @@ class CmsControllerTest < ActionController::TestCase
     assert profile.has_blog?
 
     get :view, :profile => profile.identifier, :id => profile.blog.id
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?parent_id=#{profile.blog.id}&amp;type=Folder"}
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?parent_id=#{profile.blog.id}&amp;type=Folder/}
   end
 
   should 'not show feed subitem for blog' do
@@ -972,7 +972,7 @@ class CmsControllerTest < ActionController::TestCase
 
     get :view, :profile => profile.identifier, :id => profile.blog.id
 
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{profile.blog.feed.id}" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/edit\/#{profile.blog.feed.id}/ }
   end
 
   should 'remove the image of a blog' do
@@ -1107,7 +1107,7 @@ class CmsControllerTest < ActionController::TestCase
 
     get :upload_files, :profile => profile.identifier, :parent_id => folder.id
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'back_to', :value => @request.referer }
-    assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => /^https?:\/\/colivre.net\/#{profile.identifier}\/#{folder.slug}/ }
+    assert_tag tag: 'a', descendant: { content: 'Cancel' }, attributes: { href: /^https?:\/\/colivre.net\/#{profile.identifier}\/#{folder.slug}/ }
   end
 
   should 'detect when comming from home page to upload files' do
@@ -1116,7 +1116,7 @@ class CmsControllerTest < ActionController::TestCase
     @controller.stubs(:profile).returns(profile)
     get :upload_files, :profile => profile.identifier, :parent_id => folder.id
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'back_to', :value => @request.referer }
-    assert_tag :tag => 'a', :descendant => { :content => 'Cancel' }, :attributes => { :href => @request.referer }
+    assert_tag tag: 'a', descendant: { content: 'Cancel' }, attributes: { href: @request.referer }
   end
 
   should 'go back to public view when upload files coming from there' do
@@ -1230,37 +1230,37 @@ class CmsControllerTest < ActionController::TestCase
     c2 = fast_create(Community)
     c1.add_member(profile)
     c2.add_member(profile)
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => {:href => "/myprofile/#{profile.identifier}/cms/publish/#{a.id}"}
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: {href: /\/myprofile\/#{profile.identifier}\/cms\/publish\/#{a.id}/}
   end
 
   should "display 'Publish' when profile is a person and there is a portal community" do
-    a = fast_create(TextileArticle, :profile_id => profile.id, :updated_at => DateTime.now)
+    a = fast_create(TextileArticle, profile_id: profile.id, updated_at: DateTime.now)
     environment = profile.environment
     environment.portal_community = fast_create(Community)
     environment.enable('use_portal_community')
     environment.save!
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => {:href => "/myprofile/#{profile.identifier}/cms/publish/#{a.id}"}
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: {href: /\/myprofile\/#{profile.identifier}\/cms\/publish\/#{a.id}/}
   end
 
   should "display 'Publish' when profile is a community" do
     community = fast_create(Community)
     community.add_admin(profile)
-    a = fast_create(TextileArticle, :profile_id => community.id, :updated_at => DateTime.now)
+    a = fast_create(TextileArticle, profile_id: community.id, updated_at: DateTime.now)
     Article.stubs(:short_description).returns('bli')
-    get :index, :profile => community.identifier
-    assert_tag :tag => 'a', :attributes => {:href => "/myprofile/#{community.identifier}/cms/publish/#{a.id}"}
+    get :index, profile: community.identifier
+    assert_tag tag: 'a', attributes: {href: /\/myprofile\/#{community.identifier}\/cms\/publish\/#{a.id}/}
   end
 
   should 'not offer to upload files to blog' do
-    profile.articles << Blog.new(:name => 'blog test', :profile => profile)
+    profile.articles << Blog.new(name: 'blog test', profile: profile)
 
     profile.articles.reload
     assert profile.has_blog?
 
-    get :view, :profile => profile.identifier, :id => profile.blog.id
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/upload_files?parent_id=#{profile.blog.id}"}
+    get :view, profile: profile.identifier, id: profile.blog.id
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/upload_files\?parent_id=#{profile.blog.id}/}
   end
 
   should 'not allow user without permission create an article in community' do
@@ -1369,29 +1369,29 @@ class CmsControllerTest < ActionController::TestCase
     assert profile.has_forum?
 
     b = profile.forum
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{b.id}"}
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/edit\/#{b.id}/}
   end
 
   should 'not offer to add folder to forum' do
-    profile.articles << Forum.new(:name => 'forum test', :profile => profile)
+    profile.articles << Forum.new(name: 'forum test', profile: profile)
 
     profile.articles.reload
     assert profile.has_forum?
 
-    get :view, :profile => profile.identifier, :id => profile.forum.id
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?parent_id=#{profile.forum.id}&amp;type=Folder"}
+    get :view, profile: profile.identifier, id: profile.forum.id
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?parent_id=#{profile.forum.id}&amp;type=Folder/}
   end
 
   should 'not show feed subitem for forum' do
-    profile.articles << Forum.new(:name => 'Forum for test', :profile => profile)
+    profile.articles << Forum.new(name: 'Forum for test', profile: profile)
 
     profile.articles.reload
     assert profile.has_forum?
 
-    get :view, :profile => profile.identifier, :id => profile.forum.id
+    get :view, profile: profile.identifier, id: profile.forum.id
 
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{profile.forum.feed.id}" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/edit\/#{profile.forum.feed.id}/ }
   end
 
   should 'update feed options by edit forum form' do

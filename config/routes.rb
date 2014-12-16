@@ -1,5 +1,4 @@
 require_dependency 'noosfero'
-require 'environment_domain_constraint'
 
 Noosfero::Application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
@@ -11,6 +10,9 @@ Noosfero::Application.routes.draw do
   # map.purchase 'products/:id/purchase', controller: 'catalog', action: 'purchase'
   # This route can be invoked with purchase_url(id: product.id)
 
+  environment_domain = -> request { !Domain.hosting_profile_at request.host }
+  profile_domain     = -> request {  Domain.hosting_profile_at request.host }
+
   ######################################################
   ## Public controllers
   ######################################################
@@ -19,7 +21,7 @@ Noosfero::Application.routes.draw do
 
   # -- just remember to delete public/index.html.
   # You can have the root of your site routed by hooking up ''
-  root to: 'home#index', constraints: EnvironmentDomainConstraint.new, via: :all
+  root to: 'home#index', constraints: environment_domain, via: :all
 
   match 'site(/:action)', controller: 'home', via: :all
   match 'api(/:action)', controller: 'api', via: :all
@@ -58,40 +60,42 @@ Noosfero::Application.routes.draw do
 
   ##
   # Keep products URL compatibility
-  get 'catalog/:profile', to: redirect{ |params, request| "/profile/#{request.params[:profile]}/plugin/products/catalog" }
-  get 'myprofile/:profile/manage_products(/:action(/:id))', to: (redirect do |params, request|
+  get 'catalog(/:profile)', to: redirect{ |params, request| "/profile/#{request.params[:profile]}/plugin/products/catalog" }
+  get 'myprofile(/:profile)/manage_products(/:action(/:id))', to: (redirect do |params, request|
     "/profile/#{request.params[:profile]}/plugin/products/page/#{request.params[:action]}/#{request.params[:id]}"
   end)
 
   # events
-  match 'profile/:profile/events_by_day', controller: 'events', action: 'events_by_day', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/events_by_month', controller: 'events', action: 'events_by_month', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/events/:year/:month/:day', controller: 'events', action: 'events', year: /\d*/, month: /\d*/, day: /\d*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/events/:year/:month', controller: 'events', action: 'events', year: /\d*/, month: /\d*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/events', controller: 'events', action: 'events', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/events_by_day', controller: 'events', action: 'events_by_day', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/events_by_month', controller: 'events', action: 'events_by_month', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/events/:year/:month/:day', controller: 'events', action: 'events', year: /\d*/, month: /\d*/, day: /\d*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/events/:year/:month', controller: 'events', action: 'events', year: /\d*/, month: /\d*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/events', controller: 'events', action: 'events', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # invite
-  match 'profile/:profile/invite/friends', controller: 'invite', action: 'invite_friends', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/invite/:action', controller: 'invite', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/invite/friends', controller: 'invite', action: 'invite_friends', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/invite/:action', controller: 'invite', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # feeds per tag
-  match 'profile/:profile/tags/:id/feed', controller: 'profile', action:'tag_feed', id: /.+/, profile: /#{Noosfero.identifier_format_in_url}/i, as: :tag_feed, via: :all
+  match 'profile(/:profile)/tags/:id/feed', controller: 'profile', action:'tag_feed', id: /.+/, profile: /#{Noosfero.identifier_format_in_url}/i, as: :tag_feed, via: :all
 
   # profile tags
-  match 'profile/:profile/tags/:id', controller: 'profile', action: 'content_tagged', id: /.+/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'profile/:profile/tags(/:id)', controller: 'profile', action: 'tags', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/tags/:id', controller: 'profile', action: 'content_tagged', id: /.+/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/tags(/:id)', controller: 'profile', action: 'tags', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # profile search
-  match 'profile/:profile/search', controller: 'profile_search', action: 'index', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/search', controller: 'profile_search', action: 'index', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # comments
-  match 'profile/:profile/comment/:action/:id', controller: 'comment', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'profile(/:profile)/comment/:action/:id', controller: 'comment', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # public profile information
   match 'profile/:profile(/:action(/:id))', controller: 'profile', action: 'index', id: /[^\/]*/, profile: /#{Noosfero.identifier_format_in_url}/i, as: :profile, via: :all
+  # for customs domains
+  match 'profile/(/:action(/:id))', controller: 'profile', action: 'index', id: /[^\/]*/, profile: /#{Noosfero.identifier_format}/i, via: :all
 
   # contact
-  match 'contact/:profile/:action(/:id)', controller: 'contact', action: 'index', id: /.*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
+  match 'contact(/:profile)/:action(/:id)', controller: 'contact', action: 'index', id: /.*/, profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
   # map balloon
   match 'map_balloon/:action/:id', controller: 'map_balloon', id: /.*/, via: :all
@@ -104,8 +108,8 @@ Noosfero::Application.routes.draw do
   ## Controllers that are profile-specific (for profile admins )
   ######################################################
   # profile customization - "My profile"
-  match 'myprofile/:profile', controller: 'profile_editor', action: 'index', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
-  match 'myprofile/:profile/:controller(/:action(/:id))', controller: Noosfero.pattern_for_controllers_in_directory('my_profile'), profile: /#{Noosfero.identifier_format_in_url}/i, as: :myprofile, via: :all
+  match 'myprofile(/:profile)/:controller(/:action(/:id))', controller: Noosfero.pattern_for_controllers_in_directory('my_profile'), profile: /#{Noosfero.identifier_format_in_url}/i, as: :myprofile, via: :all
+  match 'myprofile(/:profile)', controller: 'profile_editor', action: 'index', profile: /#{Noosfero.identifier_format_in_url}/i, via: :all
 
 
   ######################################################
@@ -133,17 +137,21 @@ Noosfero::Application.routes.draw do
   # cache stuff - hack
   match 'public/:action/:id', controller: 'public', via: :all
 
-  match ':profile/*page/versions', controller: 'content_viewer', action: 'article_versions', profile: /#{Noosfero.identifier_format_in_url}/i, constraints: EnvironmentDomainConstraint.new, via: :all
+  match ':profile/*page/versions', controller: 'content_viewer', action: 'article_versions', profile: /#{Noosfero.identifier_format_in_url}/i, constraints: environment_domain, via: :all
   match '*page/versions', controller: 'content_viewer', action: 'article_versions', via: :all
 
-  match ':profile/*page/versions_diff', controller: 'content_viewer', action: 'versions_diff', profile: /#{Noosfero.identifier_format_in_url}/i, constraints: EnvironmentDomainConstraint.new, via: :all
+  match ':profile/*page/versions_diff', controller: 'content_viewer', action: 'versions_diff', profile: /#{Noosfero.identifier_format_in_url}/i, constraints: environment_domain, via: :all
   match '*page/versions_diff', controller: 'content_viewer', action: 'versions_diff', via: :all
 
-  # match requests for profiles that don't have a custom domain
-  match ':profile(/*page)', controller: 'content_viewer', action: 'view_page', profile: /#{Noosfero.identifier_format_in_url}/i, constraints: EnvironmentDomainConstraint.new, via: :all
+  ##
+  # Match requests for profiles that don't have a custom domain
+  #
+  match ':profile(/*page)', controller: :content_viewer, action: :view_page, profile: /#{Noosfero.identifier_format_in_url}/i, constraints: environment_domain, via: :all
 
-  # match requests for content in domains hosted for profiles
-  match '/(*page)', controller: 'content_viewer', action: 'view_page', via: :all
-
+  ##
+  # Match requests for content in domains hosted for profiles.
+  # :profile parameter extracted conditionally at needs_profile concern
+  #
+  match '/(*page)', controller: :content_viewer, action: :view_page, profile: /#{Noosfero.identifier_format_in_url}/i, constraints: profile_domain, via: :all
 
 end

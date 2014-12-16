@@ -9,7 +9,7 @@ class SearchPopupTest < ActionDispatch::IntegrationTest
 
   should 'link to search without category when not inside a filter' do
     get '/'
-    assert_tag :tag => 'a', :attributes => { :href => '/search/popup' }
+    assert_tag tag: 'a', attributes: { href: /\/search\/popup/ }
   end
 
   should 'link to search with category when inside a filter' do
@@ -17,7 +17,7 @@ class SearchPopupTest < ActionDispatch::IntegrationTest
     Category.create!(:name => 'subcat', :environment => Environment.default, :parent => parent)
 
     get '/cat/cat1/subcat'
-    assert_tag :tag => 'a', :attributes => { :href => '/search/popup/cat1/subcat' }
+    assert_tag tag: 'a', attributes: { href: /\/search\/popup\/cat1\/subcat/ }
   end
 
 end

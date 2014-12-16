@@ -29,7 +29,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
     get :index, :profile => ze.identifier
     assert_includes assigns(:pending_tasks), t1
     assert_includes assigns(:pending_tasks), t2
-    assert_tag :tag => 'div', :attributes => { :class => 'pending-tasks' }, :descendant => { :tag => 'a', :attributes =>  { :href => '/myprofile/ze/tasks' } }
+    assert_tag tag: 'div', attributes: { class: 'pending-tasks' }, descendant: { tag: 'a', attributes:  { href: /\/myprofile\/ze\/tasks/ } }
   end
 
   def test_edit_person_info
@@ -50,8 +50,6 @@ class ProfileEditorControllerTest < ActionController::TestCase
   end
 
   should 'mass assign all environment configurable person fields' do
-    person = profile
-
     post :edit, :profile => profile.identifier, :profile_data => { "nickname" => "ze", "description" => "Just a regular ze.", "contact_information" => "What?", "contact_phone" => "+0551133445566", "cell_phone" => "+0551188889999", "comercial_phone" => "+0551144336655", "jabber_id" => "ze1234", "personal_website" => "http://ze.com.br", "sex" => "male", "birth_date" => "2014-06-04", "nationality" => "Brazilian", "country" => "BR", "state" => "DF", "city" => "Brasilia", "zip_code" => "70300-010", "address" => "Palacio do Planalto", "address_reference" => "Praca dos tres poderes", "district" => "DF", "schooling" => "Undergraduate", "schooling_status" => "Concluded", "formation" => "Engineerings", "area_of_study" => "Metallurgy", "professional_activity" => "Metallurgic", "organization" => "Metal Corp.", "organization_website" => "http://metal.com" }
 
     assert_response :redirect
@@ -245,7 +243,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'show edit profile button' do
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_editor/edit" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/profile_editor\/edit/ }
   end
 
   should 'show image field on edit profile' do
@@ -425,44 +423,44 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'link to mailconf' do
     MailConf.expects(:enabled?).returns(true).at_least_once
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/mailconf" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/mailconf/ }
   end
 
   should 'not link to mailconf for organizations' do
     MailConf.stubs(:enabled?).returns(true)
     org = fast_create(Organization)
-    get :index, :profile => org.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{org.identifier}/mailconf" }
+    get :index, profile: org.identifier
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{org.identifier}\/mailconf/ }
   end
 
   should 'not link to mailconf if mail not enabled' do
     MailConf.expects(:enabled?).returns(false).at_least_once
-    get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/mailconf" }
+    get :index, profile: profile.identifier
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/mailconf/ }
   end
 
   should 'link to enable enterprise' do
-    ent = fast_create(Enterprise, :enabled => false)
-    get :index, :profile => ent.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{ent.identifier}/profile_editor/enable" }
+    ent = fast_create(Enterprise, enabled: false)
+    get :index, profile: ent.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{ent.identifier}\/profile_editor\/enable/ }
   end
 
   should 'link to disable enterprise' do
-    ent = fast_create(Enterprise, :enabled => true)
-    get :index, :profile => ent.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{ent.identifier}/profile_editor/disable" }
+    ent = fast_create(Enterprise, enabled: true)
+    get :index, profile: ent.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{ent.identifier}\/profile_editor\/disable/ }
   end
 
   should 'not link to enable/disable for non enterprises' do
-    ent = fast_create(Organization, :enabled => true)
-    get :index, :profile => ent.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{ent.identifier}/profile_editor/disable" }
+    ent = fast_create(Organization, enabled: true)
+    get :index, profile: ent.identifier
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{ent.identifier}\/profile_editor\/disable/ }
   end
 
   should 'request enable enterprise confirmation' do
-    ent = fast_create(Enterprise, :enabled => false)
-    get :enable, :profile => ent.identifier
-    assert_tag :tag => 'form', :attributes => { :action => "/myprofile/#{ent.identifier}/profile_editor/enable", :method => 'post' }
+    ent = fast_create(Enterprise, enabled: false)
+    get :enable, profile: ent.identifier
+    assert_tag tag: 'form', attributes: { action: /\/myprofile\/#{ent.identifier}\/profile_editor\/enable/, method: 'post' }
   end
 
   should 'enable enterprise after confirmation' do
@@ -549,7 +547,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'point to header/footer editing in control panel' do
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_editor/header_footer" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/profile_editor\/header_footer/ }
   end
 
   should 'not display header/footer button to enterprises if the environment disabled it' do
@@ -563,7 +561,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
     login_as('test_user')
 
     get :index, :profile => enterprise.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{enterprise.identifier}/profile_editor/header_footer" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{enterprise.identifier}\/profile_editor\/header_footer/ }
   end
 
   should 'display header/footer button to enterprises if the environment disabled it but user is admin' do
@@ -576,7 +574,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
     Person.any_instance.expects(:is_admin?).returns(true).at_least_once
 
     get :index, :profile => enterprise.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{enterprise.identifier}/profile_editor/header_footer" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{enterprise.identifier}\/profile_editor\/header_footer/ }
   end
 
   should 'display categories if environment disable_categories disabled' do
@@ -606,29 +604,29 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'display link to CMS' do
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => '/myprofile/default_user/cms' }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/default_user\/cms/ }
   end
 
   should 'display email template link for organizations in control panel' do
     profile = fast_create(Organization)
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_email_templates" }
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/profile_email_templates/ }
   end
 
   should 'not display email template link in control panel for person' do
-    get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/email_templates" }
+    get :index, profile: profile.identifier
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/email_templates/ }
   end
 
   should 'offer to create blog in control panel' do
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/default_user/cms/new?type=Blog" }
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/default_user\/cms\/new\?type=Blog/ }
   end
 
   should 'offer to config blog in control panel' do
-    profile.articles << Blog.new(:name => 'My blog', :profile => profile)
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{profile.blog.id}" }
+    profile.articles << Blog.new(name: 'My blog', profile: profile)
+    get :index, profile: profile.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/edit\/#{profile.blog.id}/ }
   end
 
   should 'not show select preferred domain if not enabled in environment' do
@@ -700,8 +698,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
     env.disable('enterprise_activation')
     env.save!
 
-    get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'div', :attributes => { :id => 'activation_enterprise' }, :descendant => {:tag => 'form', :attributes => {:action => '/account/activation_question'}}
+    get :index, profile: profile.identifier
+    assert_no_tag tag: 'div', attributes: { id: 'activation_enterprise' }, descendant: {tag: 'form', attributes: {action: /\/account\/activation_question/}}
   end
 
   should 'display form for enterprise activation if enabled on environment' do
@@ -709,8 +707,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
     env.enable('enterprise_activation')
     env.save!
 
-    get :index, :profile => profile.identifier
-    assert_tag :tag => 'div', :attributes => { :id => 'activation_enterprise' }, :descendant => {:tag => 'form', :attributes => {:action => '/account/activation_question'}}
+    get :index, profile: profile.identifier
+    assert_tag tag: 'div', attributes: { id: 'activation_enterprise' }, descendant: {tag: 'form', attributes: {action: /\/account\/activation_question/}}
   end
 
   should 'not display enterprise activation to enterprises' do
@@ -721,8 +719,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
     enterprise = fast_create(Enterprise)
     enterprise.add_admin(profile)
 
-    get :index, :profile => enterprise.identifier
-    assert_no_tag :tag => 'div', :attributes => { :id => 'activation_enterprise' }, :descendant => {:tag => 'form', :attributes => {:action => '/account/activation_question'}}
+    get :index, profile: enterprise.identifier
+    assert_no_tag tag: 'div', attributes: { id: 'activation_enterprise' }, descendant: {tag: 'form', attributes: {action: /\/account\/activation_question/}}
   end
 
   should 'have url field for identifier when environment allows' do
@@ -834,8 +832,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
     login_as('user')
     community = fast_create(Community)
     community.add_admin(user)
-    get :edit, :profile => community.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
+    get :edit, profile: community.identifier
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/#{community.identifier}\/profile_editor\/destroy_profile/ }
   end
 
   should 'not display destroy_profile button' do
@@ -846,8 +844,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
     login_as('user')
     community = fast_create(Community)
     community.add_admin(user)
-    get :edit, :profile => community.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
+    get :edit, profile: community.identifier
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/#{community.identifier}\/profile_editor\/destroy_profile/ }
   end
 
   should 'be able to destroy a person' do
@@ -1167,7 +1165,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'not display button to manage roles on control panel of person' do
     get :index, :profile => profile.identifier
-    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/default_user/profile_roles" }
+    assert_no_tag tag: 'a', attributes: { href: /\/myprofile\/default_user\/profile_roles/ }
   end
 
   should 'save profile admin option to receive email for every task' do

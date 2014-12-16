@@ -45,7 +45,7 @@ class ContactControllerTest < ActionController::TestCase
 
   should 'add form to create contact via post' do
     get :new, :profile => enterprise.identifier
-    assert_tag :tag => 'form', :attributes => { :action => "/contact/#{enterprise.identifier}/new", :method => 'post' }
+    assert_tag tag: 'form', attributes: { action: /\/contact\/#{enterprise.identifier}\/new/, method: 'post' }
   end
 
   should 'display input for message' do

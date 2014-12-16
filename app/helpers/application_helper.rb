@@ -633,7 +633,7 @@ module ApplicationHelper
 
   class View < ActionView::Base
     def url_for *args
-      self.controller.url_for *args
+      self.controller.send :url_for, *args
     end
   end
 
@@ -642,6 +642,7 @@ module ApplicationHelper
     article_helper.controller = controller
     article_helper.extend ArticleHelper
     article_helper.extend Rails.application.routes.url_helpers
+    article_helper.extend UrlSupport
     begin
       class_name = article.class.name + 'Helper'
       klass = class_name.constantize

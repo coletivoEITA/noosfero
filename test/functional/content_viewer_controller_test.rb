@@ -105,16 +105,16 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
 
   should "display current article's tags" do
-    page = profile.articles.create!(:name => 'myarticle', :body => 'test article', :tag_list => 'tag1, tag2')
+    profile.articles.create!(name: 'myarticle', body: 'test article', tag_list: 'tag1, tag2')
 
-    get :view_page, :profile => profile.identifier, :page => [ 'myarticle' ]
-    assert_tag :tag => 'div', :attributes => { :id => 'article-tags' }, :descendant => {
-      :tag => 'a',
-      :attributes => { :href => "/profile/#{profile.identifier}/tags/tag1" }
+    get :view_page, profile: profile.identifier, page: [ 'myarticle' ]
+    assert_tag tag: 'div', attributes: { id: 'article-tags' }, descendant: {
+      tag: 'a',
+      attributes: { href: /\/profile\/#{profile.identifier}\/tags\/tag1/ }
     }
-    assert_tag :tag => 'div', :attributes => { :id => 'article-tags' }, :descendant => {
-      :tag => 'a',
-      :attributes => { :href => "/profile/#{profile.identifier}/tags/tag2" }
+    assert_tag tag: 'div', attributes: { id: 'article-tags' }, descendant: {
+      tag: 'a',
+      attributes: { href: /\/profile\/#{profile.identifier}\/tags\/tag2/ }
     }
 
     assert_tag :tag => 'div', :attributes => { :id => 'article-tags' }, :descendant => { :content => /This article's tags:/ }
@@ -134,7 +134,7 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
 
   should "not display current article's tags" do
-    page = profile.articles.create!(:name => 'myarticle', :body => 'test article')
+    profile.articles.create!(:name => 'myarticle', :body => 'test article')
 
     get :view_page, :profile => profile.identifier, :page => [ 'myarticle' ]
     assert_no_tag :tag => 'div', :attributes => { :id => 'article-tags' }
@@ -230,39 +230,39 @@ class ContentViewerControllerTest < ActionController::TestCase
   should 'give link to edit the article for owner' do
     login_as('testinguser')
     xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/edit\/#{@profile.home_page.id}/ } }
   end
   should 'not give link to edit the article for non-logged-in people' do
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    xhr :get, :view_page, profile: 'testinguser', page: [], toolbar: true
+    assert_no_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/edit\/#{@profile.home_page.id}/ } }
   end
   should 'not give link to edit article for other people' do
     login_as(create_user('anotheruser').login)
 
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{@profile.home_page.id}" } }
+    xhr :get, :view_page, profile: 'testinguser', page: [], toolbar: true
+    assert_no_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/edit\/#{@profile.home_page.id}/ } }
   end
 
   should 'give link to create new article' do
     login_as('testinguser')
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
+    xhr :get, :view_page, profile: 'testinguser', page: [], toolbar: true
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/new/ } }
   end
   should 'give no link to create new article for non-logged in people ' do
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
+    xhr :get, :view_page, profile: 'testinguser', page: [], toolbar: true
+    assert_no_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/new/ } }
   end
   should 'give no link to create new article for other people' do
     login_as(create_user('anotheruser').login)
-    xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
-    assert_no_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new" } }
+    xhr :get, :view_page, profile: 'testinguser', page: [], toolbar: true
+    assert_no_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/new/ } }
   end
 
   should 'give link to create new article inside folder' do
     login_as('testinguser')
     folder = Folder.create!(:name => 'myfolder', :profile => @profile)
     xhr :get, :view_page, :profile => 'testinguser', :page => [ 'myfolder' ], :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new?parent_id=#{folder.id}" } }
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/new\?parent_id=#{folder.id}/ } }
   end
 
   should 'not give access to private articles if logged off' do
@@ -535,7 +535,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     folder = Folder.create!(:name => 'myfolder', :profile => @profile)
     folder.children << TextileArticle.new(:name => 'children-article', :profile => @profile)
     xhr :get, :view_page, :profile => 'testinguser', :page => [ 'myfolder', 'children-article' ], :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/new?parent_id=#{folder.id}" } }
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/new\?parent_id=#{folder.id}/ } }
   end
 
   should "display 'New article' when create children of folder" do
@@ -567,29 +567,29 @@ class ContentViewerControllerTest < ActionController::TestCase
     login_as(profile.identifier)
     t = TextileArticle.create!(:name => 'article to destroy', :profile => profile)
     xhr :get, :view_page, :profile => profile.identifier, :page => [t.path], :toolbar => true
-    assert_tag :tag => 'a', :content => 'Delete', :attributes => {:href => "/myprofile/#{profile.identifier}/cms/destroy/#{t.id}"}
+    assert_tag tag: 'a', content: 'Delete', attributes: {href: /\/myprofile\/#{profile.identifier}\/cms\/destroy\/#{t.id}/}
   end
 
   should 'not display delete button for homepage' do
     login_as(profile.identifier)
     page = profile.home_page
-    xhr :get, :view_page, :profile => profile.identifier, :page => page.path, :toolbar => true
-    assert_no_tag :tag => 'a', :content => 'Delete', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/destroy/#{page.id}" }
+    xhr :get, :view_page, profile: profile.identifier, page: page.path, toolbar: true
+    assert_no_tag tag: 'a', content: 'Delete', attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/destroy\/#{page.id}/ }
   end
 
   should 'add meta tag to rss feed on view blog' do
     login_as(profile.identifier)
-    profile.articles << Blog.new(:name => 'Blog', :profile => profile)
-    get :view_page, :profile => profile.identifier, :page => ['blog']
-    assert_tag :tag => 'link', :attributes => { :rel => 'alternate', :type => 'application/rss+xml', :title => 'Blog', :href => "http://#{environment.default_hostname}/testinguser/blog/feed" }
+    profile.articles << Blog.new(name: 'Blog', profile: profile)
+    get :view_page, profile: profile.identifier, page: ['blog']
+    assert_tag tag: 'link', attributes: { rel: 'alternate', type: 'application/rss+xml', title: 'Blog', href: "http://#{environment.default_hostname}/testinguser/blog/feed" }
   end
 
   should 'add meta tag to rss feed on view post blog' do
     login_as(profile.identifier)
-    blog = Blog.create!(:name => 'Blog', :profile => profile)
-    TextileArticle.create!(:name => 'first post', :parent => blog, :profile => profile)
-    get :view_page, :profile => profile.identifier, :page => ['blog', 'first-post']
-    assert_tag :tag => 'link', :attributes => { :rel => 'alternate', :type => 'application/rss+xml', :title => 'Blog', :href => "http://#{environment.default_hostname}/testinguser/blog/feed" }
+    blog = Blog.create!(name: 'Blog', profile: profile)
+    TextileArticle.create!(name: 'first post', parent: blog, profile: profile)
+    get :view_page, profile: profile.identifier, page: ['blog', 'first-post']
+    assert_tag tag: 'link', attributes: { rel: 'alternate', type: 'application/rss+xml', title: 'Blog', href: "http://#{environment.default_hostname}/testinguser/blog/feed" }
   end
 
   should 'hit the article when viewed' do
@@ -611,7 +611,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     login_as(profile.identifier)
     f = Gallery.create!(:name => 'gallery', :profile => profile)
     xhr :get, :view_page, :profile => profile.identifier, :page => f.path, :toolbar => true
-    assert_tag :tag => 'a', :content => 'Upload files', :attributes => {:href => /parent_id=#{f.id}/}
+    assert_tag tag: 'a', content: 'Upload files', attributes: {href: /parent_id=#{f.id}/}
   end
 
   should "display 'New article' when showing folder child of image gallery" do
@@ -620,7 +620,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     folder1.children << folder2 = Folder.new(:name => 'gallery2', :profile => profile)
 
     xhr :get, :view_page, :profile => profile.identifier, :page => folder2.path, :toolbar => true
-    assert_tag :tag => 'a', :content => 'New article', :attributes => {:href =>/parent_id=#{folder2.id}/}
+    assert_tag tag: 'a', content: 'New article', attributes: {href:/parent_id=#{folder2.id}/}
   end
 
   should "display 'Upload files' to image gallery when showing its children" do
@@ -629,7 +629,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     file = UploadedFile.create!(:profile => profile, :parent => folder, :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png'))
     xhr :get, :view_page, :profile => profile.identifier, :page => file.path, :view => true, :toolbar => true
 
-    assert_tag :tag => 'a', :content => 'Upload files', :attributes => {:href => /parent_id=#{folder.id}/}
+    assert_tag tag: 'a', content: 'Upload files', attributes: {href: /parent_id=#{folder.id}/}
   end
 
   should 'render slideshow template' do
@@ -828,7 +828,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     blog = fast_create(Blog, :profile_id => profile.id, :path => 'blog')
     login_as(profile.identifier)
     xhr :get, :view_page, :profile => profile.identifier, :page => blog.path, :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{blog.id}" }, :content => 'Configure blog' }
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/edit\/#{blog.id}/ }, content: 'Configure blog' }
   end
 
   # Forum
@@ -998,7 +998,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     forum = fast_create(Forum, :profile_id => profile.id, :path => 'forum')
     login_as(profile.identifier)
     xhr :get, :view_page, :profile => profile.identifier, :page => forum.path, :toolbar => true
-    assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/myprofile/testinguser/cms/edit/#{forum.id}" }, :content => 'Configure forum' }
+    assert_tag tag: 'div', attributes: { id: 'article-actions' }, descendant: { tag: 'a', attributes: { href: /\/myprofile\/testinguser\/cms\/edit\/#{forum.id}/ }, content: 'Configure forum' }
   end
 
   should 'display add translation link if article is translatable' do
@@ -1007,7 +1007,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     login_as @profile.identifier
     textile = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'textile', :language => 'en')
     xhr :get, :view_page, :profile => @profile.identifier, :page => textile.path, :toolbar => true
-    assert_tag :a, :attributes => { :href => "/myprofile/#{profile.identifier}/cms/new?article%5Btranslation_of_id%5D=#{textile.id}&type=#{TextileArticle}" }
+    assert_tag :a, attributes: { href: /\/myprofile\/#{profile.identifier}\/cms\/new\?article%5Btranslation_of_id%5D=#{textile.id}&type=#{TextileArticle}/ }
   end
 
   should 'not display add translation link if article is not translatable' do

@@ -20,7 +20,7 @@ class EnterpriseRegistrationTest < ActionDispatch::IntegrationTest
 
     get '/enterprise_registration'
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => '/enterprise_registration', :method => 'post' }, :descendant => { :tag => 'input', :attributes => { :type => 'text', :name => 'create_enterprise[identifier]'} }
+    assert_tag tag: 'form', attributes: { action: /\/enterprise_registration/, method: 'post' }, descendant: { tag: 'input', attributes: { type: 'text', name: 'create_enterprise[identifier]'} }
 
     data = {
       :name => 'My new enterprise',
@@ -35,14 +35,14 @@ class EnterpriseRegistrationTest < ActionDispatch::IntegrationTest
 
     post '/enterprise_registration', :create_enterprise => data
     assert_response :success
-    assert_tag :tag => 'form', :attributes => { :action => '/enterprise_registration', :method => 'post' }, :descendant => { :tag => 'input', :attributes => { :type => 'radio', :name => 'create_enterprise[target_id]', :value => org.id } }
+    assert_tag tag: 'form', attributes: { action: /\/enterprise_registration/, method: 'post' }, descendant: { tag: 'input', attributes: { type: 'radio', name: 'create_enterprise[target_id]', value: org.id } }
 
     assert_difference 'CreateEnterprise.count' do
       post '/enterprise_registration', :create_enterprise => data.merge(:target_id => org.id)
     end
 
     assert_template 'confirmation'
-    assert_tag :tag => 'a', :attributes => { :href => '/' }
+    assert_tag tag: 'a', attributes: { href: /\// }
 
     code = CreateEnterprise.order('id DESC').first.code
 
@@ -55,11 +55,11 @@ class EnterpriseRegistrationTest < ActionDispatch::IntegrationTest
 
     get "/myprofile/myorg/enterprise_validation"
     assert_response :success
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/myorg/enterprise_validation/details/#{code}" }
+    assert_tag tag: 'a', attributes: { href: /\/myprofile\/myorg\/enterprise_validation\/details\/#{code}/ }
 
     get "/myprofile/myorg/enterprise_validation/details/#{code}"
     assert_response :success
-    assert_tag :form, :attributes => { :action => "/myprofile/myorg/enterprise_validation/approve/#{code}" }
+    assert_tag :form, attributes: { action: /\/myprofile\/myorg\/enterprise_validation\/approve\/#{code}/ }
 
     post_via_redirect "/myprofile/myorg/enterprise_validation/approve/#{code}"
     assert_response :success

@@ -158,26 +158,26 @@ class TemplatesControllerTest < ActionController::TestCase
     c2 = fast_create(Community, :is_template => true, :environment_id => environment.id)
 
     get :index
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_community_as_default?template_id=#{c1.id}"}
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_community_as_default?template_id=#{c2.id}"}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_community_as_default\?template_id=#{c1.id}/}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_community_as_default\?template_id=#{c2.id}/}
   end
 
   should 'display set as default link for non default person templates' do
-    p1 = fast_create(Person, :is_template => true, :environment_id => environment.id)
-    p2 = fast_create(Person, :is_template => true, :environment_id => environment.id)
+    p1 = fast_create(Person, is_template: true, environment_id: environment.id)
+    p2 = fast_create(Person, is_template: true, environment_id: environment.id)
 
     get :index
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_person_as_default?template_id=#{p1.id}"}
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_person_as_default?template_id=#{p2.id}"}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_person_as_default\?template_id=#{p1.id}/}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_person_as_default\?template_id=#{p2.id}/}
   end
 
   should 'display set as default link for non default enterprise templates' do
-    e1 = fast_create(Enterprise, :is_template => true, :environment_id => environment.id)
-    e2 = fast_create(Enterprise, :is_template => true, :environment_id => environment.id)
+    e1 = fast_create(Enterprise, is_template: true, environment_id: environment.id)
+    e2 = fast_create(Enterprise, is_template: true, environment_id: environment.id)
 
     get :index
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_enterprise_as_default?template_id=#{e1.id}"}
-    assert_tag :a, '', :attributes => {:href => "/admin/templates/set_enterprise_as_default?template_id=#{e2.id}"}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_enterprise_as_default\?template_id=#{e1.id}/}
+    assert_tag :a, '', attributes: {href: /\/admin\/templates\/set_enterprise_as_default\?template_id=#{e2.id}/}
   end
 
   should 'not display set as default link for default community template' do
@@ -187,7 +187,7 @@ class TemplatesControllerTest < ActionController::TestCase
     environment.save
 
     get :index
-    assert_no_tag :a, '', :attributes => {:href => "/admin/templates/set_community_as_default?template_id=#{c1.id}"}
+    assert_no_tag :a, '', attributes: {href: /\/admin\/templates\/set_community_as_default\?template_id=#{c1.id}/}
   end
 
 end
