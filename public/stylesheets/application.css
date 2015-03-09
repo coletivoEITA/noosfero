@@ -12,6 +12,7 @@
  * views specifics
  *= require chat
  *= require search
+ *= require block-store
  */
 
 /* browser fixes */

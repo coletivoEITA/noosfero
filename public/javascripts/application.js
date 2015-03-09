@@ -28,6 +28,8 @@
 *= require catalog.js
 *= require autogrow.js
 *= require require_login.js
+*= require slick.js
+*= require block-store.js
 */
 
 // scope for noosfero stuff

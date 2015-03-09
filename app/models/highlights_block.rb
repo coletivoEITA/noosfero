@@ -23,7 +23,7 @@ class HighlightsBlock < Block
   end
 
   def self.description
-    _('Highlights')
+    _('Creates image slideshow')
   end
 
   def featured_images
