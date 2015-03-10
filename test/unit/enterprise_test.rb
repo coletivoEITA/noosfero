@@ -54,7 +54,7 @@ class EnterpriseTest < ActiveSupport::TestCase
 
   should 'have fans' do
     p = fast_create(Person)
-    e = fast_create(Enterprise)
+    e = fast_create(Enterprise, name: 'blah')
 
     p.favorite_enterprises << e
 

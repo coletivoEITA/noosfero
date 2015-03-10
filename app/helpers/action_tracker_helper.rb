@@ -67,4 +67,10 @@ module ActionTrackerHelper
     }
   end
 
+  def favorite_enterprise_description ta
+    _('favorited enterprise %{title}') % {
+      title: link_to(truncate(ta.get_enterprise_name), ta.get_enterprise_url),
+    }
+  end
+
 end
