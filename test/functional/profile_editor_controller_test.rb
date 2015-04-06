@@ -336,14 +336,6 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert !org.closed
   end
 
-  should 'not display option to close when it is enterprise' do
-    org = fast_create(Enterprise)
-    get :edit, :profile => org.identifier
-
-    assert_no_tag :tag => 'input', :attributes => { :type => 'radio', :name => 'profile_data[closed]', :value => 'true' }
-    assert_no_tag :tag => 'input', :attributes => { :type => 'radio', :name => 'profile_data[closed]', :value => 'false' }
-  end
-
   should 'display option to close when it is community' do
     org = fast_create(Community)
     get :edit, :profile => org.identifier
