@@ -43,6 +43,13 @@ group :cucumber do
   gem 'selenium-webdriver',     '~> 2.39.0'
 end
 
+group :test, :cucumber do
+  if ENV['PARALLEL_TESTS']
+    gem 'parallel_tests'
+    gem 'zeus-parallel_tests'
+  end
+end
+
 # Requires custom dependencies
 eval(File.read('config/Gemfile'), binding) rescue nil
 

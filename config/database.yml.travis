@@ -1,5 +1,5 @@
 # From http://about.travis-ci.org/docs/user/database-setup/
 test:
   adapter: postgresql
-  database: myapp_test
+  database: test<%= ENV['TEST_ENV_NUMBER'] %>
   username: postgres
