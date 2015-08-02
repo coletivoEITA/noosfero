@@ -10,10 +10,6 @@ class TinyMceArticle < TextArticle
     _('Not accessible for visually impaired users.')
   end
 
-  xss_terminate :only => [  ]
-
-  xss_terminate :only => [ :name, :abstract, :body ], :with => 'white_list', :on => 'validation'
-
   include WhiteListFilter
   filter_iframes :abstract, :body
   def iframe_whitelist

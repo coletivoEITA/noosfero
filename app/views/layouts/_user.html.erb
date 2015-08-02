@@ -7,15 +7,20 @@
     </span>
   <% else %>
     <span class='not-logged-in'>
-      <%= _("<span class='login'>%s</span>") % modal_inline_link_to('<i class="icon-menu-login"></i><strong>' + _('Login') + '</strong>', login_url, '#inlineLoginBox', :id => 'link_login') %>
-      <%= @plugins.dispatch(:alternative_authentication_link).collect { |content| instance_exec(&content) }.join("") %>
+      <span class='login'>
+        <%= modal_inline_link_to(content_tag(:i, nil, class: 'icon-menu-login') + content_tag(:strong, _('Login')), login_url, '#inlineLoginBox', id: 'link_login') %>
+      </span>
+      <%= @plugins.dispatch(:alternative_authentication_link).map{ |content| instance_exec &content }.safe_join %>
 
     <div id='inlineLoginBox' style='display: none;'>
       <%= render :file => 'account/login', :locals => { :is_popin => true } %>
     </div>
 
     <% unless @plugins.dispatch(:allow_user_registration).include?(false) %>
-      <%= _("<span class='or'>or</span> <span class='signup'>%s</span>") % link_to('<strong>' + _('Sign up') + '</strong>', :controller => 'account', :action => 'signup')%>
+      <span class='or'><= _'or' %></span>
+      <span class='signup'>
+        <%= link_to(content_tag(:strong, _('Sign up')), controller: 'account', action: 'signup') %>
+      </span>
     <% end %>
 
   </span>

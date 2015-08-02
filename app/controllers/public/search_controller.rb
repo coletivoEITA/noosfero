@@ -134,7 +134,7 @@ class SearchController < PublicController
 
   def tag
     @tag = params[:tag]
-    @tag_cache_key = "tag_#{CGI.escape(@tag.to_s)}_env_#{environment.id.to_s}_page_#{params[:npage]}"
+    @tag_cache_key = "tag_#{h @tag}_env_#{environment.id.to_s}_page_#{params[:npage]}"
     if is_cache_expired?(@tag_cache_key)
       @searches[@asset] = {:results => environment.articles.tagged_with(@tag).paginate(paginate_options)}
     end

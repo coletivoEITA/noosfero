@@ -54,11 +54,11 @@ class FeedReaderBlock < Block
 
   def formatted_feed_content
     if error_message.blank?
-      "<ul>\n".html_safe +
-      self.feed_items[0..(limit-1)].map{ |item| "<li><a href='#{item[:link]}'>#{item[:title]}</a></li>" }.join("\n").html_safe +
-      "</ul>".html_safe
+      content_tag :ul do
+        self.feed_items[0..(limit-1)].map{ |item| content_tag :li, link_to(item[:title], item[:link]) }.safe_join
+      end
     else
-      "<p>#{error_message}</p>".html_safe
+      content_tag :p, error_message
     end
   end
 

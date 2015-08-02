@@ -9,7 +9,7 @@ module SubOrganizationsPlugin::SearchHelper
     compact_link = display == 'compact' ? c_('Compact') : link_to(c_('Compact'), params.merge(:display => 'compact'))
     full_link = display == 'full' ? c_('Full') : link_to(c_('Full'), params.merge(:display => 'full'))
     content_tag('div',
-      content_tag('strong', c_('Display')) + ': ' + [compact_link,full_link].compact.join(' | ').html_safe,
+      content_tag(:strong, c_('Display')) + ': '.html_safe + [compact_link,full_link].safe_join(' | '),
       :class => 'search-customize-options'
     )
   end

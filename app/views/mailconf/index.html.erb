@@ -16,12 +16,12 @@
   <% if profile.user.enable_email %>
     <h2><%= ('E-mail address') %></h2>
     <ul>
-      <%= profile.email_addresses.map{|i| content_tag('li', i)}.join("\n") %>
+      <%= profile.email_addresses.map{ |i| content_tag :li, i }.safe_join %>
     </ul>
     <h2><%= _('Configuration') %></h2>
     <ul>
       <li>
-      <%= link_to _('Mail configuration for POP and IMAP'), 'http://www.ynternet.org/move/infos-technique-pour-utiliser-multypass-pop3-smtp-imap-ftp-quotas...' %>  
+      <%= link_to _('Mail configuration for POP and IMAP'), 'http://www.ynternet.org/move/infos-technique-pour-utiliser-multypass-pop3-smtp-imap-ftp-quotas...' %>
       </li>
     </ul>
     <% button_bar do %>
@@ -31,7 +31,7 @@
   <% else %>
 
     <h2><%= _("Enable e-Mail account below:") %></h2>
-    <ul><%= profile.email_addresses.map{|i| content_tag('li', i)}.join("\n") %></ul>
+    <ul><%= profile.email_addresses.map{ |i| content_tag :li, i }.safe_join %></ul>
     <blockquote><%= _("You'll be able to access a webmail from your user menu.") %></blockquote>
     <% button_bar do %>
       <%= button(:ok, _('Enable e-Mail'), { :action => 'enable' }, :method => 'post') %>

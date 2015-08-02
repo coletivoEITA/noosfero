@@ -1,19 +1,3 @@
-#FIXME Don't know why, but this xss_terminate and sanitize_tag_list calls here
-# from the migration fall on a loop and breaks the migration. Both them are
-# related to alias_method_chain, probably there is a problem with this kind of
-# alias on the migration level.
-class Article < ActiveRecord::Base
-  def sanitize_tag_list
-  end
-end
-
-module XssTerminate
-  module InstanceMethods
-    def sanitize_fields_with_white_list
-    end
-  end
-end
-
 #FIXME This after save calls the environment methods 'blocks' and
 # 'portal_community'. Both acts as not defined don't know why.
 class ArticleSweeper < ActiveRecord::Observer

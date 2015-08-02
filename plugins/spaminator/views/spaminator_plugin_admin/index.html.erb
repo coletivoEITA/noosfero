@@ -44,8 +44,12 @@
     <% @reports.each do |report| %>
       <tr>
         <td><%= report.formated_date %></td>
-        <td title='<%= _('Spam comments found / number of comments verified') %>'><%= "#{report.spams} / #{report.total_comments}" %></td>
-        <td title='<%= _('Spammers found / number of users verified') %>'><%= "#{report.spammers} / #{report.total_people}" %></td>
+        <td title='<%= _('Spam comments found / number of comments verified') %>'>
+          <%= "#{report.spams} / #{report.total_comments}" %>
+        </td>
+        <td title='<%= _('Spammers found / number of users verified') %>'>
+          <%= "#{report.spammers} / #{report.total_people}" %>
+        </td>
       </tr>
     <% end %>
     <tr id="spaminator-reports-see-all">

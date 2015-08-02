@@ -26,8 +26,8 @@
 
     <script>
       sniffer.search.loadSearchInput({
-        sourceUrl: '<%= url_for :action => :product_category_search, :escape => false %>',
-        addUrl: '<%= url_for :controller => :sniffer_plugin_myprofile, :action => :product_category_add, :id => '_id_', :escape => false %>'
+        sourceUrl: <%= url_for(action: :product_category_search, escape: false).to_json %>,
+        addUrl: <%= url_for(controller: :sniffer_plugin_myprofile, action: :product_category_add, id: '_id_', escape: false).to_json %>,
       });
     </script>
   </div>

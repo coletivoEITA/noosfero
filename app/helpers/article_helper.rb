@@ -74,7 +74,7 @@ module ArticleHelper
   end
 
   def topic_creation(article)
-    return '' unless article.forum?
+    return ''.html_safe unless article.forum?
 
     general_options = Forum::TopicCreation.general_options(article)
     slider_options = {:id => 'topic-creation-slider'}

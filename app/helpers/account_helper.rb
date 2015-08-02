@@ -14,7 +14,7 @@ module AccountHelper
   end
 
   def suggestion_based_on_username(requested_username='')
-    return "" if requested_username.empty?
+    return ''.html_safe if requested_username.empty?
 
     requested_username = requested_username.downcase.tr("^#{Profile::IDENTIFIER_FORMAT}", '')
     usernames = []

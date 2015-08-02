@@ -26,7 +26,7 @@ module DatesHelper
       date_format = year ? _('%{month_name} %{day}, %{year}') : _('%{month_name} %{day}')
       date_format % { :day => date.day, :month_name => month_name(date.month), :year => date.year }
     else
-      ''
+      ''.html_safe
     end
   end
 
@@ -38,7 +38,7 @@ module DatesHelper
       date_format = year ? _('%{month_name}, %{year}') : _('%{month_name}')
       date_format % { :month_name => month_name(date.month), :year => date.year }
     else
-      ''
+      ''.html_safe
     end
   end
 
@@ -52,7 +52,7 @@ module DatesHelper
       date_format = year ? _('%{month_name} %{day}, %{year} %{hour}:%{minutes}') : _('%{month_name} %{day} %{hour}:%{minutes}')
       date_format % { :day => time.day, :month_name => month_name(time.month), :year => time.year, :hour => time.hour, :minutes => time.strftime("%M") }
     else
-      ''
+      ''.html_safe
     end
   end
 

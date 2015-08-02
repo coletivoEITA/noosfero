@@ -2,11 +2,10 @@ module TinymceHelper
   include MacrosHelper
 
   def tinymce_js
-    output = ''
-    output += javascript_include_tag 'tinymce/js/tinymce/tinymce.js'
-    output += javascript_include_tag 'tinymce/js/tinymce/jquery.tinymce.min.js'
-    output += javascript_include_tag 'tinymce.js'
-    output += include_macro_js_files.to_s
+    output = javascript_include_tag 'tinymce/js/tinymce/tinymce.js'
+    output.concat javascript_include_tag 'tinymce/js/tinymce/jquery.tinymce.min.js'
+    output.concat javascript_include_tag 'tinymce.js'
+    output.concat include_macro_js_files.to_s
     output
   end
 

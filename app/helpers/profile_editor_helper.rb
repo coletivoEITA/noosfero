@@ -122,14 +122,15 @@ module ProfileEditorHelper
     if profile
       if profile.preferred_domain
         # FIXME should be able to change
-        return ''
+        return ''.html_safe
       else
         domains = profile.possible_domains
       end
     else
       domains = environment.domains
     end
-    labelled_form_field(_('Preferred domain name:'), select(object, :preferred_domain_id, domains.map {|item| [item.name, item.id]}, :prompt => '&lt;' + _('Select domain') + '&gt;'))
+    labelled_form_field(_('Preferred domain name:'), select(object, :preferred_domain_id, domains.map{|item| [item.name, item.id]},
+                                                            prompt: '&lt;'.html_safe + _('Select domain') + '&gt;'.html_safe))
   end
 
   def control_panel(&block)
@@ -150,7 +151,7 @@ module ProfileEditorHelper
     if profile.public?
       labelled_check_box(_('Public'), '', '', true, :disabled => true, :title => _('This field must be public'), :class => 'disabled')
     else
-      ''
+      ''.html_safe
     end
   end
 

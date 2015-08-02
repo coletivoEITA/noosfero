@@ -159,7 +159,7 @@ class DisplayContentBlock < Block
               end
             when 'tags'
               if !item.tags.empty?
-                tags_section = item.tags.map { |t| content_tag('span', t.name) }.join("")
+                tags_section = item.tags.map{ |t| content_tag :span, t.name }.safe_join
                 content_sections += (block.display_section?(section) ? (content_tag('div', tags_section, :class => 'tags')) : '')
               end
             end

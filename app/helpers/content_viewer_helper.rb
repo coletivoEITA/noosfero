@@ -5,9 +5,9 @@ module ContentViewerHelper
   include DatesHelper
 
   def display_number_of_comments(n)
-    base_str = "<span class='comment-count hide'>#{n}</span>"
+    base_str = content_tag :span, n, class: 'comment-count hide'
     amount_str = n == 0 ? _('no comments yet') : (n == 1 ? _('One comment') : _('%s comments') % n)
-    base_str + "<span class='comment-count-write-out'>#{amount_str}</span>"
+    base_str + content_tag(:span, amount_str, class: 'comment-count-write-out')
   end
 
   def number_of_comments(article)
@@ -55,7 +55,7 @@ module ContentViewerHelper
   end
 
   def link_to_comments(article, args = {})
-    return '' unless article.accept_comments?
+    return ''.html_safe unless article.accept_comments?
     reference_to_article number_of_comments(article), article, 'comments_list'
   end
 

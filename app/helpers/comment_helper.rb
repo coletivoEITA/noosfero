@@ -2,15 +2,13 @@ module CommentHelper
   include DatesHelper
 
   def article_title(article, args = {})
-    title = article.title
-    title = content_tag('h1', h(title), :class => 'title')
+    title = content_tag :h1, article.title, class: 'title'
     if article.belongs_to_blog?
       unless args[:no_link]
         title = content_tag('h1', link_to(article.name, article.url), :class => 'title')
       end
-      comments = ''
       unless args[:no_comments] || !article.accept_comments
-        comments = (" - %s") % link_to_comments(article)
+        comments = (" - %s").html_safe % link_to_comments(article)
       end
       title << content_tag('span',
         content_tag('span', show_date(article.published_at), :class => 'date') +
@@ -25,7 +23,7 @@ module CommentHelper
   def comment_extra_contents(comment)
     @plugins.dispatch(:comment_extra_contents, comment).collect do |extra_content|
       extra_content.kind_of?(Proc) ? self.instance_exec(&extra_content) : extra_content
-    end.join('\n')
+    end.safe_join
   end
 
   def comment_actions(comment)

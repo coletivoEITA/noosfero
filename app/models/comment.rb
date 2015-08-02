@@ -37,8 +37,6 @@ class Comment < ActiveRecord::Base
 
   acts_as_having_settings
 
-  xss_terminate :only => [ :body, :title, :name ], :on => 'validation'
-
   acts_as_voteable
 
   def comment_root

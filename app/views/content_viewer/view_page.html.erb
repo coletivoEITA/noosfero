@@ -45,24 +45,24 @@
 <% if ! @page.categories.empty? %>
 <div id="article-cat">
   <h4><%= _('Categories') %></h4>
-    <%= @page.categories.map {|item| link_to_category(item, false) }.join(", ") %>
+    <%= @page.categories.map{ |item| link_to_category item, false }.safe_join(', ') %>
 </div>
 <% end %>
 
 <% if !@page.tags.empty? %>
   <div id="article-tags">
     <%= _("This article's tags:") %>
-    <%= @page.tags.map { |t| link_to(t, :controller => 'profile', :profile => @profile.identifier, :action => 'tags', :id => t.name ) }.join("\n") %>
+    <%= @page.tags.map{ |t| link_to t, controller: 'profile', profile: @profile.identifier, action: 'tags', id: t.name }.safe_join %>
   </div>
 <% end %>
 
 <%= display_source_info(@page) %>
 
-<%= @plugins.dispatch(:article_extra_contents, @page).collect { |content| instance_exec(&content) }.join("") %>
+<%= @plugins.dispatch(:article_extra_contents, @page).map{ |content| instance_exec &content }.safe_join %>
 
 <% if @page.accept_comments? || @comments_count > 0 %>
   <div class="comments" id="comments_list">
-    <h3 <%= 'class="no-comments-yet"' if @comments_count == 0 %>>
+    <h3 class='<%= "no-comments-yet".html_safe if @comments_count == 0 %>'>
       <%= display_number_of_comments(@comments_count) %>
     </h3>
 

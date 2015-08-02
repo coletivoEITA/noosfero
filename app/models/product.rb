@@ -84,9 +84,6 @@ class Product < ActiveRecord::Base
     self.profile.lng
   end
 
-  xss_terminate :only => [ :name ], :on => 'validation'
-  xss_terminate :only => [ :description ], :with => 'white_list', :on => 'validation'
-
   belongs_to :unit
 
   include FloatHelper

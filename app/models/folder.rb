@@ -12,8 +12,6 @@ class Folder < Article
 
   acts_as_having_settings :field => :setting
 
-  xss_terminate :only => [ :name, :body ], :with => 'white_list', :on => 'validation'
-
   include WhiteListFilter
   filter_iframes :body
   def iframe_whitelist

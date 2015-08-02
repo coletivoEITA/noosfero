@@ -34,7 +34,7 @@ module BoxesHelper
 
   def display_boxes_editor(holder)
     with_box_decorator self do
-      content_tag('div', display_boxes(holder, '&lt;' + _('Main content') + '&gt;'), :id => 'box-organizer')
+      content_tag :div, display_boxes(holder, '&lt;'.html_safe + _('Main content') + '&gt;'.html_safe), id: 'box-organizer'
     end
   end
 
@@ -44,7 +44,7 @@ module BoxesHelper
 
   def display_boxes(holder, main_content)
     boxes = holder.boxes.with_position.first(boxes_limit(holder))
-    content = boxes.reverse.map { |item| display_box(item, main_content) }.join("\n")
+    content = boxes.reverse.map{ |box| display_box box, main_content }.safe_join
     content = main_content if (content.blank?)
 
     content_tag('div', content, :class => 'boxes', :id => 'boxes' )
@@ -54,7 +54,7 @@ module BoxesHelper
     if holder.respond_to?(element)
       content_tag('div', holder.send(element), options)
     else
-      ''
+      ''.html_safe
     end
   end
 
@@ -64,7 +64,7 @@ module BoxesHelper
 
   def display_updated_box(box)
     with_box_decorator self do
-      display_box_content(box, '&lt;' + _('Main content') + '&gt;')
+      display_box_content box, '&lt;'.html_safe + _('Main content') + '&gt;'.html_safe
     end
   end
 
@@ -72,7 +72,7 @@ module BoxesHelper
     context = { :article => @page, :request_path => request.path, :locale => locale, :params => request.params, :user => user, :controller => controller }
     box_decorator.select_blocks(box, box.blocks.includes(:box), context).map do |item|
       display_block item, main_content
-    end.join("\n") + box_decorator.block_target(box)
+    end.safe_join + box_decorator.block_target(box)
   end
 
   def select_blocks box, arr, context
@@ -128,17 +128,17 @@ module BoxesHelper
   def extract_block_content(content)
     case content
     when Hash
-      content_tag('iframe', '', :src => url_for(content))
+      tag(:iframe, src: url_for(content))
     when String
       if content.split("\n").size == 1 and content =~ /^https?:\/\//
-        content_tag('iframe', '', :src => content)
+        tag(:iframe, src: content)
       else
         content
       end
     when Proc
       self.instance_eval(&content)
     when NilClass
-      ''
+      ''.html_safe
     else
       raise "Unsupported content for block (#{content.class})"
     end
@@ -147,14 +147,14 @@ module BoxesHelper
   module DontMoveBlocks
     # does nothing
     def self.block_target(box, block = nil)
-      ''
+      ''.html_safe
     end
     # does nothing
     def self.block_handle(block)
-      ''
+      ''.html_safe
     end
     def self.block_edit_buttons(block)
-      ''
+      ''.html_safe
     end
     def self.select_blocks box, arr, context
       arr = arr.select{ |block| block.visible? context }
@@ -274,7 +274,7 @@ module BoxesHelper
       buttons << modal_inline_icon(:embed, _('Embed code'), {}, "#embed-code-box-#{block.id}") << html
     end
 
-    content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'button-bar')
+    content_tag(:div, buttons.safe_join + tag(:br, style: 'clear: left'), class: 'button-bar')
   end
 
   def current_blocks

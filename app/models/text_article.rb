@@ -3,8 +3,6 @@ require 'noosfero/translatable_content'
 # a base class for all text article types.
 class TextArticle < Article
 
-  xss_terminate :only => [ :name ], :on => 'validation'
-
   def self.type_name
     _('Article')
   end

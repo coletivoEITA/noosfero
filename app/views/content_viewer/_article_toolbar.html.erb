@@ -63,7 +63,7 @@
       <div class="blog-cover"><%= image_tag(@page.image.public_filename())%></div>
     <% end %>
     <%= button_without_text(:feed, _('RSS feed'), @page.feed.url, :class => 'blog-feed-link') if @page.has_posts? && @page.feed %>
-    <%= @plugins.dispatch(:article_header_extra_contents, @page).collect { |content| instance_exec(&content) }.join("") %>
+    <%= @plugins.dispatch(:article_header_extra_contents, @page).map{ |content| instance_exec &content }.safe_join %>
     <%= render :partial => 'article_title', :locals => {:no_link => true} %>
     <%= article_translations(@page) %>
   </div>

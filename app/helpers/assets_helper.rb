@@ -14,12 +14,10 @@ module AssetsHelper
     ].select do |target, css_class, name|
       !environment.enabled?('disable_asset_' + target[:asset])
     end.map do |target,css_class,name|
-      content_tag('li',
-                  link_to(
-                    content_tag('span', '', :class => css_class) +
-                    content_tag('strong', name),
-                    target ), :class => "asset_#{target[:asset]}")
-    end.join("\n")
+      content_tag :li, class: "asset_#{target[:asset]}" do
+        link_to content_tag(:span, nil, class: css_class) + content_tag(:strong, name), target
+      end
+    end.safe_join
   end
 
 end

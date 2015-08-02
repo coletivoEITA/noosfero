@@ -46,7 +46,7 @@ module BlogHelper
         end
       end)
     }
-    content.join("\n<hr class='sep-posts'/>\n") + (pagination or '')
+    content.safe_join(tag :hr, class: 'sep-posts') + (pagination or ''.html_safe)
   end
 
   def display_post(article, format = 'full')

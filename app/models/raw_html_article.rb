@@ -12,6 +12,8 @@ class RawHTMLArticle < TextArticle
     _('Allows HTML without filter (only for admins).')
   end
 
-  xss_terminate :only => [  ]
+  def body
+    self[:body].html_safe
+  end
 
 end

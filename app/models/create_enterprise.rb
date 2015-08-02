@@ -36,7 +36,6 @@ class CreateEnterprise < Task
 
   # check for explanation when rejecting
   validates_presence_of :reject_explanation, :if => (lambda { |record| record.status == Task::Status::CANCELLED } )
-  xss_terminate :only => [ :acronym, :address, :contact_person, :contact_phone, :economic_activity, :legal_form, :management_information, :name ], :on => 'validation'
 
   validate :validator_correct_region
   validate :not_used_identifier
@@ -191,17 +190,17 @@ class CreateEnterprise < Task
     msg << _("The data provided by the enterprise was the following:\n") << "\n"
 
 
-    msg << (_("Name: %s") % self.name) << "\n"
-    msg << (_("Acronym: %s") % self.acronym) << "\n"
-    msg << (_("Address: %s") % self.address) << "\n"
-    msg << (_("Legal form: %s") % self.legal_form) << "\n"
+    msg << (_("Name: %s") % self.name) << "\n" if self.name.present?
+    msg << (_("Acronym: %s") % self.acronym) << "\n" if self.acronym.present?
+    msg << (_("Address: %s") % self.address) << "\n" if self.address.present?
+    msg << (_("Legal form: %s") % self.legal_form) << "\n" if self.legal_form.present?
     msg << (_("Foundation Year: %d") % self.foundation_year) << "\n" unless self.foundation_year.blank?
-    msg << (_("Economic activity: %s") % self.economic_activity) << "\n"
+    msg << (_("Economic activity: %s") % self.economic_activity) << "\n" if self.economic_activity.present?
 
-    msg << _("Information about enterprise's management:\n") << self.management_information.to_s << "\n"
+    msg << _("Information about enterprise's management:\n") << self.management_information.to_s << "\n" if self.management_information.present?
 
-    msg << (_("Contact phone: %s") % self.contact_phone) << "\n"
-    msg << (_("Contact person: %s") % self.contact_person) << "\n"
+    msg << (_("Contact phone: %s") % self.contact_phone) << "\n" if self.contact_person.present?
+    msg << (_("Contact person: %s") % self.contact_person) << "\n" if self.contact_person.present?
 
     msg << _('CreateEnterprise|Identifier')
 

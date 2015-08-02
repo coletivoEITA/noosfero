@@ -6,7 +6,7 @@ module EventsHelper
     content_tag('h2', title) +
     content_tag('div',
       (events.any? ?
-        content_tag('table', events.select { |item| item.display_to?(user) }.map {|item| display_event_in_listing(item)}.join('')) :
+        content_tag(:table, events.select{ |item| item.display_to?(user) }.map{ |item| display_event_in_listing(item) }.safe_join) :
         content_tag('em', _('No events for this month'), :class => 'no-events')
       ), :id => 'agenda-items'
     )

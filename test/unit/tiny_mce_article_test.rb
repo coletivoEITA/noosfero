@@ -97,16 +97,6 @@ class TinyMceArticleTest < ActiveSupport::TestCase
     assert_match  /<!-- .* --> <h1> Wellformed html code <\/h1>/, article.body
   end
 
-  should 'not allow XSS on name' do
-    article = create(TinyMceArticle, :name => 'title with <script>alert("xss")</script>', :profile => profile)
-    assert_no_match /script/, article.name
-  end
-
-  should 'not allow XSS on abstract' do
-    article = create(TinyMceArticle, :name => "test 123", :abstract => 'abstract with <script>alert("xss")</script>', :profile => profile)
-    assert_no_match /script/, article.abstract
-  end
-
   should 'notifiable be true' do
     a = fast_create(TinyMceArticle)
     assert a.notifiable?

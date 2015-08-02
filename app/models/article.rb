@@ -56,9 +56,6 @@ class Article < ActiveRecord::Base
 
   track_actions :create_article, :after_create, :keep_params => [:name, :url, :lead, :first_image], :if => Proc.new { |a| a.is_trackable? && !a.image? }
 
-  # xss_terminate plugin can't sanitize array fields
-  before_save :sanitize_tag_list
-
   before_create do |article|
     if article.author
       article.author_name = article.author.name
@@ -128,8 +125,6 @@ class Article < ActiveRecord::Base
   def destroy_link_article
     Article.where(:reference_article_id => self.id, :type => LinkArticle).destroy_all
   end
-
-  xss_terminate :only => [ :name ], :on => 'validation', :with => 'white_list'
 
   scope :in_category, -> category {
     includes('categories_including_virtual').where('categories.id' => category.id)
@@ -755,7 +750,7 @@ class Article < ActiveRecord::Base
 
   def first_paragraph
     paragraphs = Nokogiri::HTML.fragment(to_html).css('p')
-    paragraphs.empty? ? '' : paragraphs.first.to_html
+    paragraphs.empty? ? ''.html_safe : paragraphs.first.to_html
   end
 
   def lead(length = nil)
@@ -829,11 +824,6 @@ class Article < ActiveRecord::Base
   end
 
   private
-
-  def sanitize_tag_list
-    sanitizer = HTML::FullSanitizer.new
-    self.tag_list.map!{|i| strip_tag_name sanitizer.sanitize(i) }
-  end
 
   def strip_tag_name(tag_name)
     tag_name.gsub(/[<>]/, '')

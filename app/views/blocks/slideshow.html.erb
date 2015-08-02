@@ -16,7 +16,7 @@
       <div class='slideshow-block-navigation'>
         <%= link_to _('Previous'), '#', :class => 'icon-media-prev'  %>
         <% if block.interval > 0 %>
-          <%= link_to '&nbsp;', '#', :class => 'icon-media-pause', :onclick => "togglePlayback('#block-#{block.id} .slideshow-container', this); return false;" %>
+          <%= link_to '&nbsp;'.html_safe, '#', class: 'icon-media-pause', onclick: "togglePlayback('#block-#{block.id} .slideshow-container', this); return false;" %>
         <% end %>
         <%= link_to _('Next'), '#', :class => 'icon-media-next'  %>
       </div>

@@ -4,7 +4,7 @@
 
   <%= required f.text_field(:name) %>
 
-  <%= @plugins.dispatch(:profile_info_extra_contents).collect { |content| instance_exec(&content) }.join("") %>
+  <%= @plugins.dispatch(:profile_info_extra_contents).map{ |content| instance_exec &content }.safe_join %>
 
 <% if @environment.enabled?('enable_organization_url_change') %>
   <script type="text/javascript">
@@ -45,7 +45,7 @@
               text_field(:profile_data, :identifier, :onchange => "warn_value_change()", :size => 25)
             ) +
             content_tag('div',
-              content_tag('strong', _('WARNING!')) + '&nbsp;' +
+              content_tag(:strong, _('WARNING!')) + '&nbsp;'.html_safe +
                 _("You are about to change the address, and this will break external links to the homepage or to content inside it. Do you really want to change?") +
               content_tag('div',
                 button_to_function(:ok, _("Yes"), "confirm_change()") + ' ' +

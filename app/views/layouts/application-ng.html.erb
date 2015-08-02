@@ -22,11 +22,11 @@
     <%=
       @plugins.dispatch(:head_ending).map do |content|
         if content.respond_to?(:call) then instance_exec(&content).to_s.html_safe else content.to_s.html_safe end
-      end.join("\n")
+      end.safe_join
     %>
 
     <script type="text/javascript">
-      DEFAULT_LOADING_MESSAGE = <%="'#{ _('loading...') }'" %>;
+      DEFAULT_LOADING_MESSAGE = <%= _('loading...').to_json %>;
       noosfero.profile = <%= (@profile.identifier if @profile).to_json %>
     </script>
 
@@ -37,7 +37,7 @@
     <%=
       @plugins.dispatch(:body_beginning).map do |content|
         if content.respond_to?(:call) then instance_exec(&content).to_s.html_safe else content.to_s.html_safe end
-      end.join("\n")
+      end.safe_join
     %>
     <div id="global-header">
       <%= global_header %>
@@ -77,7 +77,7 @@
     <%=
       @plugins.dispatch(:body_ending).map do |content|
         if content.respond_to?(:call) then instance_exec(&content).html_safe else content.html_safe end
-      end.join("\n")
+      end.safe_join
     %>
   </body>
 </html>

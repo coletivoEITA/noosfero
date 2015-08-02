@@ -21,18 +21,13 @@ class ProductsBlock < Block
 
   def content(args={})
     block_title(title) +
-    content_tag(
-      'ul',
-      products.map {|product|
-        content_tag('li',
-          link_to( product.name,
-                   product.url,
-                   :style => 'background-image:url(%s)' % product.default_image('minor')
-                 ),
-          :class => 'product'
-        )
-      }.join
-    )
+    (content_tag :ul do
+      products.map do |product|
+        content_tag :li, class: 'product' do
+          link_to product.name, product.url, style: 'background-image:url(%s)' % product.default_image('minor')
+        end
+      end.safe_join
+    end)
   end
 
   def footer

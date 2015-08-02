@@ -1,4 +1,4 @@
-<% escaped_tag = CGI.escapeHTML(@tag) %>
+<% escaped_tag = h @tag %>
 
 <% add_rss_feed_to_head(_("%s's contents tagged with \"%s\"") % [profile.name, escaped_tag], tag_feed_path) %>
 

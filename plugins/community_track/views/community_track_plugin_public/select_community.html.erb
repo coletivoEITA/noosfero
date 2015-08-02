@@ -23,7 +23,7 @@
     <li class="search-profile-item">
       <div class="common-profile-list-block">
         <div class="vcard">
-          <a href="#" onclick="jQuery('<%= "#community_identifier_#{community.identifier}" %>').attr('checked', true);">
+          <a href="#" onclick="$(<%= "#community_identifier_#{community.identifier}".to_json %>).attr('checked', true);">
             <span class="profile-image"><%= profile_image(community) %></span>
             <span class="org"><%= community.name %></span>
             <span class="select_community"><%= radio_button_tag(:community_identifier, community.identifier) %></span>

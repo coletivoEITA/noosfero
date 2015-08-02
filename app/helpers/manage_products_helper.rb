@@ -6,8 +6,8 @@ module ManageProductsHelper
     remote_function({
       :update => container_id,
       :url => { :action => "categories_for_selection" },
-      :loading => "loading('hierarchy_navigation', '#{ _('loading…') }'); loading('#{container_id}', '&nbsp;')",
-      :complete => "loading_done('hierarchy_navigation'); loading_done('#{container_id}')"
+      :loading => "loading('hierarchy_navigation', #{ _('loading…').to_json }); loading(#{container_id.to_json}, '&nbsp;')",
+      :complete => "loading_done('hierarchy_navigation'); loading_done(#{container_id.to_json})"
     }.merge(options))
   end
 
@@ -39,9 +39,9 @@ module ManageProductsHelper
 
   def options_for_select_categories(categories, selected = nil)
     categories.sort_by{|cat| cat.name.transliterate}.map do |category|
-      selected_attribute = selected.nil? ? '' : (category == selected ? "selected='selected'" : '')
-      "<option value='#{category.id}' title='#{category.name}' #{selected_attribute}>#{category.name + (category.leaf? ? '': ' &raquo;')}</option>"
-    end.join("\n")
+      content_tag :option, category.name + (category.leaf? ? '': ' &raquo;'), value: category.id, title: category.name,
+        selected: if selected.nil? then '' else (category == selected ? "selected='selected'" : '') end
+    end.safe_join
   end
 
   def build_selects_for_ancestors(ancestors, current_category)
@@ -97,12 +97,12 @@ module ManageProductsHelper
   end
 
   def edit_link(label, url, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     link_to(label, url, html_options)
   end
 
   def edit_product_link_to_remote(product, field, label, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     options = html_options.merge(:id => 'link-edit-product-' + field)
     options[:class] = options[:class] ? options[:class] + ' link-to-remote' : 'link-to-remote'
 
@@ -115,7 +115,7 @@ module ManageProductsHelper
   end
 
   def edit_button(type, label, url, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     button(type, label, url, html_options)
   end
 
@@ -128,12 +128,12 @@ module ManageProductsHelper
   end
 
   def edit_ui_button(label, url, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     ui_button(label, url, html_options)
   end
 
   def edit_product_ui_button_to_remote(product, field, label, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     id = 'edit-product-remote-button-ui-' + field
     options = html_options.merge(:id => id)
 
@@ -147,21 +147,21 @@ module ManageProductsHelper
   end
 
   def cancel_edit_product_link(product, field, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     button_to_function(:cancel, _('Cancel'), nil, html_options) do |page|
-      page.replace_html "product-#{field}", CGI::escapeHTML(render :partial => "display_#{field}", :locals => {:product => product})
+      page.replace_html "product-#{field}", render(partial: "display_#{field}", locals: {product: product}).to_json
     end
   end
 
   def edit_product_category_link(product, html_options = {})
-    return '' unless (user && user.has_permission?('manage_products', profile))
+    return ''.html_safe unless (user && user.has_permission?('manage_products', profile))
     options = html_options.merge(:id => 'link-edit-product-category')
     link_to(_('Change category'), { :action => 'edit_category', :id => product.id}, options)
   end
 
   def display_value(product)
     price = product.price
-    return '' if price.blank? || price.zero?
+    return ''.html_safe if price.blank? || price.zero?
     discount = product.discount
     if discount.blank? || discount.zero?
       result = display_price(_('Price: '), price)
@@ -189,9 +189,8 @@ module ManageProductsHelper
   end
 
   def display_qualifiers(product)
-    data = ''
+    data = ''.html_safe
     product.product_qualifiers.each do |pq|
-      certified_by = ''
       certifier = pq.certifier
       if certifier
         certifier_name = certifier.link.blank? ? certifier.name : link_to(certifier.name, certifier.link)

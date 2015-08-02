@@ -1,7 +1,7 @@
 module EnterpriseHomepageHelper
 
   def display_profile_info(profile)
-    data = ''
+    data = ''.html_safe
     [
       [ _('Contact person:'),    :contact_person    ],
       [ _('e-Mail:'),            :contact_email     ],

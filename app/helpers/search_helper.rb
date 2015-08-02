@@ -115,7 +115,7 @@ module SearchHelper
       map_link = display?(asset, :map) ? (display == 'map' ? _('Map') : link_to(_('Map'), params.merge(:display => 'map'))) : nil
       full_link = display?(asset, :full) ? (display == 'full' ? _('Full') : link_to(_('Full'), params.merge(:display => 'full'))) : nil
       content_tag('div',
-        content_tag('strong', _('Display')) + ': ' + [compact_link, map_link, full_link].compact.join(' | ').html_safe,
+        content_tag(:strong, _('Display')) + ': '.html_safe + [compact_link, map_link, full_link].compact.safe_join(' | '),
         :class => 'search-customize-options'
       )
     end
@@ -124,10 +124,12 @@ module SearchHelper
   def filters(asset)
     return if !asset
     klass = asset_class(asset)
-    content_tag('div', klass::SEARCH_FILTERS.map do |name, options|
-      default = klass.respond_to?("default_search_#{name}") ? klass.send("default_search_#{name}".to_s) : nil
-      select_filter(name, options, default)
-    end.join("\n"), :id => 'search-filters')
+    content_tag :div, id: 'search-filters' do
+      klass::SEARCH_FILTERS.map do |name, options|
+        default = klass.respond_to?("default_search_#{name}") ? klass.send("default_search_#{name}".to_s) : nil
+        select_filter(name, options, default)
+      end.safe_join
+    end
   end
 
   def assets_menu(selected)
@@ -136,13 +138,13 @@ module SearchHelper
     #TODO searching. When this is solved we may add it back again to the assets
     #     menu.
     assets.delete(:events)
-    content_tag('ul',
+    content_tag :ul, id: 'assets-menu' do
       assets.map do |asset|
         options = {}
         options.merge!(:class => 'selected') if selected.to_s == asset.to_s
         content_tag('li', asset_link(asset), options)
-      end.join("\n"),
-    :id => 'assets-menu')
+      end.safe_join
+    end
   end
 
   def asset_link(asset)
@@ -150,7 +152,7 @@ module SearchHelper
   end
 
   def assets_submenu(asset)
-    return '' if @templates[asset].blank? || @templates[asset].length == 1
+    return ''.html_safe if @templates[asset].blank? || @templates[asset].length == 1
     options = @templates[asset].map {|template| [template.name, template.id]}
     options = options_for_select([[_('Choose a template'), nil]] + options, selected: (params[:template_id]))
     select_tag('template_id', options, :id => 'submenu')

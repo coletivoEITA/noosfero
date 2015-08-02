@@ -62,7 +62,7 @@
   <%=
     @plugins.dispatch(:profile_editor_extras).map do |content|
       content.kind_of?(Proc) ? self.instance_exec(&content) : content
-    end.join("\n")
+    end.safe_join
   %>
 
   <%= select_categories(:profile_data, _('Select the categories of your interest'), 2) %>

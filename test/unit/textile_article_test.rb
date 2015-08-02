@@ -183,7 +183,6 @@ class TextileArticleTest < ActiveSupport::TestCase
 
   def build_article(input = nil, options = {})
     article = build(TextileArticle, {:body => input}.merge(options))
-    article.valid? # trigger the xss terminate thingy
     article
   end
 

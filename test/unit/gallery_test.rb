@@ -110,14 +110,6 @@ class GalleryTest < ActiveSupport::TestCase
     assert_includes gallery.images(true), c.articles.find_by_name('rails.png')
   end
 
-  should 'not let pass javascript in the body' do
-    gallery = Gallery.new
-    gallery.body = "<script> alert(Xss!); </script>"
-    gallery.valid?
-
-    assert_no_match /(<script>)/, gallery.body
-  end
-
   should 'filter fields with white_list filter' do
     gallery = Gallery.new
     gallery.body = "<h1> Body </h1>"

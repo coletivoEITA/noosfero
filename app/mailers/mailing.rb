@@ -9,8 +9,6 @@ class Mailing < ActiveRecord::Base
 
   has_many :mailing_sents
 
-  xss_terminate :only => [ :subject, :body ], :with => 'white_list', :on => 'validation'
-
   after_create do |mailing|
     mailing.schedule
   end

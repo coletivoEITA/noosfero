@@ -184,25 +184,6 @@ class CommentTest < ActiveSupport::TestCase
     assert comment.url[:view]
   end
 
-  should 'not fill fields with javascript' do
-    owner = create_user('testuser').person
-    article = owner.articles.create!(:name => 'test', :body => '...')
-    javascript = "<script>alert('XSS')</script>"
-    comment = Comment.new(:source => article, :name => javascript, :title => javascript, :body => javascript, :email => 'cracker@test.org')
-    comment.valid?
-    assert_no_match(/<script>/, comment.name)
-  end
-
-  should 'sanitize required fields before validation' do
-    owner = create_user('testuser').person
-    article = owner.articles.create(:name => 'test', :body => '...')
-    comment = build(Comment, :article => article, :title => '<h1 title </h1>', :body => '<h1 body </h1>', :name => '<h1 name </h1>', :email => 'cracker@test.org')
-    comment.valid?
-
-    assert comment.errors[:name.to_s].present?
-    assert comment.errors[:body.to_s].present?
-  end
-
   should 'use an existing image for deleted comments' do
     image = Comment.new.removed_user_image[1..-1]
     assert File.exists?(Rails.root.join('public', image)), "#{image} does not exist."

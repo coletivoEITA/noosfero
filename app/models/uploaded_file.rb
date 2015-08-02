@@ -30,7 +30,7 @@ class UploadedFile < Article
   end
 
   def first_paragraph
-    ''
+    ''.html_safe
   end
 
   def self.max_size

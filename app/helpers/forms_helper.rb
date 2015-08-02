@@ -25,7 +25,7 @@ module FormsHelper
   end
 
   def submit_button(type, label, html_options = {})
-    bt_cancel = html_options[:cancel] ? button(:cancel, _('Cancel'), html_options[:cancel]) : ''
+    bt_cancel = if html_options[:cancel] then button :cancel, _('Cancel'), html_options[:cancel] else ''.html_safe end
 
     html_options[:class] = [html_options[:class], 'submit'].compact.join(' ')
 
@@ -50,14 +50,14 @@ module FormsHelper
 
   def select_city( simple=false )
     states = State.find(:all, :order => 'name')
-    
+
     state_id = 'state-' + FormsHelper.next_id_number
     city_id = 'city-' + FormsHelper.next_id_number
 
     if states.length < 1
       return
     end
-    
+
     if simple
       states = [State.new(:name => _('Select the State'))] + states
       cities = [City.new(:name => _('Select the City'))]
@@ -81,7 +81,7 @@ module FormsHelper
       states = [State.new(:name => '---')] + states
       cities = [City.new(:name => '---')]
 
-      html = 
+      html =
       content_tag( 'div',
                    labelled_select( _('State:'), 'state', :id, :name, nil, states, :id => state_id ),
                    :class => 'select_state_for_origin' ) +
@@ -89,7 +89,7 @@ module FormsHelper
                    labelled_select( _('City:'), 'city', :id, :name, nil, cities, :id => city_id ),
                    :class => 'select_city_for_origin' )
     end
-    
+
     html +
     observe_field( state_id, :update => city_id, :function => "new Ajax.Updater(#{city_id.inspect}, #{url_for(:controller => 'search', :action => 'cities').inspect}, {asynchronous:true, evalScripts:true, parameters:'state_id=' + value}); $(#{city_id.inspect}).innerHTML = '<option>#{_('Loading...')}</option>'", :with => 'state_id')
   end
@@ -126,14 +126,14 @@ module FormsHelper
       counter += 1
       row << item
       if counter % per_row == 0
-        rows << content_tag('tr', row.join("\n"))
+        rows << content_tag(:tr, row.safe_join)
         counter = 0
         row = []
       end
     end
-    rows << content_tag('tr', row.join("\n"))
+    rows << content_tag(:tr, row.safe_join)
 
-    content_tag('table',rows.join("\n"))
+    content_tag(:table, rows.safe_join)
   end
 
   def date_field(name, value, format = '%Y-%m-%d', datepicker_options = {}, html_options = {})

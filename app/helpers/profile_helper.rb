@@ -72,10 +72,10 @@ module ProfileHelper
     force = FORCE[kind].include?(field)
     multiple = MULTIPLE[kind].include?(field)
     unless force || profile.may_display_field_to?(field, user)
-      return ''
+      return ''.html_safe
     end
     value = begin profile.send(field) rescue nil end
-    return '' if value.blank?
+    return ''.html_safe if value.blank?
     if value.kind_of?(Hash)
       content = self.send("treat_#{field}", value)
       content_tag('tr', content_tag('td', title(field), :class => 'field-name') + content_tag('td', content))
@@ -86,7 +86,7 @@ module ProfileHelper
         unless content.blank?
           content_tag('tr', content_tag('td', title(field, entry), :class => 'field-name') + content_tag('td', content))
         end
-      end.join("\n")
+      end.safe_join
     end
   end
 
@@ -133,7 +133,7 @@ module ProfileHelper
   end
 
   def treat_admins(admins)
-    profile.admins.map { |admin| link_to(admin.short_name, admin.url)}.join(', ')
+    profile.admins.map{ |admin| link_to admin.short_name, admin.url }.safe_join(', ')
   end
 
   def treat_blogs(blog)
@@ -163,7 +163,7 @@ module ProfileHelper
   alias :image_galleries_custom_title :article_custom_title
 
   def interests_custom_title(interest)
-    ''
+    ''.html_safe
   end
 
   def method_missing(method, *args, &block)
@@ -181,9 +181,9 @@ module ProfileHelper
       contents = contents.delete_if(&:blank?)
 
       unless contents.empty?
-        content_tag('tr', content_tag('th', title(category), { :colspan => 2 })) + contents.join.html_safe
+        content_tag(:tr, content_tag(:th, title(category), colspan: 2)) + contents.safe_join
       else
-        ''
+        ''.html_safe
       end
     else
       super

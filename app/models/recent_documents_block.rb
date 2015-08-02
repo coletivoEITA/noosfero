@@ -27,7 +27,7 @@ class RecentDocumentsBlock < Block
     title = self.title
     proc do
       block_title(title) +
-        content_tag('ul', docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+        content_tag(:ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join)
     end
   end
 

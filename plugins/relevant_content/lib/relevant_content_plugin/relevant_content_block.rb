@@ -32,7 +32,7 @@ class RelevantContentPlugin::RelevantContentBlock < Block
       if !docs.blank?
         subcontent = ""
         subcontent += content_tag(:span, _("Most read articles"), :class=>"title mread") + "\n"
-        subcontent += content_tag(:ul, docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+        subcontent += content_tag :ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join
         content += content_tag(:div, subcontent, :class=>"block mread") + "\n"
       end
     end
@@ -42,7 +42,7 @@ class RelevantContentPlugin::RelevantContentBlock < Block
       if !docs.blank?
         subcontent = ""
         subcontent += content_tag(:span, _("Most commented articles"), :class=>"title mcommented") + "\n"
-        subcontent += content_tag(:ul, docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+        subcontent += content_tag :ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join
         content += content_tag(:div, subcontent, :class=>"block mcommented") + "\n"
       end
     end
@@ -59,7 +59,7 @@ class RelevantContentPlugin::RelevantContentBlock < Block
         if !docs.blank?
           subcontent = ""
           subcontent += content_tag(:span, _("Most liked articles"), :class=>"title mliked") + "\n"
-          subcontent += content_tag(:ul, docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+          subcontent += content_tag :ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join
           content += content_tag(:div, subcontent, :class=>"block mliked") + "\n"
         end
       end
@@ -68,7 +68,7 @@ class RelevantContentPlugin::RelevantContentBlock < Block
         if !docs.blank?
           subcontent = ""
           subcontent += content_tag(:span, _("Most disliked articles"), :class=>"title mdisliked") + "\n"
-          subcontent += content_tag(:ul, docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+          subcontent += content_tag :ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join
           content += content_tag(:div, subcontent, :class=>"block mdisliked") + "\n"
         end
       end
@@ -78,7 +78,7 @@ class RelevantContentPlugin::RelevantContentBlock < Block
         if !docs.blank?
           subcontent = ""
           subcontent += content_tag(:span, _("Most voted articles"), :class=>"title mvoted") + "\n"
-          subcontent += content_tag(:ul, docs.map {|item| content_tag('li', link_to(h(item.title), item.url))}.join("\n"))
+          subcontent += content_tag :ul, docs.map{ |item| content_tag :li, link_to(h(item.title), item.url) }.safe_join
           content += content_tag(:div, subcontent, :class=>"block mvoted") + "\n"
         end
       end

@@ -93,7 +93,7 @@ module MacrosHelper
       when 'select'
         labelled_form_field(label_name, select_tag(field[:name], options_for_select(field[:values], field[:default])))
       end
-    end.join("\n")
+    end.safe_join
   end
 
 end

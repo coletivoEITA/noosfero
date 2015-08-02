@@ -41,8 +41,6 @@ class Community < Organization
     community
   end
 
-  xss_terminate :only => [ :name, :address, :contact_phone, :description ], :on => 'validation'
-
   FIELDS = %w[
     language
   ]

@@ -33,7 +33,7 @@
   [ [ profile.city, 'locality' ],
     [ profile.state, 'region' ],
     [ profile.country_name, 'country-name' ]
-  ].map{ |s,c| s =~ /^\s*$/ ? nil : content_tag( 'span', s, :class => c ) }.compact.join ' - '
+  ].map{ |s,c| if s =~ /^\s*$/ then nil else content_tag :span, s, class: c end }.safe_join ' - '
 %>
 </div>
 <% end %>

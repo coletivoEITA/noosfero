@@ -60,10 +60,13 @@ class LinkListBlock < Block
   end
 
   def content(args={})
-    block_title(title) +
-    content_tag('ul',
-      links.select{|i| !i[:name].blank? and !i[:address].blank?}.map{|i| content_tag('li', link_html(i))}.join
-    )
+    block = self
+    lambda do |args|
+      block_title(block.title) +
+        (content_tag :ul do
+        block.links.select{ |i| i[:name].present? and i[:address].present? }.map{|i| content_tag :li, block.link_html(i) }.safe_join
+      end)
+    end
   end
 
   def link_html(link)
@@ -103,7 +106,7 @@ class LinkListBlock < Block
 
   def sanitize_link(text)
     sanitizer = HTML::WhiteListSanitizer.new
-    sanitizer.sanitize(text)
+    sanitizer.sanitize(text).html_safe
   end
 
 end

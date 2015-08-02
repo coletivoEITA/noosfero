@@ -30,15 +30,14 @@ module LayoutHelper
   def noosfero_javascript
     plugins_javascripts = @plugins.flat_map{ |plugin| Array.wrap(plugin.js_files).map{ |js| plugin.class.public_path(js, true) } }.flatten
 
-    output = ''
-    output += render 'layouts/javascript'
+    output = render 'layouts/javascript'
     unless plugins_javascripts.empty?
-      output += javascript_include_tag *plugins_javascripts
+      output << javascript_include_tag(*plugins_javascripts)
     end
-    output += theme_javascript_ng.to_s
-    output += javascript_tag 'render_all_jquery_ui_widgets()'
+    output << theme_javascript_ng.to_s
+    output << javascript_tag('render_all_jquery_ui_widgets()')
 
-    output += templete_javascript_ng.to_s
+    output << templete_javascript_ng.to_s
 
     output
   end
@@ -50,8 +49,7 @@ module LayoutHelper
     global_css_pub = "/designs/themes/#{environment.theme}/global.css"
     global_css_at_fs = Rails.root.join 'public' + global_css_pub
 
-    output = []
-    output << stylesheet_link_tag('application')
+    output = stylesheet_link_tag 'application'
     output << stylesheet_link_tag(template_stylesheet_path)
     output << stylesheet_link_tag(*icon_theme_stylesheet_path)
     output << stylesheet_link_tag(jquery_ui_theme_stylesheet_path)
@@ -64,7 +62,8 @@ module LayoutHelper
       output << stylesheet_link_tag(global_css_pub)
     end
     output << stylesheet_link_tag(theme_stylesheet_path)
-    output.join "\n"
+
+    output
   end
 
   def noosfero_layout_features

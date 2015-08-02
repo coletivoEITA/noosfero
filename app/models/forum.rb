@@ -70,9 +70,9 @@ class Forum < Folder
   end
 
   def first_paragraph
-    return '' if body.blank?
+    return ''.html_safe if body.blank?
     paragraphs = Nokogiri::HTML.fragment(body).css('p')
-    paragraphs.empty? ? '' : paragraphs.first.to_html
+    paragraphs.empty? ? ''.html_safe : paragraphs.first.to_html
   end
 
   def add_agreed_user(user)
