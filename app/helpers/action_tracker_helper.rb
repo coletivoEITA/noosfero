@@ -10,7 +10,7 @@ module ActionTrackerHelper
       name: ta.collect_group_with_index(:friend_name) do |n,i|
         link_to image_tag(ta.get_friend_profile_custom_icon[i] || default_or_themed_icon("/images/icons-app/person-icon.png")),
                 ta.get_friend_url[i], title: n
-      end.join
+      end.safe_join
     }
   end
 
@@ -20,7 +20,7 @@ module ActionTrackerHelper
       name: ta.collect_group_with_index(:resource_name) do |n,i|
         link_to image_tag(ta.get_resource_profile_custom_icon[i] || default_or_themed_icon("/images/icons-app/community-icon.png")),
                 ta.get_resource_url[i], title: n
-      end.join
+      end.safe_join
     }
   end
 
@@ -45,7 +45,7 @@ module ActionTrackerHelper
             style: "background-image:url(#{t})",
             class: "upimg pos#{pos} #{morethen2} #{morethen5}"
         end
-      end.reverse.join +
+      end.reverse.safe_join +
       if total <= 5 then ''.html_safe else content_tag :span, '&hellip;'.html_safe,
         class: 'more', onclick: "this.parentNode.className+=' show-all'" end +
       tag(:br, style: 'clear: both')
