@@ -301,7 +301,7 @@ class ProfileController < PublicController
   end
 
   def register_report
-    unless user.is_admin? || verify_recaptcha
+    unless @user_is_admin || verify_recaptcha
       render :text => {
         :ok => false,
         :error => {
