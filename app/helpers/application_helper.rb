@@ -282,7 +282,7 @@ module ApplicationHelper
     options[:class].nil? ?
       options[:class]='button-bar' :
       options[:class]+=' button-bar'
-    concat(content_tag('div', capture(&block).to_s + tag('br', :style => 'clear: left;'), options))
+    content_tag :div, capture(&block).html_safe + tag(:br, style: 'clear: left;'), options
   end
 
   def render_profile_actions klass
@@ -1323,7 +1323,9 @@ module ApplicationHelper
     return hidden_field_tag("#{field_name}[template_id]", templates.first.id) if templates.count == 1
 
     radios = templates.map do |template|
-      content_tag('li', labelled_radio_button(link_to(template.name, template.url, :target => '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template)))
+      content_tag :li do
+        labelled_radio_button link_to(template.name, template.url, target: '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template)
+      end
     end.safe_join
 
     content_tag('div', content_tag('label', _('Profile organization'), :for => 'template-options', :class => 'formlabel') +

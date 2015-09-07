@@ -51,7 +51,7 @@ class FeedReaderBlock < Block
   def default_title
     self.feed_title.nil? ? _('Feed Reader') : self.feed_title
   end
-
+  include ActionView::Helpers::TagHelper
   def formatted_feed_content
     if error_message.blank?
       content_tag :ul do

@@ -883,32 +883,6 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal [ published ], profile.articles.published
   end
 
-  should 'sanitize tags after save article' do
-    article = fast_create(Article, :slug => 'article-with-tags', :profile_id => profile.id)
-    tag = build(Tag, name: "TV Web w<script type='javascript'></script>")
-    assert_match /[<>]/, tag.name
-    article.tag_list.add(tag.name)
-    article.save!
-    assert_no_match /[<>]/, article.tags.last.name
-  end
-
-  should 'strip HTML from tag names after save article' do
-    article = fast_create(Article, :slug => 'article-with-tags', :profile_id => profile.id)
-    tag = build(Tag, name: "TV Web w<script type=...")
-    assert_match /</, tag.name
-    article.tag_list.add(tag.name)
-    article.save!
-    assert_no_match /</, article.tags.last.name
-  end
-
-  should 'sanitize name before validation' do
-    article = Article.new
-    article.name = "<h1 Bla </h1>"
-    article.valid?
-
-    assert_no_match /<[^>]*</, article.name
-  end
-
   should 'not doubly escape quotes in the name' do
     person = fast_create(Person)
     community = fast_create(Community)
@@ -921,13 +895,6 @@ class ArticleTest < ActiveSupport::TestCase
     published.name = 'title with "quotes"'
     published.save
     assert_equal 'title with "quotes"', published.name
-  end
-
-  should 'remove script tags from name' do
-    a = build(Article, :name => 'hello <script>alert(1)</script>')
-    a.valid?
-
-    assert_no_match(/<script>/, a.name)
   end
 
   should 'return truncated title in short_title' do

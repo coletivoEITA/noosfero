@@ -825,7 +825,7 @@ class ApplicationHelperTest < ActionView::TestCase
   should 'envelop a html with button-bar div' do
     result = button_bar { '<b>foo</b>' }
     assert_equal '<div class="button-bar"><b>foo</b>'+
-                 '<br style=\'clear: left;\' /></div>', result
+                 '<br style="clear: left;" /></div>', result
   end
 
   should 'add more classes to button-bar envelope' do
@@ -833,7 +833,7 @@ class ApplicationHelperTest < ActionView::TestCase
       '<b>foo</b>'
     end
     assert_equal '<div class="test button-bar"><b>foo</b>'+
-                 '<br style=\'clear: left;\' /></div>', result
+                 '<br style="clear: left;" /></div>', result
   end
 
   should 'add more attributes to button-bar envelope' do
@@ -1009,9 +1009,9 @@ class ApplicationHelperTest < ActionView::TestCase
 
   should 'enable fullscreen buttons' do
     html = fullscreen_buttons("#article")
-    assert html.include?("<script>fullscreenPageLoad('#article')</script>")
+    assert html =~ /fullscreenPageLoad\('#article'\)/
     assert html.include?("class=\"button with-text icon-fullscreen\"")
-    assert html.include?("onClick=\"toggle_fullwidth('#article')\"")
+    assert html.include?("onClick=\"toggle_fullwidth(&#39;#article&#39;)\"")
   end
 
   should "return the related class string" do

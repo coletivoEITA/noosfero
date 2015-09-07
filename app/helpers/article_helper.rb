@@ -21,7 +21,7 @@ module ArticleHelper
         check_box(:article, :allow_members_to_edit) +
         content_tag('label', _('Allow all members to edit this article'), :for => 'article_allow_members_to_edit')
       ) :
-      '') +
+      ''.html_safe) +
 
       content_tag(
         'div',
@@ -136,7 +136,7 @@ module ArticleHelper
             :pre_populate => tokenized_children
           }
         )
-      ) : '')
+      ) : ''.html_safe)
   end
 
   def prepare_to_token_input(array)
