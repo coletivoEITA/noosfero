@@ -12,6 +12,7 @@ rvm:
 
 sudo: false
 addons:
+  firefox: '38.0'
   apt:
     packages:
       - po4a
