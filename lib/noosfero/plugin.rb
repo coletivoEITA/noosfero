@@ -73,7 +73,7 @@ class Noosfero::Plugin
             controllers/myprofile
             controllers/admin
         ].each do |folder|
-          config.autoload_paths << File.join(dir, folder)
+          #config.autoload_paths << File.join(dir, folder)
         end
         [ config.autoload_paths, $:].each do |path|
           path << File.join(dir, 'models')
@@ -89,7 +89,7 @@ class Noosfero::Plugin
         end
 
         # add view path
-        config.paths['app/views'].unshift File.join(dir, 'views')
+        #config.paths['app/views'].unshift Rails::Paths::Root.new File.join(dir, 'views')
       end
     end
 

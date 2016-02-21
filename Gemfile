@@ -2,23 +2,24 @@ source "https://rubygems.org"
 
 platform :ruby do
   gem 'pg',                     '~> 0.17'
-  gem 'rmagick',                '~> 2.13'
+  gem 'rmagick'
 end
 platform :jruby do
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'rmagick4j'
 end
 
-gem 'rails',                    '~> 4.2.4'
+gem 'rails', '5.0.0.beta2'
 gem 'fast_gettext',             '~> 0.9'
-gem 'acts-as-taggable-on',      '~> 3.5'
+gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on'
 gem 'rails_autolink',           '~> 1.1.5'
 gem 'RedCloth',                 '~> 4.2'
 gem 'ruby-feedparser',          '~> 0.7'
 gem 'daemons',                  '~> 1.1'
-gem 'unicorn',                  '~> 4.8'
+# FIXME: rails5: don't work with rack 2
+#gem 'unicorn',                  '~> 4.8'
 gem 'nokogiri',                 '~> 1.6.0'
-gem 'will_paginate',            '~> 3.0.7'
+gem 'will_paginate'
 gem 'pothoven-attachment_fu',   '~> 3.2.16'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
@@ -28,7 +29,6 @@ gem 'exception_notification',   '~> 4.0.1'
 gem 'gettext',                  '~> 3.1', :require => false
 gem 'locale',                   '~> 2.1'
 gem 'whenever', :require => false
-gem 'eita-jrails', '~> 0.10.0', require: 'jrails'
 gem 'diffy',                    '~> 3.0'
 gem 'slim'
 gem 'activerecord-session_store', ('1.0.0.pre' if RUBY_VERSION >= '2.3.0')
@@ -38,7 +38,8 @@ gem 'grape',                    '~> 0.12'
 gem 'grape-entity',             '0.4.8'
 gem 'grape_logging'
 gem 'rack-cors'
-gem 'rack-contrib'
+# FIXME: rails5: don't work with rack 2
+#gem 'rack-contrib'
 gem 'api-pagination',           '>= 4.1.1'
 gem 'liquid',                    '~> 3.0.3'
 
@@ -49,7 +50,7 @@ gem 'sprockets-rails', '~> 2.1'
 
 # gems to enable rails3 behaviour
 gem 'protected_attributes'
-gem 'rails-observers'
+gem 'rails-observers', github: 'rails/rails-observers'
 gem 'actionpack-page_caching'
 gem 'actionpack-action_caching'
 
@@ -62,9 +63,9 @@ group :development, :test do
 end
 
 group :test do
-  gem 'rspec',                  '~> 3.3', require: false
-  gem 'rspec-rails',            '~> 3.2', require: false
-  gem 'mocha',                  '~> 1.1.0', :require => false
+  gem 'rspec',                              require: false
+  gem 'rspec-rails',                        require: false
+  gem 'mocha',                  '~> 1.1.0', require: false
   gem 'test-unit' if RUBY_VERSION >= '2.2.0'
   gem 'minitest'
   gem 'minitest-reporters'

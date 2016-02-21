@@ -20,6 +20,7 @@ rails_app = Rack::Builder.new do
 end
 
 run Rack::Cascade.new([
-  Api::App,
+  # FIXME: rails5: missing rack-contrib, see Gemfile
+  #Api::App,
   rails_app
 ])
