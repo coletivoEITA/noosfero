@@ -74,7 +74,7 @@ module ActsAsSearchable
               db_options[:conditions] = "#{table_name}.id in (#{ids.join(', ')})"
             end
 
-            results = find(:all, db_options)
+            results = all db_options
           end
         end
 
