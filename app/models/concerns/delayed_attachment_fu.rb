@@ -1,3 +1,5 @@
+require 'create_thumbnails_job'
+
 module DelayedAttachmentFu
 
   module ClassMethods

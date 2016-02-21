@@ -1,4 +1,5 @@
 class Role < ApplicationRecord
+end
 class RoleWithEnvironment < ApplicationRecord
   self.table_name = 'roles'
   belongs_to :environment
@@ -18,10 +19,10 @@ class AddEnviromentIdToRole < ActiveRecord::Migration
         re = RoleWithEnvironment.new(role.attributes)
         re.environment = env
         re.save
-        RoleAssignment.where(role_id: role.id).select{|ra| ra.resource && (ra.resource.kind_of?(Profile) ? ra.resource.environment_id : ra.resource.id) == env.id }.each do |ra|
-          ra.role_id = re.id
-          ra.save
-        end
+        RoleAssignment \
+          .where(role_id: role.id)
+          .select{ |ra| ra.resource && (ra.resource.kind_of?(Profile) ? ra.resource.environment_id : ra.resource.id) == env.id }
+          .each{ |ra| ra.role_id = re.id; ra.save }
       end
     end
     roles.each(&:destroy)

@@ -2,7 +2,7 @@ module PostgresqlAttachmentFu
 
   module ClassMethods
     def postgresql_attachment_fu
-      send :include, InstanceMethods
+      include InstanceMethods
     end
   end
 
