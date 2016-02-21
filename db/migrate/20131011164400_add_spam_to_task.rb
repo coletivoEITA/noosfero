@@ -3,7 +3,7 @@ class AddSpamToTask < ActiveRecord::Migration
     change_table :tasks do |t|
       t.boolean :spam, :default => false
     end
-    Task.update_all ["spam = ?", false]
+    Task.update_all spam: false
     add_index :tasks, [:spam]
   end
 
