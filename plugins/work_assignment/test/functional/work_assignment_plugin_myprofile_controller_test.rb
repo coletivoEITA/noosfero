@@ -22,16 +22,7 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
     work_assignment.save!
     assert_equal false, work_assignment.allow_visibility_edition
     parent = work_assignment.find_or_create_author_folder(@person)
-    UploadedFile.create(
-            {
-              :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'),
-              :profile => @organization,
-              :parent => parent,
-              :last_changed_by => @person,
-              :author => @person,
-            },
-            :without_protection => true
-          )
+    create_uploaded_file
     submission = UploadedFile.find_by filename: 'test.txt'
     assert_equal false, submission.published
     assert_equal false, submission.parent.published
@@ -67,16 +58,7 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
     assert_equal true, work_assignment.allow_visibility_edition
     work_assignment.save!
     parent = work_assignment.find_or_create_author_folder(@person)
-    UploadedFile.create(
-            {
-              :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'),
-              :profile => @organization,
-              :parent => parent,
-              :last_changed_by => @person,
-              :author => @person,
-            },
-            :without_protection => true
-          )
+    create_uploaded_file
     logout
     submission = UploadedFile.find_by filename: 'test.txt'
     assert_equal false, submission.parent.published
@@ -95,18 +77,8 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
     @organization.add_member(@person) # current_user is a member
     work_assignment = create_work_assignment('Another Work Assignment', @organization, nil, true)
     parent = work_assignment.find_or_create_author_folder(@person)
-    UploadedFile.create(
-            {
-              :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'),
-              :profile => @organization,
-              :parent => parent,
-              :last_changed_by => @person,
-              :author => @person,
-            },
-            :without_protection => true
-          )
+    create_uploaded_file
     logout
-
 
     other_person = create_user('other_user').person
     @organization.add_member(other_person)
@@ -133,16 +105,7 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
     @organization.add_member(other_person)
     work_assignment = create_work_assignment('Another Work Assignment', @organization, false,  true)
     parent = work_assignment.find_or_create_author_folder(@person)
-    UploadedFile.create(
-            {
-              :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'),
-              :profile => @organization,
-              :parent => parent,
-              :last_changed_by => @person,
-              :author => @person,
-            },
-            :without_protection => true
-          )
+    create_uploaded_file
     submission = UploadedFile.find_by filename: 'test.txt'
     assert_equal false, submission.article_privacy_exceptions.include?(other_person)
     post :edit_visibility, :profile => @organization.identifier, :article_id  => parent.id, :article => { :published => false }, :q => other_person.id
@@ -155,16 +118,7 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
     @organization.add_member(@person) # current_user is a member
     work_assignment = create_work_assignment('Work Assignment', @organization, nil, true)
     parent = work_assignment.find_or_create_author_folder(@person)
-    UploadedFile.create(
-            {
-              :uploaded_data => fixture_file_upload('/files/test.txt', 'text/plain'),
-              :profile => @organization,
-              :parent => parent,
-              :last_changed_by => @person,
-              :author => @person,
-            },
-            :without_protection => true
-          )
+    create_uploaded_file
     @organization.remove_member(@person)
     submission = UploadedFile.find_by filename: 'test.txt'
 
@@ -182,7 +136,18 @@ class WorkAssignmentPluginMyprofileControllerTest < ActionController::TestCase
   end
 
   private
-    def create_work_assignment(name = nil, profile = nil, publish_submissions = nil, allow_visibility_edition = nil)
-      @work_assignment = WorkAssignmentPlugin::WorkAssignment.create!(:name => name, :profile => profile, :publish_submissions => publish_submissions, :allow_visibility_edition => allow_visibility_edition)
-    end
+
+  def create_work_assignment(name = nil, profile = nil, publish_submissions = nil, allow_visibility_edition = nil)
+    @work_assignment = WorkAssignmentPlugin::WorkAssignment.create!(:name => name, :profile => profile, :publish_submissions => publish_submissions, :allow_visibility_edition => allow_visibility_edition)
+  end
+
+  def create_uploaded_file
+    UploadedFile.create(
+      uploaded_data:   fixture_file_upload('/files/test.txt', 'text/plain'),
+      profile:         @organization,
+      parent:          parent,
+      last_changed_by: @person,
+      author:          @person,
+    )
+  end
 end

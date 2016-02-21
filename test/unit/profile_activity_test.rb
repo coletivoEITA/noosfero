@@ -10,7 +10,6 @@ class ProfileActivityTest < ActiveSupport::TestCase
     profile = fast_create Person
     target = fast_create Person
 
-    ActionTracker::Record.attr_accessible :created_at, :updated_at
     tracker = ActionTracker::Record.create! verb: :leave_scrap, user: profile, target: target, created_at: Time.now-2.days, updated_at: Time.now-1.day
 
     pa = ProfileActivity.create! profile: profile, activity: tracker

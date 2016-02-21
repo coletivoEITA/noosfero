@@ -1,7 +1,5 @@
 class CommunitiesBlock < ProfileListBlock
 
-  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type
-
   def self.description
     _("<p>Display all of your communities.</p><p>You could choose the amount of communities will be displayed and you could priorize that profiles with images.</p> <p>The view all button is always present in the block.</p>")
   end

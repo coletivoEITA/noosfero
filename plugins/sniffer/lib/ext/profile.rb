@@ -10,9 +10,6 @@ class Profile
   }, through: :sniffer_opportunities, source: :product_category
 
   attr_accessor :sniffer_interested_product_category_string_ids
-  descendants.each do |k|
-    k.attr_accessible :sniffer_interested_product_category_string_ids
-  end
 
   def sniffer_interested_product_category_string_ids
     ''

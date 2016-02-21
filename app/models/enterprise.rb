@@ -1,8 +1,5 @@
 class Enterprise < Organization
 
-  attr_accessible :business_name, :address_reference, :district, :tag_list,
-    :organization_website, :historic_and_current_context, :activities_short_description
-
   SEARCH_FILTERS = {
     :order => %w[more_recent more_popular more_active],
     :display => %w[compact full map]

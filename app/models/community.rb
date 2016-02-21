@@ -1,8 +1,5 @@
 class Community < Organization
 
-  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type
-  attr_accessible :address_reference, :district, :tag_list, :language, :description
-
   after_destroy :check_invite_member_for_destroy
 
   def self.type_name

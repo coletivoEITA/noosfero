@@ -4,8 +4,6 @@ class CustomFormsPlugin::Field < ApplicationRecord
   validates_presence_of :name
   validates_length_of :default_value, :maximum => 255
 
-  attr_accessible :name, :form, :mandatory, :type, :position, :default_value, :show_as, :alternatives_attributes
-
   belongs_to :form, :class_name => 'CustomFormsPlugin::Form'
   has_many :answers, :class_name => 'CustomFormsPlugin::Answer', :dependent => :destroy
 

@@ -7,8 +7,6 @@ class CommunityTrackPlugin::TrackListBlock < Block
   settings_items :category_ids, :type => Array, :default => []
   settings_items :order, :type => :string, :default => 'hits'
 
-  attr_accessible :more_another_page, :category_ids, :order
-
   def self.description
     _('Track List')
   end

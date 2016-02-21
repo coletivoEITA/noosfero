@@ -5,8 +5,6 @@ class ProfileMembersHeadlinesBlock < Block
   settings_items :navigation, :type => 'boolean', :default => true
   settings_items :filtered_roles, :type => Array, :default => []
 
-  attr_accessible :interval, :limit, :navigation, :filtered_roles
-
   def self.description
     _('Display headlines from members of a community')
   end

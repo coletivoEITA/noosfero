@@ -11,8 +11,6 @@ module ProductsPlugin
     has_many :products
     has_many :inputs
 
-    attr_accessible :name, :parent, :environment
-
     scope :unique, -> { select 'DISTINCT ON (path) categories.*' }
     scope :by_enterprise, -> enterprise {
       distinct.joins(:products).

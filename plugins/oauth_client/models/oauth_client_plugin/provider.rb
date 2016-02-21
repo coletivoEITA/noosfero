@@ -13,10 +13,6 @@ class OauthClientPlugin::Provider < ApplicationRecord
   settings_items :site, type: String
   settings_items :client_options, type: Hash
 
-  attr_accessible :name, :strategy, :enabled, :site, :image_builder,
-    :environment, :environment_id, :options,
-    :client_id, :client_secret, :client_options
-
   scope :enabled, -> { where enabled: true }
 
 end

@@ -1,7 +1,5 @@
 class NewsletterPlugin::NewsletterMailing < EnvironmentMailing
 
-  attr_accessible :source, :person, :locale
-
   validates_presence_of :person
 
   def url

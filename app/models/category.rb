@@ -1,7 +1,5 @@
 class Category < ApplicationRecord
 
-  attr_accessible :name, :parent_id, :display_color, :display_in_menu, :image_builder, :environment, :parent
-
   SEARCHABLE_FIELDS = {
     :name => {:label => _('Name'), :weight => 10},
     :acronym => {:label => _('Acronym'), :weight => 5},

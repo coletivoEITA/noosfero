@@ -5,8 +5,6 @@ class SearchTerm < ApplicationRecord
   belongs_to :context, :polymorphic => true
   has_many :occurrences, :class_name => 'SearchTermOccurrence'
 
-  attr_accessible :term, :context, :asset
-
   def self.calculate_scores
     os = occurrences_scores
     find_each { |search_term| search_term.calculate_score(os) }

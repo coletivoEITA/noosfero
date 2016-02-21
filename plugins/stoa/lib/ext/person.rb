@@ -1,7 +1,6 @@
 require_dependency 'person'
 
 class Person
-  attr_accessible :usp_id, :invitation_code
 
   SEARCHABLE_FIELDS[:usp_id] = {:label => _('USP Number'), :weight => 5}
 
@@ -23,4 +22,5 @@ class Person
     Task.pending.where(code: invitation_code.to_s).first or
       Task.finished.where(code: invitation_code.to_s, target_id: id).first
   end
+
 end

@@ -3,8 +3,6 @@ class ProfileSuggestion < ApplicationRecord
   belongs_to :person
   belongs_to :suggestion, :class_name => 'Profile', :foreign_key => :suggestion_id
 
-  attr_accessible :person, :suggestion, :suggestion_type, :categories, :enabled
-
   has_many :suggestion_connections, :foreign_key => 'suggestion_id'
   has_many :profile_connections, :through => :suggestion_connections, :source => :connection, :source_type => 'Profile'
   has_many :tag_connections, :through => :suggestion_connections, :source => :connection, :source_type => 'ActsAsTaggableOn::Tag'
@@ -69,7 +67,6 @@ class ProfileSuggestion < ApplicationRecord
 
   RULES.keys.each do |rule|
     settings_items rule
-    attr_accessible rule
   end
 
   # Number of suggestions by rule
@@ -123,7 +120,7 @@ class ProfileSuggestion < ApplicationRecord
 
     suggested_profiles.each do |suggested_profile|
       suggestion   = person.suggested_profiles.find_by suggestion_id: suggested_profile.id
-      suggestion ||= person.suggested_profiles.build({suggestion_id: suggested_profile.id}, without_protection: true)
+      suggestion ||= person.suggested_profiles.build suggestion_id: suggested_profile.id
       RULES.each do |rule, options|
         begin
           value = suggested_profile.send("#{rule}_count").to_i

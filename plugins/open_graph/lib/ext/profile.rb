@@ -2,11 +2,8 @@ require_dependency 'profile'
 # hate to wrte this, but without Noosfero::Plugin::Settings is loaded instead
 require 'open_graph_plugin/settings'
 
-# attr_accessible must be defined on subclasses
 Profile.descendants.each do |subclass|
   subclass.class_eval do
-    attr_accessible :open_graph_settings
-
     has_many :open_graph_tracks, class_name: 'OpenGraphPlugin::Track', source: :tracker_id, foreign_key: :tracker_id
 
     has_many :open_graph_activities, class_name: 'OpenGraphPlugin::Activity', source: :tracker_id, foreign_key: :tracker_id
@@ -21,9 +18,6 @@ Profile.descendants.each do |subclass|
       association = klass.association
       has_many association, class_name: klass.name, foreign_key: :tracker_id
       accepts_nested_attributes_for association, allow_destroy: true, reject_if: :open_graph_reject_empty_object_type
-
-      attr_accessible attributes
-      attr_accessible profile_ids
     end
   end
 end

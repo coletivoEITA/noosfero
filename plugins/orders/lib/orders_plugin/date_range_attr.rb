@@ -15,7 +15,6 @@ module OrdersPlugin
         options[:dummy] = true if options[:dummy].nil?
 
         range_attr = self.date_range_attr_for start_field, end_field
-        attr_accessible range_attr
 
         define_method range_attr do
           return if options[:dummy]

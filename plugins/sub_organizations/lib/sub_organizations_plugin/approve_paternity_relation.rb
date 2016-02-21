@@ -6,8 +6,6 @@ class SubOrganizationsPlugin::ApprovePaternityRelation < ApplicationRecord
 
   validates_presence_of :task, :parent, :child
 
-  attr_accessible :task, :parent, :child
-
   class << self
     def parent_approval(task)
       find_by_task_id(task.id).parent

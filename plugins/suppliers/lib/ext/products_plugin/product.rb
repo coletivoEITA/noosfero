@@ -28,17 +28,11 @@ class Product
     ProductCategory.find products.collect(&:product_category_id).compact.select{ |id| not id.zero? }
   end
 
-  attr_accessible :external_id
   settings_items :external_id, type: String, default: nil
-
-  # should be on core, used by SuppliersPlugin::Import
-  attr_accessible :price_details
 
 end
 
 class Product
-
-  attr_accessible :from_products, :from_product, :supplier_id, :supplier
 
   has_many :sources_from_products, foreign_key: :to_product_id, class_name: 'SuppliersPlugin::SourceProduct', dependent: :destroy
   has_one  :sources_from_product,  foreign_key: :to_product_id, class_name: 'SuppliersPlugin::SourceProduct'

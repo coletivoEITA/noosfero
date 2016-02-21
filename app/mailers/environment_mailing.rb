@@ -1,7 +1,6 @@
 class EnvironmentMailing < Mailing
 
   settings_items :recipients_roles, :type => :array
-  attr_accessible :recipients_roles
 
   def recipients(offset=0, limit=100)
     recipients_by_role.order(:id).offset(offset).limit(limit)

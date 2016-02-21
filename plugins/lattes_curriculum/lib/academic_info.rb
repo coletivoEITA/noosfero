@@ -2,7 +2,6 @@ class AcademicInfo < ApplicationRecord
 
   belongs_to :person
 
-  attr_accessible :lattes_url
   validate :lattes_url_validate?
 
   def lattes_url_validate?

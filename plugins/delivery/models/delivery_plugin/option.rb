@@ -6,6 +6,4 @@ class DeliveryPlugin::Option < ApplicationRecord
   validates_presence_of :delivery_method
   validates_presence_of :owner
 
-  attr_accessible :owner_id, :owner_type, :delivery_methods, :delivery_method
-
 end

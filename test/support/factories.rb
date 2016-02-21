@@ -44,7 +44,7 @@ module Noosfero::Factory
     data = defaults_for(name).merge(attrs)
     object = name.to_s.camelize.constantize.new
     if object.respond_to?(:assign_attributes)
-      object.assign_attributes(data, :without_protection => true)
+      object.assign_attributes data
     else
       data.each { |attribute, value| object.send(attribute.to_s+'=', value) }
     end

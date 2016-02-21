@@ -6,6 +6,4 @@ class Comment
 
   scope :in_group, -> group_id { where 'group_id = ?', group_id }
 
-  attr_accessible :group_id
-
 end

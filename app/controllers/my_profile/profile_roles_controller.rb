@@ -12,7 +12,7 @@ class ProfileRolesController < MyProfileController
   end
 
   def create
-    @role = Role.new({:name => params[:role][:name], :permissions => params[:role][:permissions], :environment => environment }, :without_protection => true)
+    @role = Role.new name: params[:role][:name], permissions: params[:role][:permissions], environment: environment
     if @role.save
       profile.custom_roles << @role
       redirect_to :action => 'show', :id => @role

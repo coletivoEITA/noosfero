@@ -1,7 +1,5 @@
 class ProfileImageBlock < Block
 
-  attr_accessible :show_name
-
   settings_items :show_name, :type => :boolean, :default => false
 
   def self.description

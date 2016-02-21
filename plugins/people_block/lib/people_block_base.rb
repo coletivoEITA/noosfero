@@ -3,7 +3,6 @@ class PeopleBlockBase < Block
   settings_items :limit, :type => :integer, :default => 6
   settings_items :name, :type => String, :default => ""
   settings_items :address, :type => String, :default => ""
-  attr_accessible :name, :address, :prioritize_profiles_with_image
 
   def self.description
     _('Random people')

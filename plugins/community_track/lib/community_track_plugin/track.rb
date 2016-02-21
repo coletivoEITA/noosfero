@@ -5,8 +5,6 @@ class CommunityTrackPlugin::Track < Folder
 
   validate :validate_categories
 
-  attr_accessible :goals, :expected_results
-
   def comments_count
     @comments_count = sum_children_comments self unless @comments_count
     @comments_count

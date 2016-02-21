@@ -2,9 +2,6 @@
 # cycle.products will go to an infinite loop
 class SuppliersPlugin::BaseProduct < Product
 
-  attr_accessible :default_margin_percentage, :margin_percentage, :default_unit, :unit_detail,
-    :supplier_product_attributes
-
   accepts_nested_attributes_for :supplier_product
 
   default_scope -> {

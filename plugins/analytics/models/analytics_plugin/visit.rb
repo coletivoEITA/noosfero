@@ -1,8 +1,5 @@
 class AnalyticsPlugin::Visit < ApplicationRecord
 
-  attr_accessible *self.column_names
-  attr_accessible :profile
-
   belongs_to :profile
   has_many :page_views, class_name: 'AnalyticsPlugin::PageView', dependent: :destroy
   has_many :users_page_views, -> { loaded_users }, class_name: 'AnalyticsPlugin::PageView', dependent: :destroy

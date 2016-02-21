@@ -1,6 +1,6 @@
 class PushNotificationPlugin::DeviceToken < ApplicationRecord
+
   belongs_to :user
-  attr_accessible :token, :device_name, :user
 
   after_save :check_notification_settings
 

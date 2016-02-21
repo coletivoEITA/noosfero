@@ -1,7 +1,6 @@
 class VideoPlugin::VideoGalleryBlock < Block
 
   settings_items :video_gallery_id, :type => :integer
-  attr_accessible :video_gallery_id
 
   include ActionView::Helpers
   include Rails.application.routes.url_helpers

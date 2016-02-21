@@ -2,8 +2,6 @@ require_dependency 'person'
 
 class Person
 
-  attr_accessible :lattes_url, :academic_info_attributes
-
   has_one :academic_info
 
   after_destroy do |person|

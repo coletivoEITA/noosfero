@@ -1,13 +1,10 @@
 # A person is the profile of an user holding all relationships with the rest of the system
 class Person < Profile
 
-  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone, :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference, :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization_website, :following_articles
-
   SEARCH_FILTERS = {
     :order => %w[more_recent more_popular more_active],
     :display => %w[compact]
   }
-
 
   def self.type_name
     _('Person')

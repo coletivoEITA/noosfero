@@ -3,8 +3,6 @@ class CommunityTrackPlugin::Step < Folder
   settings_items :hidden, :type => :boolean, :default => false
   settings_items :tool_type, :type => String
 
-  attr_accessible :start_date, :end_date, :tool_type, :hidden
-
   alias :tools :children
 
   acts_as_list scope: -> step { where parent_id: step.parent_id }

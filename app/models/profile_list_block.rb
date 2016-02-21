@@ -1,7 +1,5 @@
 class ProfileListBlock < Block
 
-  attr_accessible :prioritize_profiles_with_image
-
   settings_items :limit, :type => :integer, :default => 6
   settings_items :prioritize_profiles_with_image, :type => :boolean, :default => true
 

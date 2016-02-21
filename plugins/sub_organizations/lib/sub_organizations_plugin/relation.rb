@@ -8,8 +8,6 @@ class SubOrganizationsPlugin::Relation < ApplicationRecord
   validate :no_cyclical_reference, :if => 'parent.present? && child.present?'
   validate :no_multi_level, :if => 'parent.present? && child.present?'
 
-  attr_accessible :parent, :child
-
   def no_self_reference
     errors.add(:child, c_('self-reference is not allowed.')) if parent == child
   end

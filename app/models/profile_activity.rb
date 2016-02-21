@@ -2,9 +2,6 @@ class ProfileActivity < ApplicationRecord
 
   self.record_timestamps = false
 
-  attr_accessible :profile_id,
-    :profile, :activity
-
   belongs_to :profile
   belongs_to :activity, polymorphic: true
 

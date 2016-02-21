@@ -1,7 +1,5 @@
 class VideoPlugin::VideoBlock < Block
 
-  attr_accessible :url, :width, :height
-
   settings_items :url, :type => :string, :default => ""
   settings_items :width, :type => :integer, :default => 400
   settings_items :height, :type => :integer, :default => 315

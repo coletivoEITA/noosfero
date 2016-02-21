@@ -40,7 +40,8 @@ class ProfileRolesControllerTest < ActionController::TestCase
     community = fast_create(Community)
     admin = create_user_with_permission('admin_user', 'manage_custom_roles', community)
     login_as :admin_user
-    role = Role.create!({:name => 'delete_article', :key => 'profile_delete_article', :profile_id => community.id, :environment => Environment.default}, :without_protection => true)
+    role = Role.create! name: 'delete_article', key: 'profile_delete_article',
+      profile_id: community.id, environment: Environment.default
     post :remove , :profile => community.identifier, :id => role.id
 
     assert_response :redirect
@@ -53,7 +54,8 @@ class ProfileRolesControllerTest < ActionController::TestCase
     community = fast_create(Community)
     admin = create_user_with_permission('admin_user', 'manage_custom_roles', community)
     login_as :admin_user
-    role = Role.create!({:name => 'delete_article', :key => 'profile_delete_article', :profile_id => community.id, :environment => Environment.default}, :without_protection => true)
+    role = Role.create! name: 'delete_article', key: 'profile_delete_article',
+      profile_id: community.id, environment: Environment.default
     admin.add_role(role, community)
     moderator_role = Role.find_by(name: "moderator")
 
@@ -72,7 +74,8 @@ class ProfileRolesControllerTest < ActionController::TestCase
     community = fast_create(Community)
     admin = create_user_with_permission('admin_user', 'manage_custom_roles', community)
     login_as :admin_user
-    role = Role.create!({:name => 'delete_article', :key => 'profile_delete_article', :profile_id => community.id, :environment => Environment.default}, :without_protection => true)
+    role = Role.create! name: 'delete_article', key: 'profile_delete_article',
+      profile_id: community.id, environment: Environment.default
 
     assert_not_includes community.members_by_role(role), admin
 
@@ -86,7 +89,8 @@ class ProfileRolesControllerTest < ActionController::TestCase
     admin = create_user_with_permission('admin_user', 'manage_custom_roles', community)
     moderator = create_user_with_permission('profile_admin', 'edit_profile', community)
     login_as :admin_user
-    role = Role.create!({:name => 'delete_article', :key => 'profile_delete_article', :profile_id => community.id, :environment => Environment.default}, :without_protection => true)
+    role = Role.create! name: 'delete_article', key: 'profile_delete_article',
+      profile_id: community.id, environment: Environment.default
     moderator_role = Role.find_by(name: "moderator")
     admin.add_role(moderator_role, community)
 

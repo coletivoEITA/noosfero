@@ -1,7 +1,5 @@
 class HighlightsBlock < Block
 
-  attr_accessible :images, :interval, :shuffle, :navigation
-
   settings_items :images, :type => Array, :default => []
   settings_items :interval, :type => 'integer', :default => 4
   settings_items :shuffle, :type => 'boolean', :default => false

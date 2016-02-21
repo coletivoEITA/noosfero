@@ -1,7 +1,5 @@
 class ValidationInfo < ApplicationRecord
 
-  attr_accessible :validation_methodology, :restrictions, :organization
-
   belongs_to :organization
 
   validates_presence_of :organization

@@ -7,8 +7,6 @@ require 'sdbm'
 
 class UploadedFile < Article
 
-  attr_accessible :uploaded_data, :title
-
   def self.type_name
     _('File')
   end

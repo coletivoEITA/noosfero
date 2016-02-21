@@ -1,9 +1,9 @@
 class ToleranceTimePlugin::Publication < ApplicationRecord
 
   belongs_to :target, :polymorphic => true
+
   validates_presence_of :target_id, :target_type
   validates_uniqueness_of :target_id, :scope => :target_type
-  attr_accessible :target
 
   class << self
     def find_by_target(target)

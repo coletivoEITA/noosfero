@@ -1,7 +1,7 @@
 class MembersBlock < PeopleBlockBase
+
   settings_items :show_join_leave_button, :type => :boolean, :default => false
   settings_items :visible_role, :type => :string, :default => nil
-  attr_accessible :show_join_leave_button, :visible_role
 
   def self.description
     c_('Members')

@@ -1,5 +1,6 @@
 class EventPlugin::EventBlock < Block
-  attr_accessible :all_env_events, :limit, :future_only, :date_distance_limit
+
+  include DatesHelper
 
   settings_items :all_env_events, :type => :boolean, :default => false
   settings_items :limit, :type => :integer, :default => 4

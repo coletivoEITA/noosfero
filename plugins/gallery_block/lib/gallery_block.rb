@@ -1,7 +1,5 @@
 class GalleryBlock < Block
 
-  attr_accessible :gallery_id, :groups_of, :speed, :interval
-
   settings_items :gallery_id, :type => :integer
   settings_items :groups_of, :type => :integer, :default => 3
   settings_items :speed, :type => :integer, :default => 1000

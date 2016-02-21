@@ -1,7 +1,6 @@
 module Customizable
 
   def self.included(base)
-    base.attr_accessible :custom_values
     base.extend ClassMethods
   end
 

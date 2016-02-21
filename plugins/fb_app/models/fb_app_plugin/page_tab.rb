@@ -3,10 +3,6 @@ class FbAppPlugin::PageTab < ApplicationRecord
   # FIXME: rename table to match model
   self.table_name = :fb_app_plugin_page_tab_configs
 
-  attr_accessible :owner_profile, :profile_id, :page_id,
-    :config_type, :profile_ids, :query,
-    :title, :subtitle
-
   belongs_to :owner_profile, foreign_key: :profile_id, class_name: 'Profile'
 
   extend ActsAsHavingSettings::ClassMethods

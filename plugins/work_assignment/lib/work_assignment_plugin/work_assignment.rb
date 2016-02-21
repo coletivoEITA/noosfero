@@ -4,10 +4,6 @@ class WorkAssignmentPlugin::WorkAssignment < Folder
   settings_items :default_email, :type => :string, :default => ""
   settings_items :allow_visibility_edition, :type => :boolean, :default => false
 
-  attr_accessible :publish_submissions
-  attr_accessible :default_email
-  attr_accessible :allow_visibility_edition
-
   def self.icon_name(article = nil)
     'work-assignment'
   end
@@ -39,16 +35,13 @@ class WorkAssignmentPlugin::WorkAssignment < Folder
   end
 
   def find_or_create_author_folder(author)
-    children.find_by(slug: author.name.to_slug) || Folder.create!(
-                                                                {
-                                                                  :name => author.name,
-                                                                  :parent => self,
-                                                                  :profile => profile,
-                                                                  :author => author,
-                                                                  :published => publish_submissions,
-                                                                },
-                                                                :without_protection => true
-                                                  )
+    children.find_by_slug(author.name.to_slug) || Folder.create!(
+      name:      author.name,
+      parent:    self,
+      profile:   profile,
+      author:    author,
+      published: publish_submissions,
+    )
   end
 
   def submissions

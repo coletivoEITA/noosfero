@@ -18,7 +18,6 @@ RoleAssignment.table_name = 'access_control_test_role_assignments'
 class AccessControlTestAccessor < ActiveRecord::Base
   self.table_name = 'access_control_test_accessors'
   acts_as_accessor
-  attr_accessible :name
   def cache_keys(arg)
     []
   end
@@ -32,8 +31,6 @@ class AccessControlTestResource < ActiveRecord::Base
   self.table_name = 'access_control_test_resources'
   acts_as_accessible
   PERMISSIONS[self.class.name] = {'bla' => N_('Bla')}
-
-  attr_accessible :name
 end
 
 # controller to test protection

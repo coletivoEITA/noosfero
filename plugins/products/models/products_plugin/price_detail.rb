@@ -2,9 +2,6 @@ class ProductsPlugin::PriceDetail < ApplicationRecord
 
   self.table_name = :price_details
 
-  attr_accessible :price, :production_cost_id
-  attr_accessible :production_cost
-
   belongs_to :product
   validates_presence_of :product_id
 

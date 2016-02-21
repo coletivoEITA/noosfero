@@ -2,8 +2,6 @@ class SuppliersPlugin::Supplier < ApplicationRecord
 
   attr_accessor :distribute_products_on_create, :dont_destroy_dummy, :identifier_from_name
 
-  attr_accessible :profile_id, :profile, :consumer, :consumer_id, :name, :name_abbreviation, :description
-
   belongs_to :profile
   belongs_to :consumer, class_name: 'Profile'
   alias_method :supplier, :profile

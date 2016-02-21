@@ -2,8 +2,6 @@ class LinkListBlock < Block
 
   include SanitizeHelper
 
-  attr_accessible :links
-
   ICONS = [
     ['no-icon', _('(No icon)')],
     ['edit', N_('Edit')],

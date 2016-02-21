@@ -1,10 +1,5 @@
 class SuppliersPlugin::DistributedProduct < SuppliersPlugin::BaseProduct
 
-  attr_accessible :from_products
-
-  # missed from lib/ext/product.rb because of STI
-  attr_accessible :external_id, :price_details
-
   validates_presence_of :supplier
 
   def supplier_price

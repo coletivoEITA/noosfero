@@ -6,8 +6,6 @@ class SpaminatorPlugin::Report < ApplicationRecord
 
   validates_presence_of :environment
 
-  attr_accessible :environment
-
   scope :from_environment, -> environment { where :environment_id => environment }
 
   after_initialize do |report|

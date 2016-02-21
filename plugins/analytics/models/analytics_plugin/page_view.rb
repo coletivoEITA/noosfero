@@ -2,11 +2,7 @@ class AnalyticsPlugin::PageView < ApplicationRecord
 
   serialize :data
 
-  attr_accessible *self.column_names
-  attr_accessible :user, :profile
-
   attr_accessor :request
-  attr_accessible :request
 
   extend ActsAsHavingSettings::ClassMethods
   acts_as_having_settings field: :options

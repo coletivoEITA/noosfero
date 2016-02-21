@@ -14,8 +14,6 @@ class CustomFormsPlugin::Form < ApplicationRecord
   validate :period_range, :if => Proc.new { |f| f.begining.present? && f.ending.present? }
   validate :access_format
 
-  attr_accessible :name, :profile, :for_admission, :access, :begining, :ending, :description, :fields_attributes, :profile_id, :on_membership
-
   before_validation do |form|
     form.slug = form.name.to_slug if form.name.present?
     form.access = nil if form.access.blank?

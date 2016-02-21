@@ -2,13 +2,6 @@ require_dependency 'profile'
 # hate to wrte this, but without Noosfero::Plugin::Settings is loaded instead
 require 'fb_app_plugin/settings'
 
-# attr_accessible must be defined on subclasses
-Profile.descendants.each do |subclass|
-  subclass.class_eval do
-    attr_accessible :fb_app_settings
-  end
-end
-
 class Profile
 
   def fb_app_settings attrs = {}

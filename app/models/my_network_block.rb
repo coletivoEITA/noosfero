@@ -1,7 +1,5 @@
 class MyNetworkBlock < Block
 
-  attr_accessible :display, :box
-
   def self.description
     _('My network')
   end

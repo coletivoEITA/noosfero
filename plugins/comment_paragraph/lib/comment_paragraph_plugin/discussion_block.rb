@@ -4,8 +4,6 @@ class CommentParagraphPlugin::DiscussionBlock < Block
   settings_items :total_items, :type => Integer, :default => 5
   settings_items :discussion_status, :type => Integer
 
-  attr_accessible :presentation_mode, :total_items, :discussion_status
-
   VALID_CONTENT = ['CommentParagraphPlugin::Discussion']
 
   STATUS_NOT_OPENED = 0

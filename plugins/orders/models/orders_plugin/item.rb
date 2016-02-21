@@ -1,9 +1,5 @@
 class OrdersPlugin::Item < ApplicationRecord
 
-  attr_accessible :order, :sale, :purchase,
-    :product, :product_id,
-    :price, :name
-
   # flag used by items to compare them with products
   attr_accessor :product_diff
 
@@ -28,9 +24,6 @@ class OrdersPlugin::Item < ApplicationRecord
   StatusDataMap.each do |status, data|
     quantity = "quantity_#{data}".to_sym
     price = "price_#{data}".to_sym
-
-    attr_accessible quantity
-    attr_accessible price
   end
 
   serialize :data

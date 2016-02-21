@@ -15,7 +15,7 @@ Given /^the following users?$/ do |table|
 end
 
 Given /^"(.+)" is (invisible|visible)$/ do |user, visibility|
-  User.find_by(login: user).person.update({visible: (visibility == 'visible')}, without_protection: true)
+  User.find_by(login: user).person.update visible: (visibility == 'visible')
 end
 
 Given /^"(.+)" is (online|offline|busy) in chat$/ do |user, status|
@@ -31,7 +31,7 @@ Given /^the following (community|communities|enterprises?|organizations?)$/ do |
     category = row.delete("category")
     img_name = row.delete("img")
     city = row.delete("region")
-    organization = klass.create!(row, :without_protection => true)
+    organization = klass.create! row
     if owner
       organization.add_admin(Profile[owner])
     end
@@ -194,9 +194,9 @@ Given /^the following states$/ do |table|
   table.hashes.each do |item|
     data = item.dup
     if validator = Enterprise.find_by(name: data.delete("validator_name"))
-      State.create!(data.merge(:environment => Environment.default, :validators => [validator]), :without_protection => true)
+      State.create! data.merge(environment: Environment.default, validators: [validator])
     else
-      r = State.create!(data.merge(:environment => Environment.default))
+      State.create! data.merge(environment: Environment.default)
     end
   end
 end
@@ -441,7 +441,7 @@ end
 
 Given /^the following units?$/ do |table|
   table.hashes.each do |row|
-    Unit.create!(row.merge(:environment_id => 1), :without_protection => true)
+    Unit.create! row.merge(environment_id: 1)
   end
 end
 

@@ -14,7 +14,6 @@ class PushNotificationPlugin::NotificationSettings < ApplicationRecord
   }
 
   belongs_to :user
-  attr_accessible :user, :notifications
 
   def self.default_hash_flags
     default_hash_flags = {}

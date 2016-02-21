@@ -1,9 +1,6 @@
 # Represents any organization of the system
 class Organization < Profile
 
-  attr_accessible :moderated_articles, :foundation_year, :contact_person, :acronym, :legal_form, :economic_activity, :management_information, :cnpj, :display_name, :enable_contact_us
-  attr_accessible :requires_email
-
   settings_items :requires_email, type: :boolean
   alias_method :requires_email?, :requires_email
 

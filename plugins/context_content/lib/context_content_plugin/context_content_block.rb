@@ -7,8 +7,6 @@ class ContextContentPlugin::ContextContentBlock < Block
   settings_items :types, :type => Array, :default => ['UploadedFile']
   settings_items :limit, :type => :integer, :default => 6
 
-  attr_accessible :show_image, :show_name, :use_parent_title, :show_parent_content, :types
-
   alias :profile :owner
 
   include Noosfero::Plugin::HotSpot

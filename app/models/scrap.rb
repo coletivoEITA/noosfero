@@ -2,8 +2,6 @@ class Scrap < ApplicationRecord
 
   include SanitizeHelper
 
-  attr_accessible :content, :sender_id, :receiver_id, :scrap_id
-
   SEARCHABLE_FIELDS = {
     :content => {:label => _('Content'), :weight => 1},
   }

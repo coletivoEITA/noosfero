@@ -1,7 +1,5 @@
 class SuppliersPlugin::SourceProduct < ApplicationRecord
 
-  attr_accessible :from_product, :to_product, :quantity
-
   default_scope -> { includes :from_product, :to_product }
 
   belongs_to :from_product, class_name: 'Product'

@@ -2,8 +2,6 @@ require 'noosfero/multi_tenancy'
 
 class Domain < ApplicationRecord
 
-  attr_accessible :name, :owner, :is_default
-
   # relationships
   ###############
 

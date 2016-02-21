@@ -15,8 +15,6 @@ class VideoPlugin::Video < Article
   settings_items :video_thumbnail_height, :type=> :integer, :default => 210
   settings_items :video_duration, :type=> :integer, :default => 0
 
-  attr_accessible :video_url
-
   before_save :fill_video_properties
 
   def self.type_name

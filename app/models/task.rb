@@ -42,8 +42,6 @@ class Task < ApplicationRecord
   validates_uniqueness_of :code, :on => :create
   validates_presence_of :code
 
-  attr_protected :status
-
   settings_items :email_template_id, :type => :integer
 
   def initialize(*args)

@@ -2,8 +2,6 @@ class EmailTemplate < ApplicationRecord
 
   belongs_to :owner, :polymorphic => true
 
-  attr_accessible :template_type, :subject, :body, :owner, :name
-
   validates_presence_of :name
 
   validates :name, uniqueness: { scope: [:owner_type, :owner_id] }

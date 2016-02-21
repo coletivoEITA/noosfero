@@ -1,7 +1,5 @@
 class Blog < Folder
 
-  attr_accessible :visualization_format
-
   extend ActsAsHavingPosts::ClassMethods
   acts_as_having_posts
 
@@ -57,7 +55,7 @@ class Blog < Folder
       if self.external_feed(true) && self.external_feed.id == self.external_feed_data[:id].to_i
         self.external_feed.attributes = self.external_feed_data.except(:id)
       else
-        self.build_external_feed(self.external_feed_data, :without_protection => true)
+        self.build_external_feed self.external_feed_data
       end
       self.external_feed.valid?
       self.external_feed.errors.delete(:blog_id) # dont validate here relation: external_feed <-> blog

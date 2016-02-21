@@ -2,8 +2,6 @@ class RelatedOrganizationsBlock < ProfileListBlock
 
   settings_items :organization_type, :type => :string, :default => 'both'
 
-  attr_accessible :organization_type
-
   def self.description
     _("Related Organizations")
   end

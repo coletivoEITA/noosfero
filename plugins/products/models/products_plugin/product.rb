@@ -19,9 +19,6 @@ class ProductsPlugin::Product < ApplicationRecord
     display: %w[full map]
   }
 
-  attr_accessible :name, :product_category, :profile, :profile_id, :enterprise,
-    :highlighted, :price, :image_builder, :description, :available, :qualifiers, :unit_id, :discount, :inputs, :qualifiers_list
-
   def self.default_search_display
     'full'
   end

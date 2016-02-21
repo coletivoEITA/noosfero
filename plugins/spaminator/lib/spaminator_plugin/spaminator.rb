@@ -29,10 +29,9 @@ class SpaminatorPlugin::Spaminator
   def initialize(environment)
     @environment = environment
     @settings = Noosfero::Plugin::Settings.new(@environment, SpaminatorPlugin)
-    @report = SpaminatorPlugin::Report.new({:environment => environment,
-                                           :total_people => Person.count,
-                                           :total_comments => Comment.count},
-                                           :without_protection => true)
+    @report = SpaminatorPlugin::Report.new environment: environment,
+      total_people: Person.count, total_comments: Comment.count
+
     self.class.initialize_logger(environment)
   end
 

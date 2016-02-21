@@ -6,9 +6,6 @@ class CreateOrganizationRatingComment < Task
   settings_items :organization_rating_id, :type => Integer, :default => nil
   settings_items :organization_rating_comment_id, :type => Integer, :default => nil
 
-  attr_accessible :organization_rating_id, :body, :requestor
-  attr_accessible :reject_explanation, :target
-
   DATA_FIELDS = ['body']
   DATA_FIELDS.each do |field|
     settings_items field.to_sym

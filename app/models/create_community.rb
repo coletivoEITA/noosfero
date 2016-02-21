@@ -9,20 +9,15 @@ class CreateCommunity < Task
   alias :environment :target
   alias :environment= :target=
 
-  attr_accessible :environment, :requestor, :target
-  attr_accessible :reject_explanation, :template_id
-
   extend ActsAsHavingImage::ClassMethods
   acts_as_having_image
 
   DATA_FIELDS = Community.fields + ['name', 'closed', 'description']
   DATA_FIELDS.each do |field|
     settings_items field.to_sym
-    attr_accessible field.to_sym
   end
 
   settings_items :custom_values
-  attr_accessible :custom_values
 
   def validate
     self.environment.required_community_fields.each do |field|

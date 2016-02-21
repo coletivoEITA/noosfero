@@ -2,8 +2,6 @@ require 'builder'
 
 class Event < Article
 
-  attr_accessible :start_date, :end_date, :link, :address
-
   def self.type_name
     _('Event')
   end

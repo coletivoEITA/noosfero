@@ -1,7 +1,5 @@
 class FavoriteEnterprisePerson < ApplicationRecord
 
-  attr_accessible :person, :enterprise
-
   track_actions :favorite_enterprise, :after_create, keep_params: [:enterprise_name, :enterprise_url], if: proc{ |f| f.is_trackable? }
 
   belongs_to :enterprise

@@ -1,7 +1,5 @@
 class LinkArticle < Article
 
-  attr_accessible :reference_article
-
   def self.short_description
     "Article link"
   end

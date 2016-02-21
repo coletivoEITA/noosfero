@@ -4,8 +4,6 @@ class ProductsPlugin::Unit < ApplicationRecord
 
   acts_as_list scope: -> unit { where environment_id: unit.environment_id }
 
-  attr_accessible :name, :singular, :plural, :environment
-
   belongs_to :environment
 
   validates_presence_of :environment_id

@@ -4,8 +4,6 @@ class SiteTourPlugin::TourBlock < Block
   settings_items :group_triggers, :type => Array, :default => []
   settings_items :display_button, :type => :boolean, :default => true
 
-  attr_accessible :actions, :display_button, :group_triggers
-
   before_save do |block|
     block.actions.reject! {|i| i[:group_name].blank? && i[:selector].blank? && i[:description].blank?}
     block.group_triggers.reject! {|i| i[:group_name].blank? && i[:selector].blank?}

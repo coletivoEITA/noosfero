@@ -3,20 +3,6 @@
 # domains.
 class Environment < ApplicationRecord
 
-  attr_accessible :name, :is_default, :signup_welcome_text_subject,
-                  :signup_welcome_text_body, :terms_of_use,
-                  :message_for_disabled_enterprise, :news_amount_by_folder,
-                  :default_language, :languages, :description,
-                  :organization_approval_method, :enabled_plugins,
-                  :enabled_features, :redirection_after_login,
-                  :redirection_after_signup, :contact_email, :theme,
-                  :reports_lower_bound, :noreply_email,
-                  :signup_welcome_screen_body, :members_whitelist_enabled,
-                  :members_whitelist, :highlighted_news_amount,
-                  :portal_news_amount, :date_format, :signup_intro,
-                  :enable_feed_proxy, :http_feed_proxy, :https_feed_proxy,
-                  :disable_feed_ssl
-
   has_many :users
 
   # allow roles use

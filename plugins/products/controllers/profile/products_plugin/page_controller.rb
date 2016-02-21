@@ -69,7 +69,7 @@ module ProductsPlugin
       @edit = true
       @level = @category.level
       if request.post?
-        if @product.update({product_category_id: params[:selected_category_id]}, without_protection: true)
+        if @product.update product_category_id: params[:selected_category_id]
           render partial: 'shared/redirect_via_javascript',
             locals: { url: url_for(controller: 'products_plugin/page', action: 'show', id: @product) }
         else

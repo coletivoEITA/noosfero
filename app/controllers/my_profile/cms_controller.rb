@@ -202,14 +202,11 @@ class CmsController < MyProfileController
       params[:uploaded_files].each do |file|
         unless file == ''
           @uploaded_files << UploadedFile.create(
-            {
-              :uploaded_data => file,
-              :profile => profile,
-              :parent => @parent,
-              :last_changed_by => user,
-              :author => user,
-            },
-            :without_protection => true
+            uploaded_data:   file,
+            profile:         profile,
+            parent:          @parent,
+            last_changed_by: user,
+            author:          user,
           )
         end
       end

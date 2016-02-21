@@ -2,8 +2,6 @@ class ProductsPlugin::Qualifier < ApplicationRecord
 
   self.table_name = :qualifiers
 
-  attr_accessible :name, :environment
-
   SEARCHABLE_FIELDS = {
     :name => {:label => _('Name'), :weight => 1},
   }

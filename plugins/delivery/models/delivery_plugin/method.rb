@@ -7,9 +7,6 @@ class DeliveryPlugin::Method < ApplicationRecord
     address address_line2 address_reference district city state country_name zip_code
   ].map(&:to_sym)
 
-  attr_accessible :profile, :delivery_type, :name, :description,
-    :fixed_cost, :free_over_price, :distribution_margin_percentage, :distribution_margin_fixed
-
   belongs_to :profile
 
   has_many :delivery_options, class_name: 'DeliveryPlugin::Option', foreign_key: :delivery_method_id, dependent: :destroy

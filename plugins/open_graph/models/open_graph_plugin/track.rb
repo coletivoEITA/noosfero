@@ -3,10 +3,6 @@ class OpenGraphPlugin::Track < ApplicationRecord
   class_attribute :context
   self.context = :open_graph
 
-  attr_accessible :type, :context, :tracker_id, :tracker, :actor_id, :action,
-    :object_type, :object_data_id, :object_data_type, :object_data_url,
-    :story, :object_data, :actor
-
   belongs_to :tracker, class_name: 'Profile'
   belongs_to :actor, class_name: 'Profile'
   belongs_to :object_data, polymorphic: true

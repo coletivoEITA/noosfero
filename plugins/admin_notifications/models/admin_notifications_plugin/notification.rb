@@ -9,8 +9,6 @@ class AdminNotificationsPlugin::Notification < ApplicationRecord
     "AdminNotificationsPlugin::DangerNotification"
   ]
 
-  attr_accessible :message, :target_id, :active, :type, :display_only_in_homepage, :display_to_all_users, :display_popup, :title, :target
-
   has_many :notifications_users, :class_name => "AdminNotificationsPlugin::NotificationsUser"
   has_many :users, :through => :notifications_users
 

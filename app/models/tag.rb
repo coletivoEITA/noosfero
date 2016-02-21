@@ -1,8 +1,6 @@
 Tag = ActsAsTaggableOn::Tag
 class Tag
 
-  attr_accessible :name, :parent_id, :pending
-
   has_many :children, class_name: 'Tag', foreign_key: 'parent_id', dependent: :destroy
 
   @@original_find = self.method(:find)

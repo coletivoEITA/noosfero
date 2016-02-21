@@ -49,7 +49,6 @@ gem 'sass-rails'
 gem 'sprockets-rails', '~> 2.1'
 
 # gems to enable rails3 behaviour
-gem 'protected_attributes'
 gem 'rails-observers', github: 'rails/rails-observers'
 gem 'actionpack-page_caching'
 gem 'actionpack-action_caching'

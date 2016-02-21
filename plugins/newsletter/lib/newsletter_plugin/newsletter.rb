@@ -9,8 +9,6 @@ class NewsletterPlugin::Newsletter < ApplicationRecord
   validates_numericality_of :periodicity, only_integer: true, greater_than: -1, message: _('must be a positive number')
   validates_numericality_of :posts_per_blog, only_integer: true, greater_than: -1, message: _('must be a positive number')
 
-  attr_accessible :environment, :enabled, :periodicity, :subject, :posts_per_blog, :footer, :blog_ids, :additional_recipients, :person, :person_id, :moderated
-
   scope :enabled, -> { where enabled: true }
 
   # These methods are used by NewsletterMailing

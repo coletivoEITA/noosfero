@@ -10,8 +10,6 @@ class ExternalFeed < ApplicationRecord
     where '(fetched_at is NULL) OR (fetched_at < ?)', Time.now - FeedUpdater.update_interval
   }
 
-  attr_accessible :address, :enabled, :only_once
-
   delegate :environment, :to => :blog, :allow_nil => true
 
   def add_item(title, link, date, content)

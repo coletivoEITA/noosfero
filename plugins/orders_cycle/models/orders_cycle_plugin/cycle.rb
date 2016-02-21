@@ -1,10 +1,5 @@
 class OrdersCyclePlugin::Cycle < ApplicationRecord
 
-  attr_accessible :profile, :status, :name, :description, :opening_message
-
-  attr_accessible :start, :finish, :delivery_start, :delivery_finish
-  attr_accessible :start_date, :start_time, :finish_date, :finish_time, :delivery_start_date, :delivery_start_time, :delivery_finish_date, :delivery_finish_time,
-
   Statuses = %w[edition orders purchases receipts separation delivery closing]
   DbStatuses = %w[new] + Statuses
   UserStatuses = Statuses
@@ -72,7 +67,6 @@ class OrdersCyclePlugin::Cycle < ApplicationRecord
 
   has_many :volunteers_periods, class_name: 'VolunteersPlugin::Period', as: :owner
   has_many :volunteers, through: :volunteers_periods, source: :profile
-  attr_accessible :volunteers_periods_attributes
   accepts_nested_attributes_for :volunteers_periods, allow_destroy: true
 
   scope :has_volunteers_periods, -> { distinct.joins :volunteers_periods }

@@ -40,9 +40,6 @@ class OrdersPlugin::Order < ApplicationRecord
     supplier: StatusAccessMap.map{ |s, a| s if a == :supplier }.compact,
   }
 
-  attr_accessible :status, :consumer, :profile,
-    :supplier_delivery_id, :consumer_delivery_id, :supplier_delivery_data, :consumer_delivery_data
-
   belongs_to :profile
   # may be override by subclasses
   belongs_to :supplier, foreign_key: :profile_id, class_name: 'Profile'

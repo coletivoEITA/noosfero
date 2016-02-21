@@ -1,7 +1,5 @@
 class DrivenSignupPlugin::Auth < ApplicationRecord
 
-  attr_accessible :name, :token
-
   belongs_to :environment
 
   validates_presence_of :environment

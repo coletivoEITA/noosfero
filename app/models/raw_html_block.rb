@@ -10,8 +10,6 @@ class RawHTMLBlock < Block
 
   settings_items :html, :type => :text
 
-  attr_accessible :html
-
   def has_macro?
     true
   end

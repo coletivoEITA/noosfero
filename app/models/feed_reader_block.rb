@@ -1,7 +1,5 @@
 class FeedReaderBlock < Block
 
-  attr_accessible :address, :update_errors
-
   def initialize(attributes = nil, options = {})
     data = attributes || {}
     super(data)

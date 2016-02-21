@@ -6,8 +6,6 @@ class CustomFormsPlugin::Answer < ApplicationRecord
   validates_presence_of :field
   validate :value_mandatory, :if => 'field.present?'
 
-  attr_accessible :field, :value, :submission
-
   def value_mandatory
     if field.mandatory && value.blank?
       errors.add(:value, _("is mandatory.").fix_i18n)

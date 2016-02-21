@@ -5,6 +5,5 @@ class CustomFormsPlugin::Alternative < ApplicationRecord
 
   belongs_to :field, :class_name => 'CustomFormsPlugin::Field'
 
-  attr_accessible :label, :field, :position, :selected_by_default
 end
 

@@ -3,10 +3,6 @@ require File.dirname(__FILE__) + '/test_helper'
 
 class ActAsAccessorTest < Test::Unit::TestCase
 
-  def setup
-    RoleAssignment.attr_accessible :accessor
-  end
-
   def test_can_have_role_in_respect_to_an_resource
     res = AccessControlTestResource.create!(:name => 'bla')
     a = AccessControlTestAccessor.create!(:name => 'ze')
@@ -57,7 +53,7 @@ class ActAsAccessorTest < Test::Unit::TestCase
     a = AccessControlTestAccessor.create!(:name => 'ze')
     role = Role.create!(:name => 'an_author', :permissions => ['bli'])
 
-    assert !a.role_assignments.map{|ra|[ra.role, ra.accessor, ra.resource]}.include?([role, a, res]) 
+    assert !a.role_assignments.map{|ra|[ra.role, ra.accessor, ra.resource]}.include?([role, a, res])
     assert !a.remove_role(role, res)
   end
 

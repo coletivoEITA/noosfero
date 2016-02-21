@@ -5,8 +5,6 @@ class RecentContentBlock < Block
   settings_items :show_blog_picture, :type => :boolean, :default => false
   settings_items :selected_folder, :type => Integer
 
-  attr_accessible :presentation_mode, :total_items, :show_blog_picture, :selected_folder
-
   VALID_CONTENT = ['RawHTMLArticle', 'TextArticle', 'TextileArticle', 'TinyMceArticle']
 
   def self.description

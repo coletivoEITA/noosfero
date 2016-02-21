@@ -1,6 +1,5 @@
 module ActionTracker
   class Record < ActiveRecord::Base
-    attr_accessible :verb, :params, :user, :target
 
     self.table_name = 'action_tracker'
 
