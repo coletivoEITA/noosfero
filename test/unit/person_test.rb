@@ -1005,7 +1005,7 @@ class PersonTest < ActiveSupport::TestCase
 
   should 'track only one action when a person joins a community' do
     ActionTracker::Record.delete_all
-    p = create_user('test_user').person
+    p = (User.current=create_user('test_user')).person
     c = fast_create(Community, :name => "Foo")
     c.add_member(p)
     assert_equal ["Foo"], ActionTracker::Record.where(verb: 'join_community').last.get_resource_name
@@ -1283,7 +1283,7 @@ class PersonTest < ActiveSupport::TestCase
     profile = fast_create(Profile)
     profile.add_admin(admin)
 
-    assert admin.has_permission?('anything', profile), 'Admin does not have every permission!'
+    assert admin.has_permission?('manage_environment_users', profile), 'Admin does not have every permission!'
   end
 
   should 'grant every permission over profile for environment admin' do
@@ -1292,7 +1292,7 @@ class PersonTest < ActiveSupport::TestCase
     environment = profile.environment
     environment.add_admin(admin)
 
-    assert admin.has_permission?('anything', profile), 'Environment admin does not have every permission!'
+    assert admin.has_permission?('manage_environment_users', profile), 'Environment admin does not have every permission!'
   end
 
   should 'allow plugins to extend person\'s permission access' do

@@ -21,7 +21,7 @@ class Person < Profile
     joins << :user if User.attribute_names.include? field
 
     conditions = resources.map {|resource| "role_assignments.resource_type = '#{resource.class.base_class.name}' AND role_assignments.resource_id = #{resource.id || -1}"}.join(' OR ')
-    distinct.select('profiles.*').joins(joins).where([conditions])
+    distinct.select('profiles.*').joins(joins).where(conditions)
   }
 
   scope :not_members_of, -> resources {

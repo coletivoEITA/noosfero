@@ -1,5 +1,7 @@
 require 'noosfero/i18n'
 require 'action_tracker_config'
+require 'notify_activity_to_profiles_job'
+require 'activities_counter_cache_job'
 
 # ActionTracker plugin stuff
 
