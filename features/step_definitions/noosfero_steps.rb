@@ -659,9 +659,7 @@ When /^wait for the captcha signup time$/ do
 end
 
 Given /^there are no pending jobs$/ do
-  silence_stream(STDOUT) do
-    Delayed::Worker.new.work_off
-  end
+  Delayed::Worker.new.work_off
 end
 
 Given /^the field (.*) is public for all users$/ do |field|

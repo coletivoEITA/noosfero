@@ -175,9 +175,7 @@ class ActiveSupport::TestCase
   end
 
   def process_delayed_job_queue
-    silence_stream STDOUT do
-      Delayed::Worker.new.work_off
-    end
+    Delayed::Worker.new.work_off
   end
 
   def uses_postgresql(schema_name = 'test_schema')
