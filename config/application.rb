@@ -107,11 +107,10 @@ module Noosfero
     }
     config.session_store :active_record_store, key: '_noosfero_session'
 
-    root = Rails::Paths::Root.new Rails.root
-    #require'pry';binding.pry
     Dir["{baseplugins,config/plugins}/*/db/migrate"].each do |dir|
-      config.paths['db/migrate'] << root.add(dir)
+      config.paths['db/migrate'] << dir
     end
+    root = Rails::Paths::Root.new Rails.root
     Dir["{baseplugins,config/plugins}/*/locales/*.{rb,yml}"].each do |dir|
       config.i18n.load_path << root.add(dir)
     end
