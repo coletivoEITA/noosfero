@@ -32,6 +32,7 @@ addons:
 before_install:
   - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
   - gem install bundler
+  - "/sbin/start-stop-daemon --start --quiet --pidsidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 cache: bundler
 
 before_script:
