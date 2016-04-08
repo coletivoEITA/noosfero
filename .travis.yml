@@ -6,10 +6,10 @@ notifications:
     template:
       - "%{repository_slug} %{branch} %{commit} %{commit_subject} - %{result} %{build_url}"
 
-#dist: trusty
+dist: trusty
 language: ruby
 rvm:
-  - 2.2
+  - 2.2.3
   # ruby 2.3 works but isn't stable on travis
 
 addons:
