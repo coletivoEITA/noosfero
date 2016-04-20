@@ -29,11 +29,6 @@ addons:
     paths:
       - $(ls tmp/artifact* | tr "\n" ":")
 
-# workaround for https://github.com/travis-ci/travis-ci/issues/4536
-before_install:
-  - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
-  - gem install bundler
-
 before_script:
   - mkdir -p tmp/{pids,cache} log cache
   - script/noosfero-plugins disableall

@@ -112,11 +112,11 @@ end
 
 def run_minitest files
   files = files.map{|f| File.join(Rails.root, f)}
-  sh 'ruby', '-Itest', '-e ARGV.each{|f| require f}', *files
+  sh 'bundle', 'exec', 'ruby', '-Itest', '-e ARGV.each{|f| require f}', *files
 end
 
 def run_cucumber(profile, files)
-  sh 'xvfb-run', '-a', 'ruby', '-S', 'cucumber', '--profile', profile.to_s, '--format', ENV['CUCUMBER_FORMAT'] || 'progress' , *files
+  sh 'xvfb-run', '-a', 'bundle', 'exec', 'ruby', '-S', 'cucumber', '--profile', profile.to_s, '--format', ENV['CUCUMBER_FORMAT'] || 'progress' , *files
 end
 
 def custom_run(name, files, run=:all)
