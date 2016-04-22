@@ -1,3 +1,5 @@
+require 'rake/testtask'
+
 namespace :test do
   desc "Run the API tests in test/api"
   Rake::TestTask.new api: "db:test:prepare" do |t|
