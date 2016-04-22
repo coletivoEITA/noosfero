@@ -9,7 +9,7 @@ platform :jruby do
   gem 'rmagick4j'
 end
 
-gem 'rails', '5.0.0.beta2'
+gem 'rails', '5.0.0.beta3'
 gem 'fast_gettext',             '~> 0.9'
 gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on'
 gem 'rails_autolink',           '~> 1.1.5'
