@@ -7,8 +7,6 @@ class AccountControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @controller = AccountController.new
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
 
     e = Environment.default
     e.enable 'skip_new_user_email_confirmation', true
